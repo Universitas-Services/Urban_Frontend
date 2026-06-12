@@ -1,7 +1,7 @@
 'use client';
 
-import { useChat } from '@/store/chat.context';
-import { useAuth } from '@/store/auth.context';
+import { useChatStore } from '@/store/chat.store';
+import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
 import { MessageSquare, Settings, LogOut, Menu, X, User, Headset, HelpCircle } from 'lucide-react';
 import { IoMdBook, IoMdInformationCircleOutline } from 'react-icons/io';
@@ -29,8 +29,9 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 export function Sidebar() {
-    const { isSidebarOpen, dispatch, conversations, activeConversationId } = useChat();
-    const { user, logout } = useAuth();
+    const { isSidebarOpen, toggleSidebar, conversations, activeConversationId, startNewChat, selectConversation } =
+        useChatStore();
+    const { user, logout } = useAuthStore();
     const router = useRouter();
     const [isMobile, setIsMobile] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
@@ -44,9 +45,8 @@ export function Sidebar() {
         return () => window.removeEventListener('resize', checkViewport);
     }, []);
 
-    const toggleSidebar = () => dispatch({ type: 'TOGGLE_SIDEBAR' });
     const handleNewChat = () => {
-        dispatch({ type: 'SET_ACTIVE', payload: null });
+        startNewChat();
         if (isMobile) toggleSidebar();
         router.push('/chat');
     };
@@ -62,7 +62,7 @@ export function Sidebar() {
             {/* Header */}
             <div className={cn('flex items-center h-[60px] shrink-0', expanded ? 'p-4' : 'justify-center w-full')}>
                 <button
-                    onClick={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
+                    onClick={toggleSidebar}
                     className={cn(
                         'flex items-center justify-center rounded-md hover:bg-surface-soft/10 transition-colors text-on-primary shrink-0',
                         expanded ? 'p-2 mr-2' : 'w-10 h-10'
@@ -334,7 +334,7 @@ export function Sidebar() {
                                                     <div
                                                         key={conv.id}
                                                         onClick={() => {
-                                                            dispatch({ type: 'SET_ACTIVE', payload: conv.id });
+                                                            void selectConversation(conv.id);
                                                             if (isMobile) toggleSidebar();
                                                             router.push('/chat');
                                                         }}

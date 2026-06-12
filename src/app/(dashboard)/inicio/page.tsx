@@ -18,7 +18,7 @@ export default function InicioPage() {
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-[var(--color-dashboard-bg)]">
+        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
             {/* Contenedor principal — se centra verticalmente y permite scroll si no cabe */}
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* ── Card 1: ¿Qué es la Plataforma GIRS? ── */}
@@ -26,7 +26,7 @@ export default function InicioPage() {
                     <h1 className="titulos-cards mb-0 tracking-tight leading-tight mb-2">
                         ¿Qué es la Plataforma GIRS?
                     </h1>
-                    <p className="text-xs md:text-[0.8rem] font-semibold italic text-[var(--color-btn-green)] mb-2 leading-snug">
+                    <p className="text-xs md:text-[0.8rem] font-semibold italic text-(--color-btn-green) mb-2 leading-snug">
                         Tu infraestructura jurídica y técnica para la Gestión Integral de Residuos Sólidos (GIRS)
                     </p>
                     <p className="descripcion-cards leading-snug">

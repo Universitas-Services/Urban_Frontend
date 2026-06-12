@@ -155,11 +155,11 @@ const BASE_CARDS: LegalCardData[] = [
 
 export default function RepositorioLegalPage() {
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-[var(--color-dashboard-bg)]">
+        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* ── Card de Información ── */}
                 <div className="rounded-xl bg-white border border-gray-200/70 shadow-sm p-6 md:p-8 flex flex-col gap-4">
-                    <div className="flex items-center gap-2 text-[var(--color-icon-green)] etiquetas font-bold">
+                    <div className="flex items-center gap-2 text-(--color-icon-green) etiquetas font-bold">
                         <FaBalanceScale size={18} />
                         <span>Base de Conocimiento</span>
                     </div>
@@ -204,8 +204,8 @@ export default function RepositorioLegalPage() {
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute -left-10 md:-left-16 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/40 hover:bg-white" />
-                        <CarouselNext className="absolute -right-10 md:-right-16 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/40 hover:bg-white" />
+                        <CarouselPrevious className="absolute -left-10 md:-left-16 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-primary hover:border-primary/40 hover:bg-white" />
+                        <CarouselNext className="absolute -right-10 md:-right-16 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-primary hover:border-primary/40 hover:bg-white" />
                     </Carousel>
                 </div>
             </div>

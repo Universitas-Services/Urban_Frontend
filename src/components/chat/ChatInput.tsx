@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { useChat } from '@/store/chat.context';
+import { useChatStore } from '@/store/chat.store';
 
 export function ChatInput({
     onSendMessage,
@@ -15,7 +15,7 @@ export function ChatInput({
 }) {
     const [content, setContent] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { isSending } = useChat();
+    const { isSending } = useChatStore();
 
     const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setContent(e.target.value);
@@ -54,7 +54,7 @@ export function ChatInput({
         return (
             <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col items-center pb-6">
                 <div className="w-full max-w-3xl px-4 mx-auto">
-                    <div className="relative bg-white border border-surface-soft/60 rounded-full flex items-center min-h-[56px] pl-4 pr-2">
+                    <div className="relative bg-white border border-surface-soft/60 rounded-full flex items-center min-h-14 pl-4 pr-2">
                         <textarea
                             ref={textareaRef}
                             value={content}
@@ -62,7 +62,7 @@ export function ChatInput({
                             onKeyDown={handleKeyDown}
                             placeholder="Escribe un mensaje..."
                             disabled={isSending}
-                            className="flex-1 bg-transparent border-none focus:outline-none outline-none focus:ring-0 focus-visible:ring-0 resize-none max-h-[144px] py-4 text-[15px] text-neutral-dark placeholder:text-neutral-dark/40 font-medium"
+                            className="flex-1 bg-transparent border-none focus:outline-none outline-none focus:ring-0 focus-visible:ring-0 resize-none max-h-36 py-4 text-[15px] text-neutral-dark placeholder:text-neutral-dark/40 font-medium"
                             rows={1}
                         />
                         <div className="shrink-0 ml-2 py-1.5 flex items-center">
@@ -75,7 +75,7 @@ export function ChatInput({
                                 {isSending ? (
                                     <Spinner size="icon" />
                                 ) : (
-                                    <Send size={16} className="translate-x-[-1px] translate-y-[1px]" />
+                                    <Send size={16} className="-translate-x-px translate-y-px" />
                                 )}
                             </Button>
                         </div>
@@ -88,7 +88,7 @@ export function ChatInput({
     return (
         <div className="p-4 sm:p-6 bg-white shrink-0 z-10 rounded-b-[24px]">
             <div className="w-full">
-                <div className="relative bg-surface-light border border-surface-soft rounded-xl flex items-center min-h-[56px] px-2 shadow-sm">
+                <div className="relative bg-surface-light border border-surface-soft rounded-xl flex items-center min-h-14 px-2 shadow-sm">
                     <textarea
                         ref={textareaRef}
                         value={content}
@@ -96,7 +96,7 @@ export function ChatInput({
                         onKeyDown={handleKeyDown}
                         placeholder="Escribe un mensaje..."
                         disabled={isSending}
-                        className="flex-1 bg-transparent border-none focus:outline-none outline-none focus:ring-0 focus-visible:ring-0 resize-none max-h-[144px] py-4 px-3 text-[15px] text-neutral-dark placeholder:text-neutral-dark/40 font-medium"
+                        className="flex-1 bg-transparent border-none focus:outline-none outline-none focus:ring-0 focus-visible:ring-0 resize-none max-h-36 py-4 px-3 text-[15px] text-neutral-dark placeholder:text-neutral-dark/40 font-medium"
                         rows={1}
                     />
                     <div className="shrink-0 ml-2 py-1.5 flex items-center">
@@ -104,12 +104,12 @@ export function ChatInput({
                             size="icon"
                             disabled={!content.trim() || isSending}
                             onClick={handleSubmit}
-                            className="w-11 h-11 rounded-full bg-[var(--color-gray-soft)] text-white hover:bg-[var(--color-gray-dark)] disabled:bg-surface-soft disabled:text-neutral-dark/30 transition-all active:scale-95"
+                            className="w-11 h-11 rounded-full bg-(--color-gray-soft) text-white hover:bg-(--color-gray-dark) disabled:bg-surface-soft disabled:text-neutral-dark/30 transition-all active:scale-95"
                         >
                             {isSending ? (
                                 <Spinner size="icon" />
                             ) : (
-                                <Send size={18} className="translate-x-[-1px] translate-y-[1px]" />
+                                <Send size={18} className="-translate-x-px translate-y-px" />
                             )}
                         </Button>
                     </div>

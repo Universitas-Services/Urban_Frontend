@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/store/auth.context';
+import { useAuthStore } from '@/store/auth.store';
 import { Settings, Key, Trash2, X, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import { authService } from '@/lib/services/auth.service';
+import { getFullProfileService } from '@/lib/services/auth.service';
 import { UserProfile } from '@/types/auth.types';
 import { toast } from 'sonner';
 
@@ -47,7 +47,7 @@ const passwordSchema = z
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function ProfilePage() {
-    const { user, logout, updateUser } = useAuth();
+    const { user, updateProfile, changePassword: changePasswordAction, deleteAccount } = useAuthStore();
     const [activeTab, setActiveTab] = useState<Tab>('edit');
     const [fullProfile, setFullProfile] = useState<UserProfile | null>(null);
     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -56,7 +56,7 @@ export default function ProfilePage() {
         const fetchFullProfile = async () => {
             setIsLoadingProfile(true);
             try {
-                const data = await authService.getFullProfile();
+                const data = await getFullProfileService();
                 setFullProfile(data);
             } catch {
                 toast.error('Error al cargar la información del perfil.');
@@ -101,19 +101,19 @@ export default function ProfilePage() {
     const handleUpdateProfile = async (data: ProfileFormValues) => {
         setIsEditingProfile(true);
         try {
-            const updatedUser = await authService.updateProfile({
+            await updateProfile({
                 nombre: data.nombre,
                 apellido: data.apellido,
                 telefono: data.telefono || '',
             });
-            updateUser(updatedUser);
+            setFullProfile((prev) =>
+                prev ? { ...prev, nombre: data.nombre, apellido: data.apellido, telefono: data.telefono || '' } : prev
+            );
             setIsEditingProfileMode(false);
             toast.success('Perfil actualizado correctamente.');
         } catch (error) {
             console.error('Failed to update profile', error);
-            const errMsg =
-                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
-                'Error al actualizar el perfil.';
+            const errMsg = (error as Error).message || 'Error al actualizar el perfil.';
             toast.error(errMsg);
         } finally {
             setIsEditingProfile(false);
@@ -123,14 +123,12 @@ export default function ProfilePage() {
     const handleChangePassword = async (data: PasswordFormValues) => {
         setIsChangingPassword(true);
         try {
-            await authService.changePassword({ currentPassword: data.currentPassword, newPassword: data.newPassword });
+            await changePasswordAction({ currentPassword: data.currentPassword, newPassword: data.newPassword });
             toast.success('Contraseña actualizada correctamente.');
             resetPassword();
         } catch (error) {
             console.error('Failed to change password', error);
-            const errMsg =
-                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
-                'Error al cambiar la contraseña.';
+            const errMsg = (error as Error).message || 'Error al cambiar la contraseña.';
             toast.error(errMsg);
         } finally {
             setIsChangingPassword(false);
@@ -168,15 +166,12 @@ export default function ProfilePage() {
 
         setIsDeleting(true);
         try {
-            await authService.deleteAccount(deletePassword);
+            await deleteAccount(deletePassword);
             toast.success('Tu cuenta ha sido eliminada permanentemente.');
-            await logout();
             window.location.href = '/login';
         } catch (error) {
             console.error('Failed to delete account', error);
-            const errMsg =
-                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
-                'Contraseña incorrecta o error al procesar tu solicitud.';
+            const errMsg = (error as Error).message || 'Contraseña incorrecta o error al procesar tu solicitud.';
             toast.error(errMsg);
         } finally {
             setIsDeleting(false);
@@ -184,7 +179,7 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-[var(--color-dashboard-bg)]">
+        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="mb-2 flex justify-center">

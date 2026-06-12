@@ -1,109 +1,147 @@
-import {
-    AuthResponse,
-    LoginInput,
-    RegisterInput,
+'use server';
+
+import type {
     User,
     UserProfile,
+    LoginInput,
+    RegisterInput,
     UpdateProfileInput,
     ChangePasswordInput,
 } from '@/types/auth.types';
-import { api } from '@/lib/api/axios.instance';
+import { getAuthHeader } from '@/lib/auth/session';
 
-export const authService = {
-    login: async (data: LoginInput): Promise<AuthResponse> => {
-        const response = await api.post('/auth/login', data);
+const API = process.env.API_URL;
 
-        const user = response.data.user;
-        const token = response.data.access_token || response.data.token;
+async function handleResponse<T>(res: Response): Promise<T> {
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const message = Array.isArray(err.message) ? err.message[0] : err.message || err.error || 'Error del servidor';
+        throw new Error(message);
+    }
+    if (res.status === 204) return undefined as T;
+    return res.json();
+}
 
-        if (user) {
-            // Ensure the frontend 'name' property is populated from the backend's 'nombreCompleto' or 'nombre'
-            if (!user.name && user.nombreCompleto) {
-                user.name = user.nombreCompleto;
-            } else if (!user.name && user.nombre) {
-                user.name = `${user.nombre} ${user.apellido || ''}`.trim();
-            }
-        }
+// ─── Auth: endpoints del backend ──────────────────────────────────────────────
 
-        return {
-            user,
-            token,
-        };
-    },
+export async function loginService(data: LoginInput): Promise<{ user: User; access_token: string }> {
+    const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        cache: 'no-store',
+    });
+    return handleResponse<{ user: User; access_token: string }>(res);
+}
 
-    getProfile: async (): Promise<User> => {
-        const profileResponse = await api.get('/users/my');
-        const data = profileResponse.data;
+export async function logoutService(): Promise<void> {
+    await fetch(`${API}/auth/logout`, {
+        method: 'POST',
+        headers: await getAuthHeader(),
+        cache: 'no-store',
+    });
+}
 
-        let name = data.name || data.nombreCompleto || '';
-        if (!name && data.nombre) {
-            name = `${data.nombre} ${data.apellido || ''}`.trim();
-        }
+export async function registerService(data: RegisterInput): Promise<{ message: string }> {
+    const res = await fetch(`${API}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-        return {
-            ...data, // Include nombre, apellido, telefono, etc.
-            name,
-        };
-    },
+export async function confirmEmailService(token: string): Promise<{ message: string }> {
+    const res = await fetch(`${API}/auth/confirm-email/${token}`, {
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-    register: async (data: RegisterInput): Promise<void> => {
-        await api.post('/auth/register', data);
-    },
+export async function forgotPasswordService(email: string): Promise<{ message: string }> {
+    const res = await fetch(`${API}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-    getFullProfile: async (): Promise<UserProfile> => {
-        const response = await api.get('/users/profile');
-        return response.data;
-    },
+export async function verifyOtpService(email: string, otp: string): Promise<{ message: string }> {
+    const res = await fetch(`${API}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-    confirmEmail: async (token: string): Promise<void> => {
-        await api.get(`/auth/confirm-email/${token}`);
-    },
+export async function resetPasswordService(email: string, newPassword: string): Promise<{ message: string }> {
+    const res = await fetch(`${API}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, newPassword }),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-    forgotPassword: async (email: string): Promise<void> => {
-        await api.post('/auth/forgot-password', { email });
-    },
+// ─── Usuarios (requieren sesión) ──────────────────────────────────────────────
 
-    resetPassword: async (email: string, newPassword: string): Promise<void> => {
-        await api.post('/auth/reset-password', { email, newPassword });
-    },
+export async function getProfileService(): Promise<User> {
+    const res = await fetch(`${API}/users/my`, {
+        headers: await getAuthHeader(),
+        cache: 'no-store',
+    });
+    return handleResponse<User>(res);
+}
 
-    verifyOtp: async (email: string, otp: string): Promise<void> => {
-        await api.post('/auth/verify-otp', { email, otp });
-    },
+export async function getFullProfileService(): Promise<UserProfile> {
+    const res = await fetch(`${API}/users/profile`, {
+        headers: await getAuthHeader(),
+        cache: 'no-store',
+    });
+    return handleResponse<UserProfile>(res);
+}
 
-    logout: async (): Promise<void> => {
-        try {
-            await api.post('/auth/logout');
-        } catch (error) {
-            // If it fails (e.g., token already expired), we still want to clear local state.
-            console.warn('Logout API failed, continuing local cleanup', error);
-        }
-    },
+export async function updateProfileService(data: UpdateProfileInput): Promise<User> {
+    const res = await fetch(`${API}/users/profile`, {
+        method: 'PATCH',
+        headers: await getAuthHeader(),
+        body: JSON.stringify(data),
+        cache: 'no-store',
+    });
+    return handleResponse<User>(res);
+}
 
-    deleteAccount: async (password: string): Promise<void> => {
-        await api.delete('/users/me', {
-            data: { password },
-        });
-    },
+export async function changePasswordService(data: ChangePasswordInput): Promise<{ message: string }> {
+    const res = await fetch(`${API}/users/password/change`, {
+        method: 'POST',
+        headers: await getAuthHeader(),
+        body: JSON.stringify(data),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-    updateProfile: async (data: UpdateProfileInput): Promise<User> => {
-        const response = await api.patch('/users/profile', data);
-        const user = response.data;
-        if (user) {
-            if (!user.name && user.nombreCompleto) {
-                user.name = user.nombreCompleto;
-            } else if (!user.name && user.nombre) {
-                user.name = `${user.nombre} ${user.apellido || ''}`.trim();
-            }
-        }
-        return user;
-    },
+export async function acceptNewsService(): Promise<{ message: string }> {
+    const res = await fetch(`${API}/users/accept-news`, {
+        method: 'POST',
+        headers: await getAuthHeader(),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}
 
-    changePassword: async (data: ChangePasswordInput): Promise<void> => {
-        await api.post('/users/password/change', data);
-    },
-
-    acceptNews: async (): Promise<void> => {
-        await api.post('/users/accept-news');
-    },
-};
+export async function deleteAccountService(password: string): Promise<{ message: string }> {
+    const res = await fetch(`${API}/users/me`, {
+        method: 'DELETE',
+        headers: await getAuthHeader(),
+        body: JSON.stringify({ password }),
+        cache: 'no-store',
+    });
+    return handleResponse<{ message: string }>(res);
+}

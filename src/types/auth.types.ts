@@ -34,6 +34,13 @@ export interface UserProfile {
     estatus_normativa_girs: string | null;
     profileCompleted: boolean;
     estadoCuenta?: string;
+    hasUnreadNews?: boolean;
+    latestNews?: {
+        id: string;
+        title: string;
+        content: string;
+        createdAt: string;
+    } | null;
     alertaVencimiento?: {
         mensaje: string;
         diasRestantes: number;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { authService } from '@/lib/services/auth.service';
+import { confirmEmailService } from '@/lib/services/auth.service';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -21,7 +21,7 @@ function ConfirmEmailContent() {
 
         const confirm = async () => {
             try {
-                await authService.confirmEmail(token);
+                await confirmEmailService(token);
                 setStatus('success');
             } catch (error) {
                 setStatus('error');

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { registerSchema } from '@/lib/validations/auth.schemas';
-import { useAuth } from '@/store/auth.context';
+import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -37,7 +37,7 @@ export function RegisterForm() {
     const [isLoadingMunicipios, setIsLoadingMunicipios] = useState(false);
     const [showEnteFields, setShowEnteFields] = useState(false);
     const [showCargoNormativa, setShowCargoNormativa] = useState(false);
-    const { register, isLoading } = useAuth();
+    const { register } = useAuthStore();
     const router = useRouter();
 
     const form = useForm<z.infer<typeof registerSchema>>({
@@ -58,6 +58,9 @@ export function RegisterForm() {
             termsAccepted: false,
         },
     });
+
+    // Estado local del envío — NO el isLoading global (que es el gate de sesión del dashboard)
+    const { isSubmitting } = form.formState;
 
     const passwordValue = form.watch('password');
 
@@ -706,11 +709,11 @@ export function RegisterForm() {
                                     <Button
                                         type="submit"
                                         className="flex-1 bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                                        disabled={isLoading}
+                                        disabled={isSubmitting}
                                     >
-                                        {isLoading ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
+                                        {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
                                         Crear cuenta
-                                        {!isLoading && <ArrowRight size={18} className="ml-2" />}
+                                        {!isSubmitting && <ArrowRight size={18} className="ml-2" />}
                                     </Button>
                                 </div>
                             </div>

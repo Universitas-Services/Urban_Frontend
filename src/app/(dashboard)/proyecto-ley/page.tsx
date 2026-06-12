@@ -16,7 +16,7 @@ export default function ProyectoLeyPage() {
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-[var(--color-dashboard-bg)]">
+        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
             <div className="max-w-6xl mx-auto space-y-6">
                 <div className="rounded-xl bg-white border border-gray-200/70 shadow-sm px-4 py-3 flex items-center gap-3">
                     <div
@@ -32,7 +32,7 @@ export default function ProyectoLeyPage() {
 
                 <div className="grid grid-cols-2 gap-8 items-stretch">
                     <div className="flex flex-col gap-4 h-full">
-                        <div className="rounded-xl bg-white border border-green-500 shadow-sm p-1.5 flex-1 flex flex-col min-h-[280px] relative">
+                        <div className="rounded-xl bg-white border border-green-500 shadow-sm p-1.5 flex-1 flex flex-col min-h-70 relative">
                             {imageUrl ? (
                                 <div className="relative w-full h-full flex-1 rounded-lg overflow-hidden">
                                     <Image

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { authService } from '@/lib/services/auth.service';
+import { updateProfileService } from '@/lib/services/auth.service';
 import { Loader2, UserPen, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -48,7 +48,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
 
         setIsSubmitting(true);
         try {
-            await authService.updateProfile({
+            await updateProfileService({
                 tipoUsuario: tipoUsuario,
                 nombre_ente: nombreEnte,
                 ...(tipoUsuario === 'SERVIDOR_PUBLICO' && {
@@ -61,8 +61,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
             onSuccess();
         } catch (error) {
             console.error('Error al actualizar el perfil', error);
-            const err = error as { response?: { data?: { message?: string } } };
-            const errorMessage = err.response?.data?.message || 'Ocurrió un error al guardar los datos.';
+            const errorMessage = (error as Error).message || 'Ocurrió un error al guardar los datos.';
             toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -72,7 +71,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
     return (
         <Dialog open={isOpen} onOpenChange={() => {}}>
             <DialogContent
-                className="sm:max-w-[480px] p-6 max-h-[95vh] overflow-y-auto rounded-[24px]"
+                className="sm:max-w-120 p-6 max-h-[95vh] overflow-y-auto rounded-[24px]"
                 showCloseButton={false}
             >
                 <div className="flex flex-col items-center w-full mb-4 relative z-10">

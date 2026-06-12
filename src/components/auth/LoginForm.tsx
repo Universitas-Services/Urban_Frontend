@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { loginSchema } from '@/lib/validations/auth.schemas';
-import { useAuth } from '@/store/auth.context';
+import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -17,13 +17,16 @@ import { Spinner } from '@/components/ui/spinner';
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
-    const { login, isLoading } = useAuth();
+    const { login } = useAuthStore();
     const router = useRouter();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: { email: '', password: '' },
     });
+
+    // Estado local del envío — NO el isLoading global (que es el gate de sesión del dashboard)
+    const { isSubmitting } = form.formState;
 
     async function onSubmit(values: z.infer<typeof loginSchema>) {
         try {
@@ -148,11 +151,11 @@ export function LoginForm() {
                     <Button
                         type="submit"
                         className="w-full bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                        disabled={isLoading}
+                        disabled={isSubmitting}
                     >
-                        {isLoading ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
+                        {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
                         Ingresar
-                        {!isLoading && <ArrowRight size={18} className="ml-2" />}
+                        {!isSubmitting && <ArrowRight size={18} className="ml-2" />}
                     </Button>
 
                     <div className="pt-6 border-t border-surface-soft/30 text-center">

@@ -12,7 +12,7 @@ import { Mail, ArrowRight, Eye, EyeOff, KeyRound, ShieldCheck } from 'lucide-rea
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
-import { authService } from '@/lib/services/auth.service';
+import { forgotPasswordService, verifyOtpService, resetPasswordService } from '@/lib/services/auth.service';
 import { useRouter } from 'next/navigation';
 
 export function ForgotPasswordForm() {
@@ -35,7 +35,7 @@ export function ForgotPasswordForm() {
 
         setIsSubmitting(true);
         try {
-            await authService.forgotPassword(emailValue);
+            await forgotPasswordService(emailValue);
             toast.success('Código enviado a tu correo');
             setStep(2);
         } catch (error) {
@@ -52,7 +52,7 @@ export function ForgotPasswordForm() {
         setIsSubmitting(true);
         try {
             const code = form.getValues('code') || '';
-            await authService.verifyOtp(emailValue, code);
+            await verifyOtpService(emailValue, code);
             toast.success('Código verificado correctamente');
             setStep(3);
         } catch (error) {
@@ -66,7 +66,7 @@ export function ForgotPasswordForm() {
         if (step !== 3) return;
         setIsSubmitting(true);
         try {
-            await authService.resetPassword(values.email, values.password || '');
+            await resetPasswordService(values.email, values.password || '');
             toast.success('Contraseña actualizada exitosamente');
             router.push('/login');
         } catch (error) {
