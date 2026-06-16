@@ -16,14 +16,11 @@ export default function ProyectoLeyPage() {
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
+        <div className="flex-1 p-6">
             <div className="max-w-6xl mx-auto space-y-6">
                 <div className="rounded-xl bg-white border border-gray-200/70 shadow-sm px-4 py-3 flex items-center gap-3">
-                    <div
-                        className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: 'var(--color-icon-green-bg)' }}
-                    >
-                        <FaBook className="w-9 h-9" style={{ color: 'var(--color-icon-green)' }} />
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                        <FaBook className="w-9 h-9 text-accent" />
                     </div>
                     <h1 className="titulos-cards leading-tight mb-0">
                         ANTEPROYECTO DE &ldquo;LEY ORGÁNICA DE GESTIÓN INTEGRAL DE RESIDUOS Y DESECHOS SÓLIDOS&rdquo;
@@ -32,7 +29,7 @@ export default function ProyectoLeyPage() {
 
                 <div className="grid grid-cols-2 gap-8 items-stretch">
                     <div className="flex flex-col gap-4 h-full">
-                        <div className="rounded-xl bg-white border border-green-500 shadow-sm p-1.5 flex-1 flex flex-col min-h-70 relative">
+                        <div className="rounded-xl bg-white border border-accent shadow-sm p-1.5 flex-1 flex flex-col min-h-70 relative">
                             {imageUrl ? (
                                 <div className="relative w-full h-full flex-1 rounded-lg overflow-hidden">
                                     <Image
@@ -69,14 +66,7 @@ export default function ProyectoLeyPage() {
                         <div className="h-10 flex items-center">
                             <Button
                                 onClick={handleDownload}
-                                className="h-10 text-white font-semibold rounded-lg px-5 text-sm transition-all active:scale-95 cursor-pointer gap-2"
-                                style={{ backgroundColor: 'var(--color-icon-green)' }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'var(--color-btn-green-hover)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'var(--color-icon-green)';
-                                }}
+                                className="h-10 bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg px-5 text-sm transition-all active:scale-95 cursor-pointer gap-2"
                             >
                                 Descarga aqui
                                 <IoDownloadOutline className="w-5 h-5" />

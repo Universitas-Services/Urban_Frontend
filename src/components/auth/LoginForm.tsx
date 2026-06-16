@@ -49,7 +49,7 @@ export function LoginForm() {
                 />
             </div>
             <div className="space-y-1 text-center mb-6">
-                <h2 className="text-3xl font-bold text-primary">Bienvenido</h2>
+                <h2 className="font-display text-3xl font-bold text-primary">Bienvenido</h2>
                 <p className="text-neutral-dark/60 text-sm">Ingresa tus credenciales para continuar</p>
             </div>
 

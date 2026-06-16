@@ -53,7 +53,7 @@ export async function getAuthHeader(): Promise<HeadersInit> {
     const token = await getServerToken();
     return {
         'Content-Type': 'application/json',
-        ...(token ? { Cookie: `${TOKEN_COOKIE}=${token}` } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
 }
 

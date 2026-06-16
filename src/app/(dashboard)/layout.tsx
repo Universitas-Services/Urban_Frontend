@@ -9,6 +9,7 @@ import { useChatStore } from '@/store/chat.store';
 import { UserProfile } from '@/types/auth.types';
 import { MembershipExpiringModal, ProfileIncompleteModal } from '@/components/Modales';
 import { DisruptiveNewsModal } from '@/components/layout/DisruptiveNewsModal';
+import { DashboardCityscapeBackground } from '@/components/layout/DashboardCityscapeBackground';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const { isLoading, initAuth, isAuthenticated, getFullProfile } = useAuthStore();
@@ -73,12 +74,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
 
     return (
-        <div className="flex h-dvh overflow-hidden bg-surface-light text-neutral-dark">
+        <div className="relative flex h-dvh overflow-hidden bg-surface-light text-neutral-dark">
+            <DashboardCityscapeBackground />
             <Sidebar />
-            <main className="flex-1 flex flex-col min-w-0 relative overflow-y-auto custom-scrollbar">
-                <div className="flex-1 flex flex-col">{children}</div>
-                <CopyrightFooter />
-            </main>
+            <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
+                <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden">
+                    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto custom-scrollbar">
+                        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+                    </div>
+                    <CopyrightFooter />
+                </main>
+            </div>
 
             <MembershipExpiringModal
                 isOpen={isMembershipModalOpen}

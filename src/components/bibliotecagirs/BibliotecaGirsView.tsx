@@ -5,13 +5,13 @@ import { BookOpen, ArrowRight } from 'lucide-react';
 
 export function BibliotecaGirsView() {
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
+        <div className="flex-1 p-6">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 flex flex-col gap-4">
                     <div className="flex items-center gap-2">
-                        <BookOpen className="w-5 h-5 text-icon-green" />
-                        <span className="text-icon-green font-medium text-sm tracking-wider uppercase">
+                        <BookOpen className="w-5 h-5 text-accent" />
+                        <span className="text-accent font-medium text-sm tracking-wider uppercase">
                             Documentación Técnica
                         </span>
                     </div>
@@ -38,8 +38,8 @@ export function BibliotecaGirsView() {
                     <BibliotecaGirsCard
                         title="Ordenanzas"
                         tagLabel="LOCAL"
-                        tagBgColor="bg-green-100"
-                        tagTextColor="text-green-700"
+                        tagBgColor="bg-accent/10"
+                        tagTextColor="text-accent"
                         imageSrc="/bibliotecagirs/ordenanzass.png"
                         description="Compendio especializado de los instrumentos dictados por los Concejos Municipales que regulan el servicio local de aseo urbano, los regímenes tarifarios, la participación ciudadana y el control ambiental territorial."
                         href="https://universitas.legal/biblioteca-girs-ordenanzas/"
@@ -85,7 +85,7 @@ export function BibliotecaGirsView() {
                         <a
                             href="https://drive.google.com/file/d/1SuWQpzY8ik0tgykwrEt3UkFNhtqnLGUT/view?usp=drive_link"
                             target="_blank"
-                            className="w-full inline-flex items-center justify-center px-6 py-2.5 bg-icon-green hover:bg-[#009900] transition-colors text-white font-medium rounded-lg text-sm group mt-auto"
+                            className="w-full inline-flex items-center justify-center px-6 py-2.5 bg-accent hover:bg-accent-hover transition-colors text-white font-medium rounded-lg text-sm group mt-auto"
                         >
                             Saber más
                             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />

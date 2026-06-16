@@ -18,7 +18,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import { getFullProfileService } from '@/lib/services/auth.service';
+import { getFullProfileService, getProfileService } from '@/lib/services/auth.service';
 import { UserProfile } from '@/types/auth.types';
 import { toast } from 'sonner';
 
@@ -56,8 +56,13 @@ export default function ProfilePage() {
         const fetchFullProfile = async () => {
             setIsLoadingProfile(true);
             try {
-                const data = await getFullProfileService();
-                setFullProfile(data);
+                const [profileResult] = await Promise.allSettled([getFullProfileService(), getProfileService()]);
+
+                if (profileResult.status === 'fulfilled') {
+                    setFullProfile(profileResult.value);
+                } else {
+                    toast.error('Error al cargar la información del perfil.');
+                }
             } catch {
                 toast.error('Error al cargar la información del perfil.');
             } finally {
@@ -74,12 +79,22 @@ export default function ProfilePage() {
         formState: { errors: profileErrors },
     } = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        values: {
-            nombre: fullProfile?.nombre || user?.nombre || '',
-            apellido: fullProfile?.apellido || user?.apellido || '',
-            telefono: fullProfile?.telefono || user?.telefono || '',
+        defaultValues: {
+            nombre: '',
+            apellido: '',
+            telefono: '',
         },
     });
+
+    useEffect(() => {
+        if (!fullProfile) return;
+
+        resetProfile({
+            nombre: fullProfile.nombre ?? '',
+            apellido: fullProfile.apellido ?? '',
+            telefono: fullProfile.telefono ?? '',
+        });
+    }, [fullProfile, resetProfile]);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingProfileMode, setIsEditingProfileMode] = useState(false);
 
@@ -179,15 +194,15 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
-            <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex min-h-0 flex-1 flex-col p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
                 {/* Header */}
                 <div className="mb-2 flex justify-center">
                     <h1 className="text-xl font-bold text-neutral-dark">Gestión de perfil</h1>
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-2xl shadow-sm border border-surface-soft overflow-hidden flex flex-col flex-1">
+                <div className="overflow-hidden rounded-2xl border border-surface-soft bg-white shadow-sm">
                     {/* Inner Header */}
                     <div className="p-4 border-b border-surface-soft/40">
                         <h2 className="text-lg font-bold text-neutral-dark">Configuración de tu perfil</h2>
@@ -196,7 +211,7 @@ export default function ProfilePage() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row flex-1 min-h-0">
+                    <div className="flex min-h-0 flex-col md:flex-row">
                         {/* Sidebar Navigation */}
                         <div className="w-full md:w-56 border-r border-surface-soft/40 p-2 space-y-0.5">
                             <button
@@ -242,7 +257,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 p-5 overflow-y-auto">
+                        <div className="flex-1 p-5">
                             {activeTab === 'edit' && (
                                 <div className="w-full">
                                     <form

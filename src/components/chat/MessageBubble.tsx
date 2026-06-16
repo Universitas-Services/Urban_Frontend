@@ -57,7 +57,7 @@ export function MessageBubble({ message, isLast }: MessageBubbleProps) {
                         className={cn(
                             'p-4 relative max-w-full',
                             isAgent
-                                ? 'bg-msg-user-bg text-neutral-dark rounded-[20px] rounded-tl-sm border border-msg-user-border/40'
+                                ? 'bg-msg-agent-bg text-neutral-dark rounded-[20px] rounded-tl-sm border border-msg-agent-border/50'
                                 : 'bg-primary text-on-primary rounded-[20px] rounded-tr-sm'
                         )}
                     >

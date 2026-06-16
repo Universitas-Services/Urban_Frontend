@@ -30,7 +30,8 @@ export function MessageList() {
                         </span>
                     </div>
                     <h2 className="text-[32px] font-bold tracking-tight mb-2 text-center text-neutral-dark">
-                        Hola, soy tu <span className="text-(--color-consultant-text)">Consultor IA GIRS</span>
+                        Hola, soy tu{' '}
+                        <span className="text-(--color-consultant-text)">Consultor IA - Derecho Urbanístico</span>
                     </h2>
                     <p className="text-center text-neutral-dark max-w-150 text-[15px] mx-auto">
                         Soy un agente IA experto en Gestión Integral de Residuos Sólidos - GIRS. Estoy aquí para
@@ -42,7 +43,7 @@ export function MessageList() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar relative">
+        <div className="flex-1 min-h-0 overflow-y-auto w-full custom-scrollbar relative">
             <div className="w-full mx-auto p-4 sm:p-6 space-y-6">
                 {/* Mocked Initial Date Separator */}
                 <div className="flex items-center justify-center my-6">

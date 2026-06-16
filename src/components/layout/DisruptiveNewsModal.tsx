@@ -48,7 +48,7 @@ export function DisruptiveNewsModal() {
 
                     <div className="flex flex-col items-center gap-1.5 mt-2">
                         <Avatar className="h-7 w-7 border-2 border-white shadow-sm">
-                            <AvatarImage src="/asset/Julio-AI-Fospuca.png" alt="Universitas" />
+                            <AvatarImage src="/asset/LOS_URBANOS.png" alt="Universitas" />
                             <AvatarFallback className="text-[9px] font-bold bg-slate-100 text-slate-600">
                                 UN
                             </AvatarFallback>
@@ -63,7 +63,7 @@ export function DisruptiveNewsModal() {
                     <button
                         onClick={handleAccept}
                         disabled={isLoading}
-                        className="w-full h-10 rounded-xl bg-[#00B800] text-white font-black text-xs tracking-widest uppercase shadow-md shadow-green-900/10 hover:bg-[#009900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full h-10 rounded-xl bg-accent text-white font-black text-xs tracking-widest uppercase shadow-md shadow-accent/10 hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? 'CARGANDO...' : 'ACEPTAR'}
                     </button>

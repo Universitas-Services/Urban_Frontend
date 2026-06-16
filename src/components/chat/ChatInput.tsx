@@ -86,7 +86,7 @@ export function ChatInput({
     }
 
     return (
-        <div className="p-4 sm:p-6 bg-white shrink-0 z-10 rounded-b-[24px]">
+        <div className="p-4 sm:p-6 shrink-0 z-10">
             <div className="w-full">
                 <div className="relative bg-surface-light border border-surface-soft rounded-xl flex items-center min-h-14 px-2 shadow-sm">
                     <textarea

@@ -7,8 +7,9 @@
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    --font-sans: var(--font-inter);
+    --font-display: var(--font-cormorant);
+    --font-mono: ui-monospace, monospace;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,33 +45,40 @@
     --radius-3xl: calc(var(--radius) + 12px);
     --radius-4xl: calc(var(--radius) + 16px);
 
-    /* Custom Theme Colors as specified */
-    --color-primary: oklch(0.337 0.066 228.778);
-    --color-primary-hover: oklch(0.267 0.053 229.3);
-    --color-accent: oklch(0.678 0.231 142.495);
-    --color-surface-soft: oklch(0.851 0.014 179.402);
-    --color-surface-light: oklch(0.918 0.017 174.028);
-    --color-neutral-dark: oklch(0.368 0.01 241.911);
-    --color-neutral-bg: oklch(0.516 0.002 197.08);
-    --color-on-primary: oklch(0.969 0.007 219.56);
-    --color-on-surface: oklch(0.252 0.015 211.197);
-    --color-white: oklch(1 0 0);
-    --color-gray-soft: oklch(0.566 0.021 243.202);
-    --color-gray-dark: oklch(0.518 0.022 243.262);
-    --color-status-online: oklch(0.761 0.198 150.905);
-    --color-chat-bg: oklch(0.934 0.008 157.083);
-    --color-consultant-text: oklch(0.379 0.07 221.116);
-    --color-msg-user-bg: oklch(0.947 0.008 145.508);
-    --color-msg-user-border: oklch(0.883 0.017 156.872);
-    --color-status-error: oklch(0.631 0.211 23.725);
-    --color-dashboard-bg: oklch(0.962 0.003 174.483);
-    --color-avatar-bg: oklch(0.86 0.042 70.788);
-    --color-btn-green: oklch(0.627 0.152 144.266);
-    --color-btn-green-hover: oklch(0.566 0.136 144.182);
-    --color-icon-green-bg: #bedabe;
-    --color-icon-green: #00b800;
-    --color-accent-bar: #6391c0;
-    --color-heading-dark: #003d52;
+    /* Paleta institucional */
+    --color-primary: #1a284b;
+    --color-primary-hover: #141f38;
+    --color-accent: #f28c28;
+    --color-accent-hover: #d97a1f;
+    --color-success: #00ab6b;
+    --color-success-hover: #00995c;
+    --color-territorial: #3e7d4a;
+    --color-territorial-light: #fef3e8;
+    --color-surface-soft: #d9e1e8;
+    --color-surface-light: #f8f9fa;
+    --color-neutral-dark: #253042;
+    --color-neutral-bg: #d9e1e8;
+    --color-on-primary: #ffffff;
+    --color-on-surface: #253042;
+    --color-white: #ffffff;
+    --color-gray-soft: #8a96a3;
+    --color-gray-dark: #5c6773;
+    --color-status-online: #f28c28;
+    --color-chat-bg: #f8f9fa;
+    --color-consultant-text: #1a284b;
+    --color-msg-user-bg: #e8f2ea;
+    --color-msg-user-border: #d9e1e8;
+    --color-msg-agent-bg: #fef3e8;
+    --color-msg-agent-border: #f5d4a8;
+    --color-status-error: #dc2626;
+    --color-dashboard-bg: #f8f9fa;
+    --color-avatar-bg: #f28c28;
+    --color-icon-green-bg: #fef3e8;
+    --color-icon-green: #f28c28;
+    --color-accent-bar: #1a284b;
+    --color-heading-dark: #1a284b;
+    --color-btn-green: #f28c28;
+    --color-btn-green-hover: #d97a1f;
 
     /* Legal Card Types */
     --color-legal-organica: #e3dbe2;
@@ -125,37 +133,39 @@
 
 :root {
     --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --dashboard-cityscape-opacity: 0.36;
+    --dashboard-cityscape-saturate: 1.65;
+    --background: #f8f9fa;
+    --foreground: #253042;
+    --card: #ffffff;
+    --card-foreground: #253042;
+    --popover: #ffffff;
+    --popover-foreground: #253042;
+    --primary: #1a284b;
+    --primary-foreground: #ffffff;
+    --secondary: #e8f2ea;
+    --secondary-foreground: #1a284b;
+    --muted: #f8f9fa;
+    --muted-foreground: #5c6773;
+    --accent: #fef3e8;
+    --accent-foreground: #1a284b;
+    --destructive: #dc2626;
+    --border: #d9e1e8;
+    --input: #d9e1e8;
+    --ring: #f28c28;
+    --chart-1: #1a284b;
+    --chart-2: #3e7d4a;
+    --chart-3: #00ab6b;
+    --chart-4: #f28c28;
+    --chart-5: #253042;
+    --sidebar: #1a284b;
+    --sidebar-foreground: #ffffff;
+    --sidebar-primary: #f28c28;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #141f38;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #141f38;
+    --sidebar-ring: #f28c28;
 }
 
 .dark {
@@ -223,77 +233,57 @@
 }
 
 .titulos-cards {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
-    font-weight: 800;
+    font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+    font-weight: 700;
     font-size: 23px;
     line-height: 40px;
-    color: #003d52;
+    color: var(--color-primary);
 }
 
 .titulos-cards-proyecto-ley {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
-    font-weight: 800;
+    font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+    font-weight: 700;
     font-size: 18px;
     line-height: 22px;
-    color: #003d52;
+    color: var(--color-primary);
 }
 
 .descripcion-cards {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-style: italic;
     font-size: 15px;
     line-height: 22px;
-    color: #5b686c;
+    color: var(--color-gray-dark);
 }
 
 .descripcion-cards-proyecto-ley {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-style: italic;
     font-size: 12px;
     line-height: 14px;
-    color: #5b686c;
+    color: var(--color-gray-dark);
 }
 
 .descripcion-cards-small {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-style: italic;
     font-size: 13px;
-    color: #5b686c;
+    color: var(--color-gray-dark);
 }
 
 .descripcion-cards-small li::marker {
-    color: #00b800;
+    color: var(--color-accent);
 }
 
 .etiquetas {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-weight: 400;
     font-size: 14px;
     text-transform: uppercase;
+}
+
+.font-display {
+    font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
 }
 
 /* Gavel Strike Animation */
@@ -357,4 +347,58 @@ a:hover .support-bounce-icon {
     50% {
         transform: translateY(-4px);
     }
+}
+
+/* Fondo cityscape del dashboard (sidebar + contenido) */
+.dashboard-cityscape-layer {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+        to top,
+        #000 12%,
+        rgba(0, 0, 0, 0.92) 28%,
+        rgba(0, 0, 0, 0.55) 52%,
+        rgba(0, 0, 0, 0.18) 72%,
+        transparent 92%
+    );
+    mask-image: linear-gradient(
+        to top,
+        #000 12%,
+        rgba(0, 0, 0, 0.92) 28%,
+        rgba(0, 0, 0, 0.55) 52%,
+        rgba(0, 0, 0, 0.18) 72%,
+        transparent 92%
+    );
+}
+
+.dashboard-cityscape-layer img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: unset;
+    object-position: bottom center;
+    opacity: var(--dashboard-cityscape-opacity);
+    filter: saturate(var(--dashboard-cityscape-saturate)) contrast(1.2) brightness(1.08);
+}
+
+.dashboard-cityscape-tint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-primary) 12%, transparent) 0%,
+        color-mix(in srgb, var(--color-accent) 6%, transparent) 22%,
+        transparent 55%
+    );
+    pointer-events: none;
 }

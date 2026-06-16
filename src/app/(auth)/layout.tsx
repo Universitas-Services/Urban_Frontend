@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                         <div className="w-40 h-40 sm:w-48 sm:h-48 flex items-center justify-center mb-4 bg-white rounded-full border-4 border-primary overflow-hidden shadow-2xl relative">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="/asset/Julio-AI-Fospuca.png"
+                                src="/asset/LOS_URBANOS.png"
                                 alt="Consultor IA GIRS"
                                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                             />

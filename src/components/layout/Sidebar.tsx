@@ -3,7 +3,7 @@
 import { useChatStore } from '@/store/chat.store';
 import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
-import { MessageSquare, Settings, LogOut, Menu, X, User, Headset, HelpCircle } from 'lucide-react';
+import { MessageSquare, Settings, LogOut, Menu, User, Headset, HelpCircle } from 'lucide-react';
 import { IoMdBook, IoMdInformationCircleOutline } from 'react-icons/io';
 import { IoHomeSharp, IoAddCircleOutline } from 'react-icons/io5';
 import { FaGavel, FaBalanceScale } from 'react-icons/fa';
@@ -88,10 +88,10 @@ export function Sidebar() {
             </div>
 
             {/* Menú Principal Section */}
-            <div className="w-full flex-shrink-0 mt-2">
+            <div className="w-full flex-shrink-0 mt-1">
                 <div
                     className={cn(
-                        'mb-2 transition-opacity duration-300',
+                        'mb-1 transition-opacity duration-300',
                         expanded ? 'px-3 opacity-100' : 'opacity-0 hidden'
                     )}
                 >
@@ -104,7 +104,7 @@ export function Sidebar() {
                         <button
                             onClick={() => router.push('/inicio')}
                             className={cn(
-                                'flex items-center py-1.5 rounded-lg transition-colors cursor-pointer',
+                                'flex items-center py-1 rounded-lg transition-colors cursor-pointer',
                                 'w-full px-3 text-on-primary/80 hover:bg-surface-soft/10'
                             )}
                         >
@@ -133,7 +133,7 @@ export function Sidebar() {
                     {expanded ? (
                         <button
                             onClick={() => router.push('/proyecto-ley')}
-                            className="flex items-center py-1.5 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
+                            className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
                         >
                             <FaGavel size={18} color="var(--color-white)" className="shrink-0 gavel-icon" />
                             <span className="font-medium text-[13px] ml-3">Proyecto ley</span>
@@ -160,7 +160,7 @@ export function Sidebar() {
                     {expanded ? (
                         <button
                             onClick={() => router.push('/repositorio-legal')}
-                            className="flex items-center py-1.5 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
+                            className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
                         >
                             <FaBalanceScale size={18} color="var(--color-white)" className="shrink-0" />
                             <span className="font-medium text-[13px] ml-3">Repositorio legal</span>
@@ -187,7 +187,7 @@ export function Sidebar() {
                     {expanded ? (
                         <button
                             onClick={() => router.push('/biblioteca-girs')}
-                            className="flex items-center py-1.5 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
+                            className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
                         >
                             <IoMdBook size={18} color="var(--color-white)" className="shrink-0" />
                             <span className="font-medium text-[13px] ml-3">Biblioteca GIRS</span>
@@ -211,12 +211,7 @@ export function Sidebar() {
             </div>
 
             {/* Navigation / History */}
-            <div
-                className={cn(
-                    'flex-1 py-2 custom-scrollbar',
-                    expanded ? 'overflow-y-auto px-3' : 'flex flex-col items-center'
-                )}
-            >
+            <div className={cn('flex flex-1 flex-col min-h-0', expanded ? 'px-3' : 'items-center')}>
                 {!expanded ? (
                     <div className="w-full flex justify-center pt-4 text-on-primary/60 transition-opacity duration-300">
                         <Tooltip>
@@ -234,37 +229,27 @@ export function Sidebar() {
                         </Tooltip>
                     </div>
                 ) : (
-                    <div className="space-y-6 mt-2 transition-opacity duration-300">
-                        <div>
-                            <p className="text-[11px] font-semibold text-on-primary/50 tracking-wider mb-2 px-3 pt-4 border-t border-surface-soft/10">
-                                Consultor GIRS IA
+                    <>
+                        <div className="shrink-0 mt-1 border-t border-surface-soft/10 pt-2">
+                            <p className="text-[11px] font-semibold text-on-primary/50 tracking-wider mb-1 px-3">
+                                Consultor IA - Derecho Urbanístico
                             </p>
 
-                            {/* New Chat Button */}
-                            <div className={cn('shrink-0 mb-1', expanded ? '' : 'w-full flex justify-center')}>
+                            <div className="shrink-0">
                                 <button
                                     onClick={handleNewChat}
-                                    className={cn(
-                                        'flex items-center py-1.5 rounded-lg transition-colors border-transparent cursor-pointer',
-                                        expanded
-                                            ? 'w-full px-3 text-on-primary/80 hover:bg-surface-soft/10 border'
-                                            : 'w-10 h-10 justify-center text-on-primary/70 hover:text-on-primary hover:bg-surface-soft/10'
-                                    )}
+                                    className="flex w-full items-center rounded-lg border border-transparent px-3 py-1 text-on-primary/80 transition-colors hover:bg-surface-soft/10 cursor-pointer"
                                     title="Iniciar nuevo chat"
                                 >
-                                    <IoAddCircleOutline size={20} color="var(--color-white)" className="shrink-0" />
-                                    <span
-                                        className={cn(
-                                            'font-medium text-[13px] transition-all duration-300 whitespace-nowrap overflow-hidden',
-                                            expanded ? 'ml-3 opacity-100' : 'opacity-0 w-0 hidden'
-                                        )}
-                                    >
+                                    <IoAddCircleOutline size={18} color="var(--color-white)" className="shrink-0" />
+                                    <span className="ml-2.5 overflow-hidden whitespace-nowrap text-[13px] font-medium">
                                         Iniciar nuevo chat
                                     </span>
                                 </button>
                             </div>
+                        </div>
 
-                            {/* Filter out empty/new chats with no messages from history */}
+                        <div className="mt-1 min-h-0 flex-1 overflow-y-auto custom-scrollbar">
                             {(() => {
                                 const validConversations = conversations.filter(
                                     (c) =>
@@ -325,8 +310,8 @@ export function Sidebar() {
                                 }
 
                                 return groups.map((group) => (
-                                    <div key={group.label} className="mb-4">
-                                        <p className="text-xs text-on-primary/40 px-3 mb-1">{group.label}</p>
+                                    <div key={group.label} className="mb-2">
+                                        <p className="text-xs text-on-primary/40 px-3 mb-0.5">{group.label}</p>
                                         <div className="space-y-0.5">
                                             {group.items.map((conv) => {
                                                 const isActive = conv.id === activeConversationId;
@@ -339,10 +324,10 @@ export function Sidebar() {
                                                             router.push('/chat');
                                                         }}
                                                         className={cn(
-                                                            'group flex items-center justify-between px-3 py-1.5 rounded-lg text-[13px] cursor-pointer transition-colors whitespace-nowrap overflow-hidden',
+                                                            'group flex items-center justify-between px-3 py-1 rounded-lg text-[13px] cursor-pointer transition-colors whitespace-nowrap overflow-hidden',
                                                             isActive
-                                                                ? 'bg-accent/20 border-l-2 border-accent text-on-primary'
-                                                                : 'text-on-primary/80 hover:bg-on-primary/10 border-l-2 border-transparent'
+                                                                ? 'bg-surface-soft/20 border-l-2 border-surface-soft text-on-primary'
+                                                                : 'text-on-primary/80 hover:bg-surface-soft/10 border-l-2 border-transparent'
                                                         )}
                                                     >
                                                         <span
@@ -361,17 +346,17 @@ export function Sidebar() {
                                 ));
                             })()}
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
 
             {/* Otros Servicios Section */}
-            <div className="w-full flex-shrink-0 mb-2 mt-4 pt-4 border-t border-surface-soft/10">
+            <div className="w-full flex-shrink-0 mb-1 mt-2 pt-2 border-t border-surface-soft/10">
                 <div className={cn('shrink-0 mb-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
                     {expanded ? (
                         <button
                             onClick={() => router.push('/acerca-de')}
-                            className="flex items-center py-1.5 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
+                            className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
                         >
                             <IoMdInformationCircleOutline
                                 size={18}
@@ -406,7 +391,7 @@ export function Sidebar() {
                     {expanded ? (
                         <button
                             onClick={() => router.push('/faq')}
-                            className="flex items-center py-1.5 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
+                            className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-on-primary/80 hover:bg-surface-soft/10"
                         >
                             <HelpCircle size={18} color="var(--color-white)" className="shrink-0" />
                             <span className="font-medium text-[13px] ml-3">FAQ</span>

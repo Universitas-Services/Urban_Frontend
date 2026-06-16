@@ -24,7 +24,13 @@ export function AgentAvatar({ size = 'sm', className }: AgentAvatarProps) {
             )}
         >
             {APP_CONFIG.AGENT_AVATAR_URL ? (
-                <Image src={APP_CONFIG.AGENT_AVATAR_URL} alt={APP_CONFIG.AGENT_NAME} fill className="object-cover" />
+                <Image
+                    src={APP_CONFIG.AGENT_AVATAR_URL}
+                    alt={APP_CONFIG.AGENT_NAME}
+                    fill
+                    sizes={isLarge ? '120px' : '32px'}
+                    className="object-cover"
+                />
             ) : (
                 <Sparkles size={iconSize} className="text-on-primary" />
             )}

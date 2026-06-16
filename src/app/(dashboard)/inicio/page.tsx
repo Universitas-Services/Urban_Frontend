@@ -2,23 +2,18 @@
 
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { FaInstagram, FaLinkedin, FaTwitter, FaXTwitter, FaFacebook, FaBook, FaGavel } from 'react-icons/fa6';
 import { BsChatRight } from 'react-icons/bs';
 
 export default function InicioPage() {
     const router = useRouter();
 
-    const handleIniciarConsulta = () => {
-        router.push('/chat');
-    };
-
     const handleMasInformacion = () => {
         window.open('https://agora.universitasfundacion.com/', '_blank');
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
+        <div className="flex-1 p-6">
             {/* Contenedor principal — se centra verticalmente y permite scroll si no cabe */}
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* ── Card 1: ¿Qué es la Plataforma GIRS? ── */}
@@ -26,7 +21,7 @@ export default function InicioPage() {
                     <h1 className="titulos-cards mb-0 tracking-tight leading-tight mb-2">
                         ¿Qué es la Plataforma GIRS?
                     </h1>
-                    <p className="text-xs md:text-[0.8rem] font-semibold italic text-(--color-btn-green) mb-2 leading-snug">
+                    <p className="text-xs md:text-[0.8rem] font-semibold italic text-accent mb-2 leading-snug">
                         Tu infraestructura jurídica y técnica para la Gestión Integral de Residuos Sólidos (GIRS)
                     </p>
                     <p className="descripcion-cards leading-snug">
@@ -42,11 +37,8 @@ export default function InicioPage() {
                     <div className="bg-white rounded-xl border border-gray-200/70 shadow-sm px-4 py-2 flex flex-col justify-between relative">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <div
-                                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                                    style={{ backgroundColor: '#BEDABE' }}
-                                >
-                                    <FaBook className="w-3.5 h-3.5" style={{ color: '#00B800' }} />
+                                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                                    <FaBook className="w-3.5 h-3.5 text-accent" />
                                 </div>
                                 <h2 className="titulos-cards leading-tight">Biblioteca legal - GIRS</h2>
                             </div>
@@ -79,11 +71,8 @@ export default function InicioPage() {
                     <div className="bg-white rounded-xl border border-gray-200/70 shadow-sm px-4 py-2 flex flex-col justify-between relative">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <div
-                                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                                    style={{ backgroundColor: '#BEDABE' }}
-                                >
-                                    <BsChatRight className="w-3.5 h-3.5" style={{ color: '#00B800' }} />
+                                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                                    <BsChatRight className="w-3.5 h-3.5 text-accent" />
                                 </div>
                                 <h2 className="titulos-cards leading-tight">Consultor IA – GIRS</h2>
                             </div>
@@ -112,11 +101,8 @@ export default function InicioPage() {
                 <div className="rounded-xl bg-white border border-gray-200/70 text-gray-800 px-4 pt-4 pb-2 shadow-sm relative overflow-hidden">
                     <div className="relative z-10">
                         <div className="flex items-center gap-2 mb-1">
-                            <div
-                                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                                style={{ backgroundColor: '#BEDABE' }}
-                            >
-                                <FaGavel className="w-3.5 h-3.5" style={{ color: '#00B800' }} />
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                                <FaGavel className="w-3.5 h-3.5 text-accent" />
                             </div>
                             <h2 className="titulos-cards mb-0 leading-tight">Anteproyecto de Ley Orgánica GIRS</h2>
                         </div>
@@ -214,7 +200,7 @@ export default function InicioPage() {
                         xmlns="http://www.w3.org/2000/svg"
                     >
                         <path
-                            fill="#00b800"
+                            fill="var(--color-accent)"
                             fillOpacity="1"
                             d="M0,160L80,144C160,128,320,96,480,101.3C640,107,800,149,960,165.3C1120,181,1280,171,1360,165.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"
                         ></path>

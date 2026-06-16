@@ -78,7 +78,7 @@ export function LegalCard({
 
                 {/* Body: Title + Description */}
                 <div className="space-y-2">
-                    <h3 className="titulos-cards-proyecto-ley text-[18px] text-[#003d52] text-base leading-snug font-bold">
+                    <h3 className="titulos-cards-proyecto-ley text-[18px] text-primary text-base leading-snug font-bold">
                         {title}
                     </h3>
                     <p className="descripcion-cards-proyecto-ley text-[11.5px] italic text-gray-500 leading-relaxed">
@@ -95,7 +95,7 @@ export function LegalCard({
                 <div className="space-y-2">
                     <div className="flex justify-between items-center text-[12px]">
                         <span className="text-gray-400 font-medium">Fecha publicación</span>
-                        <span className="text-[#003d52] font-extrabold">{publishDate}</span>
+                        <span className="text-primary font-extrabold">{publishDate}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px]">
                         <span className="text-gray-400 font-medium font-bold">GACETA OFICIAL</span>
@@ -116,7 +116,7 @@ export function LegalCard({
                     href={downloadLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center h-10 bg-[#003d52] hover:bg-[#002f40] text-white font-bold rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-[#003d52]/10 text-sm"
+                    className="w-full flex items-center justify-center h-10 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-primary/10 text-sm"
                 >
                     Descargar
                 </a>

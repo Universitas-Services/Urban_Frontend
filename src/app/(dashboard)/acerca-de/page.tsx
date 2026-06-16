@@ -9,7 +9,7 @@ export default function AcercaDePage() {
     const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-(--color-dashboard-bg)">
+        <div className="flex-1 p-6">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* ── Un solo card conteniendo todo el contenido ── */}
                 <div className="w-full rounded-xl bg-white border border-gray-200/70 shadow-sm p-6 md:p-8 flex flex-col gap-6">
