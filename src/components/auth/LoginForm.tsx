@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { useAuthFormStyles } from './auth-context';
 import { cn } from '@/lib/utils';
+import { getHomeByRole } from '@/lib/constants/routes';
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +33,9 @@ export function LoginForm() {
     async function onSubmit(values: z.infer<typeof loginSchema>) {
         try {
             await login(values);
+            const loggedInUser = useAuthStore.getState().user;
             toast.success('¡Bienvenido!');
-            router.replace('/inicio');
+            router.replace(getHomeByRole(loggedInUser?.role ?? 'USER'));
         } catch (error) {
             toast.error((error as Error).message || 'Credenciales incorrectas');
         }

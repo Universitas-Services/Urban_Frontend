@@ -2,6 +2,7 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { jwtDecode } from 'jwt-decode';
+import type { UserRole } from '@/types/roles';
 
 export const TOKEN_COOKIE = 'access_token';
 const PAYLOAD_COOKIE = 'access_token_payload';
@@ -17,7 +18,7 @@ const COOKIE_OPTIONS = {
 export interface SessionPayload {
     sub: string;
     email: string;
-    role: 'USER' | 'ADMIN';
+    role: UserRole;
     iat?: number;
     exp?: number;
 }

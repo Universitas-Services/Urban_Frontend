@@ -72,7 +72,7 @@ export function proxy(request: NextRequest) {
 
     // 6. Verificar permisos de ruta según rol
     const allowedRoles = getAllowedRoles(pathname);
-    if (allowedRoles && !allowedRoles.includes(role)) {
+    if (allowedRoles && !allowedRoles.includes(role as import('@/types/roles').UserRole)) {
         return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
     }
 

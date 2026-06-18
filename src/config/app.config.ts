@@ -1,4 +1,6 @@
 export const APP_CONFIG = {
+    DOCUMENT_TITLE: 'Consultor IA - Derecho Urbanístico',
+    ADMIN_DOCUMENT_TITLE: 'Panel - Consultor IA - Derecho Urbanístico',
     PROJECT_NAME: 'GIRS',
     PROJECT_LOGO_URL: '/asset/LOGO UNIVERSITAS LEGAL (BLANCO).png',
     AGENT_NAME: 'GIRS',

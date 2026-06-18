@@ -144,6 +144,61 @@
     --radius: 0.625rem;
     --dashboard-cityscape-opacity: 0.36;
     --dashboard-cityscape-saturate: 1.65;
+
+    /* Admin: alias de la paleta Urban (un solo origen de color) */
+    --admin-text-title: var(--color-heading-dark);
+    --admin-card-1-text: var(--color-success);
+    --admin-card-1-bg: var(--color-accent-light);
+    --admin-card-2-text: var(--color-agent-accent);
+    --admin-card-2-bg: var(--color-msg-agent-bg);
+    --admin-card-3-text: var(--color-primary);
+    --admin-card-3-bg: var(--color-surface-soft);
+    --admin-card-4-text: var(--color-status-error);
+    --admin-card-4-bg: color-mix(in srgb, var(--color-status-error) 14%, var(--card));
+    --admin-card-5-text: var(--color-territorial);
+    --admin-card-5-bg: var(--color-territorial-light);
+    --admin-search-bg: var(--color-surface-light);
+    --admin-chart-bar: var(--color-territorial);
+    --admin-chart-bar-highlight: var(--color-accent);
+    --admin-toggle-bg: var(--color-surface-soft);
+    --admin-toggle-active-bg: var(--color-accent);
+    --admin-toggle-active-text: var(--color-on-primary);
+    --admin-badge-suscrito-bg: var(--color-accent-light);
+    --admin-badge-suscrito-text: var(--color-territorial);
+    --admin-badge-activo-bg: var(--secondary);
+    --admin-badge-activo-text: var(--color-heading-dark);
+    --admin-badge-porpagar-bg: var(--color-msg-agent-bg);
+    --admin-badge-porpagar-text: var(--color-agent-accent);
+    --admin-badge-suspendido-bg: color-mix(in srgb, var(--color-status-error) 14%, var(--card));
+    --admin-badge-suspendido-text: var(--color-status-error);
+    --admin-avatar-bg: var(--color-icon-green-bg);
+    --admin-avatar-text: var(--color-heading-dark);
+    --admin-text-link: var(--color-accent);
+    --admin-filter-bg: var(--secondary);
+    --admin-panel-bg: var(--color-accent-light);
+    --admin-id-badge-bg: var(--color-surface-soft);
+    --admin-id-badge-text: var(--color-primary);
+    --admin-card-blue-bg: var(--color-primary);
+    --admin-card-blue-border: var(--color-primary-hover);
+    --admin-log-gold-bg: var(--color-msg-agent-bg);
+    --admin-log-gold-text: var(--color-agent-accent);
+    --crm-label-por-contactar-bg: var(--color-msg-agent-bg);
+    --crm-label-por-contactar-text: var(--color-agent-accent);
+    --crm-label-contactado-bg: var(--color-surface-soft);
+    --crm-label-contactado-text: var(--color-primary);
+    --crm-label-pago-realizado-bg: var(--color-accent-light);
+    --crm-label-pago-realizado-text: var(--color-success);
+    --crm-label-por-enviar-doc-bg: var(--color-msg-agent-border);
+    --crm-label-por-enviar-doc-text: var(--color-agent-accent-hover);
+    --crm-label-envio-doc-bg: var(--color-territorial-light);
+    --crm-label-envio-doc-text: var(--color-territorial);
+    --crm-label-no-tiene-doc-bg: color-mix(in srgb, var(--color-status-error) 14%, var(--card));
+    --crm-label-no-tiene-doc-text: var(--color-status-error);
+    --crm-label-no-envio-doc-planificar-bg: color-mix(in srgb, var(--color-status-error) 22%, var(--card));
+    --crm-label-no-envio-doc-planificar-text: var(--color-status-error);
+    --chat-bubble: var(--color-primary);
+    --chat-bubble-foreground: var(--color-on-primary);
+
     --background: #f8f9fa;
     --foreground: #253042;
     --card: #ffffff;
@@ -301,6 +356,27 @@
 
 .font-display {
     font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
+}
+
+/* Admin — misma tipografía que el dashboard de usuario (Inter + EB Garamond) */
+.admin-area {
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+}
+
+.admin-area h1,
+.admin-area h2,
+.admin-area [data-slot='card-title'],
+.admin-area .admin-section-title {
+    font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
+    font-weight: 700;
+}
+
+.admin-area [data-sidebar='group-label'] {
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .icon-accent-box {

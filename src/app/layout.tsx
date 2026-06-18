@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, EB_Garamond } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
+import { APP_CONFIG } from '@/config/app.config';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const ebGaramond = EB_Garamond({
@@ -12,7 +13,7 @@ const ebGaramond = EB_Garamond({
 });
 
 export const metadata: Metadata = {
-    title: 'Consultor IA - GIRS',
+    title: APP_CONFIG.DOCUMENT_TITLE,
     description: 'Plataforma de consultoría experta en Gestión Integral de Residuos Sólidos',
     icons: {
         icon: '/asset/icons_12.png',
