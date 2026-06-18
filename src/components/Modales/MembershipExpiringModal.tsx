@@ -17,7 +17,7 @@ export function MembershipExpiringModal({ isOpen, onClose, daysLeft = 2 }: Membe
             <DialogContent className="sm:max-w-[440px] p-6 gap-0 rounded-3xl" showCloseButton={false}>
                 <div className="flex flex-col items-center">
                     <div
-                        className={`flex items-center justify-center w-16 h-16 rounded-2xl mb-4 ${daysLeft <= 0 ? 'bg-red-50' : 'bg-accent/10'}`}
+                        className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${daysLeft <= 0 ? 'bg-red-50' : 'icon-accent-box'}`}
                     >
                         <AlertTriangle
                             className={`w-8 h-8 ${daysLeft <= 0 ? 'text-red-500' : 'text-accent'}`}

@@ -10,22 +10,23 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
+import { useAuthFormStyles } from './auth-context';
+import { cn } from '@/lib/utils';
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuthStore();
     const router = useRouter();
+    const s = useAuthFormStyles();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: { email: '', password: '' },
     });
 
-    // Estado local del envío — NO el isLoading global (que es el gate de sesión del dashboard)
     const { isSubmitting } = form.formState;
 
     async function onSubmit(values: z.infer<typeof loginSchema>) {
@@ -40,17 +41,9 @@ export function LoginForm() {
 
     return (
         <div className="w-full animate-fade-in">
-            <div className="flex justify-center mb-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    src="/asset/LOGO UNIVERSITAS LEGAL.png"
-                    alt="Universitas Legal Logo"
-                    className="h-14 sm:h-16 w-auto object-contain drop-shadow-sm"
-                />
-            </div>
-            <div className="space-y-1 text-center mb-6">
-                <h2 className="font-display text-3xl font-bold text-primary">Bienvenido</h2>
-                <p className="text-neutral-dark/60 text-sm">Ingresa tus credenciales para continuar</p>
+            <div className="mb-6 space-y-1 text-center">
+                <h2 className={cn(s.title, 'text-3xl')}>Iniciar sesión</h2>
+                <p className={s.subtext}>Ingresa tus credenciales para continuar</p>
             </div>
 
             <Form {...form}>
@@ -60,10 +53,15 @@ export function LoginForm() {
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-primary font-bold text-sm">Correo electrónico</FormLabel>
+                                <FormLabel className={s.label}>Correo electrónico</FormLabel>
                                 <FormControl>
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-dark/40">
+                                        <div
+                                            className={cn(
+                                                'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
+                                                s.iconMuted
+                                            )}
+                                        >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 width="18"
@@ -81,12 +79,12 @@ export function LoginForm() {
                                         </div>
                                         <Input
                                             placeholder="nombre@empresa.com"
-                                            className="bg-surface-light border-transparent focus:border-accent focus:ring-accent pl-10 text-neutral-dark h-11"
+                                            className={s.inputWithPl10}
                                             {...field}
                                         />
                                     </div>
                                 </FormControl>
-                                <FormMessage className="text-red-500 font-medium text-xs" />
+                                <FormMessage className={s.messageError} />
                             </FormItem>
                         )}
                     />
@@ -96,10 +94,15 @@ export function LoginForm() {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-primary font-bold text-sm">Contraseña</FormLabel>
+                                <FormLabel className={s.label}>Contraseña</FormLabel>
                                 <FormControl>
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-dark/40">
+                                        <div
+                                            className={cn(
+                                                'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
+                                                s.iconMuted
+                                            )}
+                                        >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 width="18"
@@ -118,52 +121,55 @@ export function LoginForm() {
                                         <Input
                                             type={showPassword ? 'text' : 'password'}
                                             placeholder="••••••••"
-                                            className="bg-surface-light border-transparent focus:border-accent focus:ring-accent pl-10 pr-10 text-neutral-dark h-11"
+                                            className={s.inputWithPx10}
                                             {...field}
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-dark/60 hover:text-neutral-dark"
+                                            className={cn(
+                                                'absolute right-3 top-1/2 -translate-y-1/2 hover:text-white',
+                                                s.iconMuted
+                                            )}
                                         >
                                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                         </button>
                                     </div>
                                 </FormControl>
-                                <FormMessage className="text-red-500 font-medium text-xs" />
+                                <FormMessage className={s.messageError} />
                             </FormItem>
                         )}
                     />
 
-                    <div className="flex justify-between items-center px-1">
-                        <label className="flex items-center space-x-2 text-sm text-neutral-dark/60 cursor-pointer">
+                    <div className="flex items-center justify-between px-1">
+                        <label className={cn('flex cursor-pointer items-center space-x-2', s.checkboxLabel)}>
                             <input
                                 type="checkbox"
-                                className="rounded border-neutral-bg text-accent focus:ring-accent"
+                                className="rounded border-white/30 text-auth-accent focus:ring-auth-accent"
                             />
                             <span>Recordarme</span>
                         </label>
-                        <Link href="/forgot-password" className="text-sm text-accent hover:underline font-medium">
+                        <button type="button" onClick={() => router.push('/forgot-password')} className={s.link}>
                             ¿Olvidaste tu contraseña?
-                        </Link>
+                        </button>
                     </div>
 
-                    <Button
-                        type="submit"
-                        className="w-full bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                        disabled={isSubmitting}
-                    >
+                    <Button type="submit" className={s.submitBtn} disabled={isSubmitting}>
                         {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
                         Ingresar
                         {!isSubmitting && <ArrowRight size={18} className="ml-2" />}
                     </Button>
 
-                    <div className="pt-6 border-t border-surface-soft/30 text-center">
-                        <p className="text-sm text-neutral-dark/60">
+                    <div className={cn('border-t pt-6 text-center', s.divider)}>
+                        <p className={s.footerText}>
                             ¿No tienes una cuenta?{' '}
-                            <Link href="/register" className="text-accent hover:underline font-bold">
+                            <button
+                                type="button"
+                                onClick={() => router.push('/register')}
+                                className="font-bold text-auth-accent hover:underline"
+                            >
                                 Regístrate
-                            </Link>
+                            </button>
                         </p>
                     </div>
                 </form>

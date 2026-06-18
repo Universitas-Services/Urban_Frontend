@@ -18,7 +18,7 @@ export function AgentAvatar({ size = 'sm', className }: AgentAvatarProps) {
     return (
         <div
             className={cn(
-                'rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center relative overflow-hidden shrink-0 shadow-lg',
+                'rounded-full bg-gradient-to-br from-primary to-agent-accent flex items-center justify-center relative overflow-hidden shrink-0 shadow-lg',
                 sizeClasses,
                 className
             )}

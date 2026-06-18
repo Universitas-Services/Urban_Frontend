@@ -62,5 +62,10 @@
         "vite": "^8.0.16",
         "vitest": "^4.0.18"
     },
-    "packageManager": "pnpm@11.1.2"
+    "packageManager": "pnpm@11.1.2",
+    "pnpm": {
+        "overrides": {
+            "hono": "4.12.26"
+        }
+    }
 }

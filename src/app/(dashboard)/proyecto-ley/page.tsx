@@ -19,7 +19,7 @@ export default function ProyectoLeyPage() {
         <div className="flex-1 p-6">
             <div className="max-w-6xl mx-auto space-y-6">
                 <div className="rounded-xl bg-white border border-gray-200/70 shadow-sm px-4 py-3 flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                    <div className="icon-accent-box flex h-12 w-12 shrink-0 items-center justify-center rounded-lg">
                         <FaBook className="w-9 h-9 text-accent" />
                     </div>
                     <h1 className="titulos-cards leading-tight mb-0">

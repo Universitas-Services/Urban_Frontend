@@ -38,7 +38,7 @@ export function BibliotecaGirsView() {
                     <BibliotecaGirsCard
                         title="Ordenanzas"
                         tagLabel="LOCAL"
-                        tagBgColor="bg-accent/10"
+                        tagBgColor="icon-accent-box"
                         tagTextColor="text-accent"
                         imageSrc="/bibliotecagirs/ordenanzass.png"
                         description="Compendio especializado de los instrumentos dictados por los Concejos Municipales que regulan el servicio local de aseo urbano, los regímenes tarifarios, la participación ciudadana y el control ambiental territorial."
@@ -65,8 +65,8 @@ export function BibliotecaGirsView() {
                     <BibliotecaGirsCard
                         title="Doctrina"
                         tagLabel="ACADÉMICO"
-                        tagBgColor="bg-orange-100"
-                        tagTextColor="text-orange-700"
+                        tagBgColor="icon-accent-box"
+                        tagTextColor="text-accent"
                         imageSrc="/bibliotecagirs/doctrinass.png"
                         description="Compendio especializado de artículos académicos, ensayos e investigaciones que analizan críticamente los fundamentos teóricos, las competencias municipales y los debates tributarios en el manejo de residuos sólidos."
                         href="https://universitas.legal/biblioteca-girs-doctrina/"

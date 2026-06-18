@@ -56,8 +56,10 @@ export default function ChatDashboardPage() {
                 <div className="flex flex-col">
                     <h1 className="font-semibold text-neutral-dark text-base">{APP_CONFIG.AGENT_NAME}</h1>
                     <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                        <span className="text-[10px] uppercase font-bold text-accent tracking-wider">En línea</span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-(--color-status-online) animate-pulse" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-(--color-status-online)">
+                            En línea
+                        </span>
                     </div>
                 </div>
             </div>

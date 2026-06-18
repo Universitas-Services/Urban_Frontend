@@ -64,7 +64,7 @@ export function MessageBubble({ message, isLast }: MessageBubbleProps) {
                         <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
                             {displayedText}
                             {isTyping && (
-                                <span className="inline-block w-1.5 h-4 ml-1 bg-accent animate-pulse align-middle" />
+                                <span className="inline-block w-1.5 h-4 ml-1 bg-agent-accent animate-pulse align-middle" />
                             )}
                         </p>
                     </div>

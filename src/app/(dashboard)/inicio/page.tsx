@@ -37,7 +37,7 @@ export default function InicioPage() {
                     <div className="bg-white rounded-xl border border-gray-200/70 shadow-sm px-4 py-2 flex flex-col justify-between relative">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                                <div className="icon-accent-box flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
                                     <FaBook className="w-3.5 h-3.5 text-accent" />
                                 </div>
                                 <h2 className="titulos-cards leading-tight">Biblioteca legal - GIRS</h2>
@@ -71,7 +71,7 @@ export default function InicioPage() {
                     <div className="bg-white rounded-xl border border-gray-200/70 shadow-sm px-4 py-2 flex flex-col justify-between relative">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                                <div className="icon-accent-box flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
                                     <BsChatRight className="w-3.5 h-3.5 text-accent" />
                                 </div>
                                 <h2 className="titulos-cards leading-tight">Consultor IA – GIRS</h2>
@@ -101,7 +101,7 @@ export default function InicioPage() {
                 <div className="rounded-xl bg-white border border-gray-200/70 text-gray-800 px-4 pt-4 pb-2 shadow-sm relative overflow-hidden">
                     <div className="relative z-10">
                         <div className="flex items-center gap-2 mb-1">
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+                            <div className="icon-accent-box flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
                                 <FaGavel className="w-3.5 h-3.5 text-accent" />
                             </div>
                             <h2 className="titulos-cards mb-0 leading-tight">Anteproyecto de Ley Orgánica GIRS</h2>
