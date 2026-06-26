@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/store/auth.context';
+import { useAuthStore } from '@/store/auth.store';
 import { Settings, Key, Trash2, X, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import { authService } from '@/lib/services/auth.service';
+import { getFullProfileService, getProfileService } from '@/lib/services/auth.service';
 import { UserProfile } from '@/types/auth.types';
 import { toast } from 'sonner';
 
@@ -47,7 +47,7 @@ const passwordSchema = z
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function ProfilePage() {
-    const { user, logout, updateUser } = useAuth();
+    const { user, updateProfile, changePassword: changePasswordAction, deleteAccount } = useAuthStore();
     const [activeTab, setActiveTab] = useState<Tab>('edit');
     const [fullProfile, setFullProfile] = useState<UserProfile | null>(null);
     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -56,8 +56,13 @@ export default function ProfilePage() {
         const fetchFullProfile = async () => {
             setIsLoadingProfile(true);
             try {
-                const data = await authService.getFullProfile();
-                setFullProfile(data);
+                const [profileResult] = await Promise.allSettled([getFullProfileService(), getProfileService()]);
+
+                if (profileResult.status === 'fulfilled') {
+                    setFullProfile(profileResult.value);
+                } else {
+                    toast.error('Error al cargar la información del perfil.');
+                }
             } catch {
                 toast.error('Error al cargar la información del perfil.');
             } finally {
@@ -74,12 +79,22 @@ export default function ProfilePage() {
         formState: { errors: profileErrors },
     } = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        values: {
-            nombre: fullProfile?.nombre || user?.nombre || '',
-            apellido: fullProfile?.apellido || user?.apellido || '',
-            telefono: fullProfile?.telefono || user?.telefono || '',
+        defaultValues: {
+            nombre: '',
+            apellido: '',
+            telefono: '',
         },
     });
+
+    useEffect(() => {
+        if (!fullProfile) return;
+
+        resetProfile({
+            nombre: fullProfile.nombre ?? '',
+            apellido: fullProfile.apellido ?? '',
+            telefono: fullProfile.telefono ?? '',
+        });
+    }, [fullProfile, resetProfile]);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingProfileMode, setIsEditingProfileMode] = useState(false);
 
@@ -101,19 +116,19 @@ export default function ProfilePage() {
     const handleUpdateProfile = async (data: ProfileFormValues) => {
         setIsEditingProfile(true);
         try {
-            const updatedUser = await authService.updateProfile({
+            await updateProfile({
                 nombre: data.nombre,
                 apellido: data.apellido,
                 telefono: data.telefono || '',
             });
-            updateUser(updatedUser);
+            setFullProfile((prev) =>
+                prev ? { ...prev, nombre: data.nombre, apellido: data.apellido, telefono: data.telefono || '' } : prev
+            );
             setIsEditingProfileMode(false);
             toast.success('Perfil actualizado correctamente.');
         } catch (error) {
             console.error('Failed to update profile', error);
-            const errMsg =
-                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
-                'Error al actualizar el perfil.';
+            const errMsg = (error as Error).message || 'Error al actualizar el perfil.';
             toast.error(errMsg);
         } finally {
             setIsEditingProfile(false);
@@ -123,14 +138,12 @@ export default function ProfilePage() {
     const handleChangePassword = async (data: PasswordFormValues) => {
         setIsChangingPassword(true);
         try {
-            await authService.changePassword({ currentPassword: data.currentPassword, newPassword: data.newPassword });
+            await changePasswordAction({ currentPassword: data.currentPassword, newPassword: data.newPassword });
             toast.success('Contraseña actualizada correctamente.');
             resetPassword();
         } catch (error) {
             console.error('Failed to change password', error);
-            const errMsg =
-                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
-                'Error al cambiar la contraseña.';
+            const errMsg = (error as Error).message || 'Error al cambiar la contraseña.';
             toast.error(errMsg);
         } finally {
             setIsChangingPassword(false);
@@ -168,15 +181,12 @@ export default function ProfilePage() {
 
         setIsDeleting(true);
         try {
-            await authService.deleteAccount(deletePassword);
+            await deleteAccount(deletePassword);
             toast.success('Tu cuenta ha sido eliminada permanentemente.');
-            await logout();
             window.location.href = '/login';
         } catch (error) {
             console.error('Failed to delete account', error);
-            const errMsg =
-                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
-                'Contraseña incorrecta o error al procesar tu solicitud.';
+            const errMsg = (error as Error).message || 'Contraseña incorrecta o error al procesar tu solicitud.';
             toast.error(errMsg);
         } finally {
             setIsDeleting(false);
@@ -184,15 +194,15 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-[var(--color-dashboard-bg)]">
-            <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex min-h-0 flex-1 flex-col p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
                 {/* Header */}
                 <div className="mb-2 flex justify-center">
                     <h1 className="text-xl font-bold text-neutral-dark">Gestión de perfil</h1>
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-2xl shadow-sm border border-surface-soft overflow-hidden flex flex-col flex-1">
+                <div className="overflow-hidden rounded-2xl border border-surface-soft bg-white shadow-sm">
                     {/* Inner Header */}
                     <div className="p-4 border-b border-surface-soft/40">
                         <h2 className="text-lg font-bold text-neutral-dark">Configuración de tu perfil</h2>
@@ -201,7 +211,7 @@ export default function ProfilePage() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row flex-1 min-h-0">
+                    <div className="flex min-h-0 flex-col md:flex-row">
                         {/* Sidebar Navigation */}
                         <div className="w-full md:w-56 border-r border-surface-soft/40 p-2 space-y-0.5">
                             <button
@@ -247,7 +257,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 p-5 overflow-y-auto">
+                        <div className="flex-1 p-5">
                             {activeTab === 'edit' && (
                                 <div className="w-full">
                                     <form

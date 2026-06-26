@@ -17,10 +17,10 @@ export function CopyrightFooter() {
             </p>
 
             {/* Enlaces interactivos */}
-            <div className="flex flex-wrap justify-center items-center gap-2 mt-2 text-[12px] md:text-[13px] text-[#003B4A]/80 font-semibold">
+            <div className="flex flex-wrap justify-center items-center gap-2 mt-2 text-[12px] md:text-[13px] text-primary/80 font-semibold">
                 <button
                     onClick={() => setIsTermsOpen(true)}
-                    className="hover:text-[#388E3C] hover:underline transition-colors focus:outline-none"
+                    className="hover:text-accent hover:underline transition-colors focus:outline-none"
                 >
                     Términos y Condiciones de Uso
                 </button>
@@ -28,7 +28,7 @@ export function CopyrightFooter() {
 
                 <button
                     onClick={() => setIsPrivacyOpen(true)}
-                    className="hover:text-[#388E3C] hover:underline transition-colors focus:outline-none"
+                    className="hover:text-accent hover:underline transition-colors focus:outline-none"
                 >
                     Política de Privacidad
                 </button>
@@ -38,7 +38,7 @@ export function CopyrightFooter() {
                     href="https://wa.me/584145051716"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-[#388E3C] hover:underline transition-colors"
+                    className="hover:text-accent hover:underline transition-colors"
                 >
                     Contacto / Soporte
                 </a>
@@ -794,7 +794,7 @@ export function CopyrightFooter() {
                                         setIsPrivacyOpen(false);
                                         setIsTermsOpen(true);
                                     }}
-                                    className="text-[#388E3C] hover:underline font-bold"
+                                    className="text-accent hover:underline font-bold"
                                 >
                                     Términos y Condiciones
                                 </button>

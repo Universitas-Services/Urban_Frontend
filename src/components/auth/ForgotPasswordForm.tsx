@@ -9,11 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, ArrowRight, Eye, EyeOff, KeyRound, ShieldCheck } from 'lucide-react';
-import Link from 'next/link';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
-import { authService } from '@/lib/services/auth.service';
+import { forgotPasswordService, verifyOtpService, resetPasswordService } from '@/lib/services/auth.service';
 import { useRouter } from 'next/navigation';
+import { useAuthFormStyles } from './auth-context';
+import { cn } from '@/lib/utils';
+
+const stepLabels = ['Correo', 'Código', 'Nueva clave'];
 
 export function ForgotPasswordForm() {
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -21,6 +24,7 @@ export function ForgotPasswordForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
+    const s = useAuthFormStyles();
 
     const form = useForm<z.infer<typeof forgotPasswordSchema>>({
         resolver: zodResolver(forgotPasswordSchema),
@@ -35,10 +39,10 @@ export function ForgotPasswordForm() {
 
         setIsSubmitting(true);
         try {
-            await authService.forgotPassword(emailValue);
+            await forgotPasswordService(emailValue);
             toast.success('Código enviado a tu correo');
             setStep(2);
-        } catch (error) {
+        } catch {
             toast.error('Error al enviar el código');
         } finally {
             setIsSubmitting(false);
@@ -52,10 +56,10 @@ export function ForgotPasswordForm() {
         setIsSubmitting(true);
         try {
             const code = form.getValues('code') || '';
-            await authService.verifyOtp(emailValue, code);
+            await verifyOtpService(emailValue, code);
             toast.success('Código verificado correctamente');
             setStep(3);
-        } catch (error) {
+        } catch {
             toast.error('Código inválido o expirado');
         } finally {
             setIsSubmitting(false);
@@ -66,10 +70,10 @@ export function ForgotPasswordForm() {
         if (step !== 3) return;
         setIsSubmitting(true);
         try {
-            await authService.resetPassword(values.email, values.password || '');
+            await resetPasswordService(values.email, values.password || '');
             toast.success('Contraseña actualizada exitosamente');
-            router.push('/login');
-        } catch (error) {
+            router.push('/login?panel=login');
+        } catch {
             toast.error('Error al actualizar contraseña');
         } finally {
             setIsSubmitting(false);
@@ -77,59 +81,77 @@ export function ForgotPasswordForm() {
     }
 
     return (
-        <div className="w-full animate-fade-in relative overflow-hidden">
-            <div className="flex justify-center mb-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    src="/asset/LOGO UNIVERSITAS LEGAL.png"
-                    alt="Universitas Legal Logo"
-                    className="h-14 sm:h-16 w-auto object-contain drop-shadow-sm"
-                />
-            </div>
-            <div className="space-y-1 mb-5 text-center">
-                <h2 className="text-3xl font-bold text-primary">Recuperar contraseña</h2>
-                <p className="text-neutral-dark/60 text-sm">
+        <div className="relative w-full animate-fade-in overflow-hidden">
+            <div className="mb-5 space-y-1 text-center">
+                <h2 className={cn(s.title, 'text-3xl')}>Recuperar contraseña</h2>
+                <p className={s.subtext}>
                     {step === 1 && 'Ingresa tu correo para recibir un código.'}
                     {step === 2 && 'Ingresa el código numérico de 6 dígitos.'}
                     {step === 3 && 'Crea tu nueva contraseña segura.'}
                 </p>
             </div>
 
+            <div className="mb-6 flex items-center justify-center gap-4">
+                {stepLabels.map((label, index) => {
+                    const stepNumber = index + 1;
+                    const isActive = step === stepNumber;
+                    const isDone = step > stepNumber;
+                    return (
+                        <div key={label} className="flex flex-col items-center gap-1">
+                            <div
+                                className={cn(
+                                    'flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors',
+                                    isActive || isDone ? s.stepActive : s.stepInactive
+                                )}
+                            >
+                                {stepNumber}
+                            </div>
+                            <span
+                                className={cn(
+                                    'text-[11px] font-medium',
+                                    isActive ? s.stepLabelActive : s.stepLabelInactive
+                                )}
+                            >
+                                {label}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                     {step === 1 && (
-                        <div className="space-y-6 animate-fade-in">
+                        <div className="animate-fade-in space-y-6">
                             <FormField
                                 control={form.control}
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-primary font-bold text-sm">
-                                            Correo electrónico
-                                        </FormLabel>
+                                        <FormLabel className={s.label}>Correo electrónico</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-dark/40">
+                                                <div
+                                                    className={cn(
+                                                        'absolute left-3 top-1/2 -translate-y-1/2',
+                                                        s.iconMuted
+                                                    )}
+                                                >
                                                     <Mail size={18} />
                                                 </div>
                                                 <Input
                                                     placeholder="nombre@empresa.com"
-                                                    className="pl-10 bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
+                                                    className={s.inputWithPl10}
                                                     {...field}
                                                 />
                                             </div>
                                         </FormControl>
-                                        <FormMessage className="text-red-500 font-medium text-xs" />
+                                        <FormMessage className={s.messageError} />
                                     </FormItem>
                                 )}
                             />
 
-                            <Button
-                                type="button"
-                                onClick={onNextStep1}
-                                className="w-full bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                                disabled={isSubmitting}
-                            >
+                            <Button type="button" onClick={onNextStep1} className={s.submitBtn} disabled={isSubmitting}>
                                 {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
                                 Siguiente
                                 {!isSubmitting && <ArrowRight size={18} className="ml-2" />}
@@ -138,24 +160,32 @@ export function ForgotPasswordForm() {
                     )}
 
                     {step === 2 && (
-                        <div className="space-y-6 animate-fade-in">
+                        <div className="animate-fade-in space-y-6">
                             <FormField
                                 control={form.control}
                                 name="code"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-primary font-bold text-sm text-center block">
+                                        <FormLabel className={cn(s.label, 'block text-center')}>
                                             Código de verificación
                                         </FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-dark/40">
+                                                <div
+                                                    className={cn(
+                                                        'absolute left-3 top-1/2 -translate-y-1/2',
+                                                        s.iconMuted
+                                                    )}
+                                                >
                                                     <KeyRound size={18} />
                                                 </div>
                                                 <Input
                                                     placeholder="123456"
                                                     maxLength={6}
-                                                    className="pl-10 text-center tracking-widest text-lg font-bold bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-14"
+                                                    className={cn(
+                                                        s.inputWithPl10,
+                                                        'h-14 text-center text-lg font-bold tracking-widest'
+                                                    )}
                                                     {...field}
                                                     onChange={(e) => {
                                                         const val = e.target.value.replace(/\D/g, '');
@@ -164,52 +194,48 @@ export function ForgotPasswordForm() {
                                                 />
                                             </div>
                                         </FormControl>
-                                        <FormMessage className="text-red-500 font-medium text-xs text-center" />
+                                        <FormMessage className={cn(s.messageError, 'text-center')} />
                                     </FormItem>
                                 )}
                             />
 
-                            <Button
-                                type="button"
-                                onClick={onNextStep2}
-                                className="w-full bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                                disabled={isSubmitting}
-                            >
+                            <Button type="button" onClick={onNextStep2} className={s.submitBtn} disabled={isSubmitting}>
                                 {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
-                                Verificar Código
+                                Verificar código
                                 {!isSubmitting && <ShieldCheck size={18} className="ml-2" />}
                             </Button>
                         </div>
                     )}
 
                     {step === 3 && (
-                        <div className="space-y-6 animate-fade-in">
+                        <div className="animate-fade-in space-y-6">
                             <FormField
                                 control={form.control}
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-primary font-bold text-sm">
-                                            Nueva contraseña
-                                        </FormLabel>
+                                        <FormLabel className={s.label}>Nueva contraseña</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
                                                     type={showPassword ? 'text' : 'password'}
                                                     placeholder="••••••••"
-                                                    className="bg-surface-light border-transparent focus:border-accent focus:ring-accent pr-10 text-neutral-dark h-11"
+                                                    className={s.inputWithPr10}
                                                     {...field}
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowPassword(!showPassword)}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-dark/60 hover:text-neutral-dark"
+                                                    className={cn(
+                                                        'absolute right-3 top-1/2 -translate-y-1/2',
+                                                        s.iconMuted
+                                                    )}
                                                 >
                                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                                 </button>
                                             </div>
                                         </FormControl>
-                                        <FormMessage className="text-red-500 font-medium text-xs" />
+                                        <FormMessage className={s.messageError} />
                                     </FormItem>
                                 )}
                             />
@@ -219,36 +245,33 @@ export function ForgotPasswordForm() {
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-primary font-bold text-sm">
-                                            Confirmar nueva contraseña
-                                        </FormLabel>
+                                        <FormLabel className={s.label}>Confirmar nueva contraseña</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
                                                     type={showConfirmPassword ? 'text' : 'password'}
                                                     placeholder="••••••••"
-                                                    className="bg-surface-light border-transparent focus:border-accent focus:ring-accent pr-10 text-neutral-dark h-11"
+                                                    className={s.inputWithPr10}
                                                     {...field}
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-dark/60 hover:text-neutral-dark"
+                                                    className={cn(
+                                                        'absolute right-3 top-1/2 -translate-y-1/2',
+                                                        s.iconMuted
+                                                    )}
                                                 >
                                                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                                 </button>
                                             </div>
                                         </FormControl>
-                                        <FormMessage className="text-red-500 font-medium text-xs" />
+                                        <FormMessage className={s.messageError} />
                                     </FormItem>
                                 )}
                             />
 
-                            <Button
-                                type="submit"
-                                className="w-full bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                                disabled={isSubmitting}
-                            >
+                            <Button type="submit" className={s.submitBtn} disabled={isSubmitting}>
                                 {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
                                 Guardar contraseña
                             </Button>
@@ -257,10 +280,14 @@ export function ForgotPasswordForm() {
                 </form>
             </Form>
 
-            <div className="pt-6 border-t border-surface-soft/30 text-center mt-6">
-                <Link href="/login" className="text-sm text-accent hover:underline font-bold">
+            <div className={cn('mt-6 border-t pt-6 text-center', s.divider)}>
+                <button
+                    type="button"
+                    onClick={() => router.push('/login?panel=login')}
+                    className="text-sm font-bold text-auth-accent hover:underline"
+                >
                     Volver al inicio de sesión
-                </Link>
+                </button>
             </div>
         </div>
     );

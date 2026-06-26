@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { authService } from '@/lib/services/auth.service';
-import { useAuth } from '@/store/auth.context';
+import { useAuthStore } from '@/store/auth.store';
 import { toast } from 'sonner';
 import { AlertCircle, Lock, Trash2, Loader2, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +13,7 @@ interface UserSettingsModalProps {
 }
 
 export function UserSettingsModal({ isOpen, onClose }: UserSettingsModalProps) {
-    const { logout } = useAuth();
+    const { deleteAccount } = useAuthStore();
     const router = useRouter();
 
     const [isDeleting, setIsDeleting] = useState(false);
@@ -36,15 +35,13 @@ export function UserSettingsModal({ isOpen, onClose }: UserSettingsModalProps) {
 
         setIsDeleting(true);
         try {
-            await authService.deleteAccount(password);
+            await deleteAccount(password);
             toast.success('Tu cuenta ha sido eliminada exitosamente.');
-            await logout();
             router.replace('/login');
         } catch (error) {
             console.error('Failed to delete account', error);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const errMsg =
-                (error as any).response?.data?.message || 'Contraseña incorrecta o error al eliminar cuenta.';
+
+            const errMsg = (error as Error).message || 'Contraseña incorrecta o error al eliminar cuenta.';
             toast.error(errMsg);
         } finally {
             setIsDeleting(false);
@@ -75,7 +72,7 @@ export function UserSettingsModal({ isOpen, onClose }: UserSettingsModalProps) {
                             <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
                                     <h4 className="font-bold text-red-700 text-sm mb-1">Eliminar Cuenta</h4>
-                                    <p className="text-red-700/80 text-xs max-w-[250px]">
+                                    <p className="text-red-700/80 text-xs max-w-62.5">
                                         Esta acción es irreversible y eliminará de forma permanente tu usuario,
                                         historial y todos tus datos asociados.
                                     </p>
@@ -133,7 +130,7 @@ export function UserSettingsModal({ isOpen, onClose }: UserSettingsModalProps) {
                                             size="sm"
                                             onClick={handleDeleteAccount}
                                             disabled={isDeleting || !password}
-                                            className="h-10 bg-red-600 hover:bg-red-700 text-white font-bold min-w-[120px]"
+                                            className="h-10 bg-red-600 hover:bg-red-700 text-white font-bold min-w-30"
                                         >
                                             {isDeleting ? (
                                                 <Loader2 className="w-4 h-4 animate-spin" />

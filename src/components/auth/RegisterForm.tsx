@@ -4,14 +4,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { registerSchema } from '@/lib/validations/auth.schemas';
-import { useAuth } from '@/store/auth.context';
+import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff, ArrowRight, ChevronLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -21,6 +20,7 @@ import { type Estado, type Municipio } from '@universitas/sdk-global';
 import { sdkApi } from '@/lib/api/universitas.sdk';
 
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuthFormStyles } from './auth-context';
 
 export function RegisterForm() {
     const [step, setStep] = useState(1);
@@ -37,8 +37,9 @@ export function RegisterForm() {
     const [isLoadingMunicipios, setIsLoadingMunicipios] = useState(false);
     const [showEnteFields, setShowEnteFields] = useState(false);
     const [showCargoNormativa, setShowCargoNormativa] = useState(false);
-    const { register, isLoading } = useAuth();
+    const { register } = useAuthStore();
     const router = useRouter();
+    const s = useAuthFormStyles();
 
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
@@ -58,6 +59,9 @@ export function RegisterForm() {
             termsAccepted: false,
         },
     });
+
+    // Estado local del envío — NO el isLoading global (que es el gate de sesión del dashboard)
+    const { isSubmitting } = form.formState;
 
     const passwordValue = form.watch('password');
 
@@ -140,7 +144,7 @@ export function RegisterForm() {
             };
             await register(payload);
             toast.success('Te hemos enviado un enlace de activación a tu correo electrónico.');
-            router.push('/login');
+            router.push('/login?panel=login');
         } catch {
             toast.error('Error al registrar la cuenta');
         }
@@ -149,20 +153,10 @@ export function RegisterForm() {
     return (
         <>
             <div className="w-full animate-fade-in">
-                <div className="flex justify-center mb-3 sm:mb-4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src="/asset/LOGO UNIVERSITAS LEGAL.png"
-                        alt="Universitas Legal Logo"
-                        className="h-12 sm:h-14 w-auto object-contain drop-shadow-sm"
-                    />
-                </div>
                 <div className="space-y-4 mb-4">
                     <div className="space-y-1 text-center">
-                        <h2 className="text-2xl sm:text-3xl font-bold text-primary">
-                            {step === 1 ? 'Crea tu cuenta' : 'Completa tus datos'}
-                        </h2>
-                        <p className="text-neutral-dark/60 text-sm">Por favor introduce tus datos para continuar.</p>
+                        <h2 className={s.title}>{step === 1 ? 'Crea tu cuenta' : 'Completa tus datos'}</h2>
+                        <p className={s.subtext}>Por favor introduce tus datos para continuar.</p>
                     </div>
 
                     <div className="flex justify-center items-center space-x-8 sm:space-x-12">
@@ -170,9 +164,7 @@ export function RegisterForm() {
                             <div
                                 className={cn(
                                     'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg font-bold transition-all duration-300',
-                                    step === 1
-                                        ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                        : 'bg-surface-soft/20 text-neutral-dark/40'
+                                    step === 1 ? s.stepActive : s.stepInactive
                                 )}
                             >
                                 1
@@ -180,7 +172,7 @@ export function RegisterForm() {
                             <span
                                 className={cn(
                                     'text-xs sm:text-sm transition-colors',
-                                    step === 1 ? 'text-primary font-bold' : 'text-neutral-dark/40 font-medium'
+                                    step === 1 ? s.stepLabelActive : s.stepLabelInactive
                                 )}
                             >
                                 Credenciales
@@ -190,9 +182,7 @@ export function RegisterForm() {
                             <div
                                 className={cn(
                                     'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg font-bold transition-all duration-300',
-                                    step === 2
-                                        ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                        : 'bg-surface-soft/20 text-neutral-dark/40'
+                                    step === 2 ? s.stepActive : s.stepInactive
                                 )}
                             >
                                 2
@@ -200,7 +190,7 @@ export function RegisterForm() {
                             <span
                                 className={cn(
                                     'text-xs sm:text-sm transition-colors',
-                                    step === 2 ? 'text-primary font-bold' : 'text-neutral-dark/40 font-medium'
+                                    step === 2 ? s.stepLabelActive : s.stepLabelInactive
                                 )}
                             >
                                 Datos personales
@@ -218,17 +208,15 @@ export function RegisterForm() {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-primary font-bold text-sm">
-                                                Correo electrónico
-                                            </FormLabel>
+                                            <FormLabel className={s.label}>Correo electrónico</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="nombre@empresa.com"
-                                                    className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
+                                                    className={s.input}
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                            <FormMessage className={s.messageError} />
                                         </FormItem>
                                     )}
                                 />
@@ -238,19 +226,22 @@ export function RegisterForm() {
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-primary font-bold text-sm">Contraseña</FormLabel>
+                                            <FormLabel className={s.label}>Contraseña</FormLabel>
                                             <FormControl>
                                                 <div className="relative">
                                                     <Input
                                                         type={showPassword ? 'text' : 'password'}
                                                         placeholder="••••••••"
-                                                        className="bg-surface-light border-transparent focus:border-accent focus:ring-accent pr-10 text-neutral-dark h-11"
+                                                        className={s.inputWithPr10}
                                                         {...field}
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowPassword(!showPassword)}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-dark/60 hover:text-neutral-dark"
+                                                        className={cn(
+                                                            'absolute right-3 top-1/2 -translate-y-1/2 hover:text-neutral-dark',
+                                                            s.iconMuted
+                                                        )}
                                                     >
                                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                                     </button>
@@ -269,14 +260,14 @@ export function RegisterForm() {
                                                                         ? 'bg-red-500'
                                                                         : level === 2
                                                                           ? 'bg-yellow-500'
-                                                                          : 'bg-accent'
-                                                                    : 'bg-surface-soft/30'
+                                                                          : 'bg-auth-accent'
+                                                                    : 'bg-surface-soft/50'
                                                             )}
                                                         />
                                                     ))}
                                                 </div>
                                             )}
-                                            <FormMessage className="text-red-500 font-medium text-xs mt-1" />
+                                            <FormMessage className={cn(s.messageError, 'mt-1')} />
                                         </FormItem>
                                     )}
                                 />
@@ -286,36 +277,33 @@ export function RegisterForm() {
                                     name="confirmPassword"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-primary font-bold text-sm">
-                                                Confirmar contraseña
-                                            </FormLabel>
+                                            <FormLabel className={s.label}>Confirmar contraseña</FormLabel>
                                             <FormControl>
                                                 <div className="relative">
                                                     <Input
                                                         type={showConfirmPassword ? 'text' : 'password'}
                                                         placeholder="••••••••"
-                                                        className="bg-surface-light border-transparent focus:border-accent focus:ring-accent pr-10 text-neutral-dark h-11"
+                                                        className={s.inputWithPr10}
                                                         {...field}
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-dark/60 hover:text-neutral-dark"
+                                                        className={cn(
+                                                            'absolute right-3 top-1/2 -translate-y-1/2 hover:text-neutral-dark',
+                                                            s.iconMuted
+                                                        )}
                                                     >
                                                         {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                                     </button>
                                                 </div>
                                             </FormControl>
-                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                            <FormMessage className={s.messageError} />
                                         </FormItem>
                                     )}
                                 />
 
-                                <Button
-                                    type="button"
-                                    onClick={onNextStep}
-                                    className="w-full bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20 mt-4"
-                                >
+                                <Button type="button" onClick={onNextStep} className={cn(s.submitBtn, 'mt-4')}>
                                     Siguiente
                                     <ArrowRight size={18} className="ml-2" />
                                 </Button>
@@ -329,15 +317,11 @@ export function RegisterForm() {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-primary font-bold text-sm">Nombre</FormLabel>
+                                            <FormLabel className={s.label}>Nombre</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="Ejemplo: Juan"
-                                                    className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Ejemplo: Juan" className={s.input} {...field} />
                                             </FormControl>
-                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                            <FormMessage className={s.messageError} />
                                         </FormItem>
                                     )}
                                 />
@@ -347,15 +331,11 @@ export function RegisterForm() {
                                     name="lastName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-primary font-bold text-sm">Apellido</FormLabel>
+                                            <FormLabel className={s.label}>Apellido</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="Ejemplo: Pérez"
-                                                    className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Ejemplo: Pérez" className={s.input} {...field} />
                                             </FormControl>
-                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                            <FormMessage className={s.messageError} />
                                         </FormItem>
                                     )}
                                 />
@@ -365,10 +345,10 @@ export function RegisterForm() {
                                     name="phone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-primary font-bold text-sm">Teléfono</FormLabel>
+                                            <FormLabel className={s.label}>Teléfono</FormLabel>
                                             <FormControl>
                                                 <div className="flex space-x-2">
-                                                    <div className="bg-surface-light rounded-md flex items-center relative pr-2">
+                                                    <div className="auth-panel-input flex items-center relative rounded-md pr-2">
                                                         <select
                                                             value={phonePrefix}
                                                             onChange={(e) => {
@@ -376,7 +356,7 @@ export function RegisterForm() {
                                                                 setPhonePrefix(newPrefix);
                                                                 field.onChange(`${newPrefix}${phoneNumber}`);
                                                             }}
-                                                            className="w-24 bg-transparent border-transparent focus:outline-none focus:ring-0 text-neutral-dark h-11 pl-3 appearance-none cursor-pointer relative z-10"
+                                                            className="relative z-10 h-11 w-24 cursor-pointer appearance-none border-transparent bg-transparent pl-3 text-neutral-dark focus:outline-none focus:ring-0"
                                                         >
                                                             {['0412', '0414', '0416', '0424', '0426', '0422'].map(
                                                                 (p) => (
@@ -386,7 +366,12 @@ export function RegisterForm() {
                                                                 )
                                                             )}
                                                         </select>
-                                                        <div className="absolute right-3 pointer-events-none text-neutral-dark/50">
+                                                        <div
+                                                            className={cn(
+                                                                'pointer-events-none absolute right-3',
+                                                                s.iconMuted
+                                                            )}
+                                                        >
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 width="16"
@@ -410,11 +395,11 @@ export function RegisterForm() {
                                                             setPhoneNumber(val);
                                                             field.onChange(`${phonePrefix}${val}`);
                                                         }}
-                                                        className="flex-1 bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
+                                                        className={cn('flex-1', s.input)}
                                                     />
                                                 </div>
                                             </FormControl>
-                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                            <FormMessage className={s.messageError} />
                                         </FormItem>
                                     )}
                                 />
@@ -425,9 +410,7 @@ export function RegisterForm() {
                                         name="estado"
                                         render={({ field }) => (
                                             <FormItem className="flex-1">
-                                                <FormLabel className="text-primary font-bold text-sm">
-                                                    Ubicación
-                                                </FormLabel>
+                                                <FormLabel className={s.label}>Ubicación</FormLabel>
                                                 <Select
                                                     onValueChange={(value) => {
                                                         const estadoId = parseInt(value);
@@ -442,10 +425,7 @@ export function RegisterForm() {
                                                     value={selectedEstadoId?.toString() ?? ''}
                                                 >
                                                     <FormControl>
-                                                        <SelectTrigger
-                                                            className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
-                                                            disabled={isLoadingEstados}
-                                                        >
+                                                        <SelectTrigger className={s.input} disabled={isLoadingEstados}>
                                                             <SelectValue
                                                                 placeholder={
                                                                     isLoadingEstados
@@ -463,7 +443,7 @@ export function RegisterForm() {
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
-                                                <FormMessage className="text-red-500 font-medium text-xs" />
+                                                <FormMessage className={s.messageError} />
                                             </FormItem>
                                         )}
                                     />
@@ -473,7 +453,7 @@ export function RegisterForm() {
                                         name="municipio"
                                         render={({ field }) => (
                                             <FormItem className="flex-1">
-                                                <FormLabel className="text-primary font-bold text-sm">&nbsp;</FormLabel>
+                                                <FormLabel className={s.label}>&nbsp;</FormLabel>
                                                 <Select
                                                     onValueChange={field.onChange}
                                                     defaultValue={field.value}
@@ -481,7 +461,7 @@ export function RegisterForm() {
                                                     disabled={!selectedEstadoId || isLoadingMunicipios}
                                                 >
                                                     <FormControl>
-                                                        <SelectTrigger className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11">
+                                                        <SelectTrigger className={s.input}>
                                                             <SelectValue
                                                                 placeholder={
                                                                     isLoadingMunicipios
@@ -499,7 +479,7 @@ export function RegisterForm() {
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
-                                                <FormMessage className="text-red-500 font-medium text-xs" />
+                                                <FormMessage className={s.messageError} />
                                             </FormItem>
                                         )}
                                     />
@@ -532,10 +512,7 @@ export function RegisterForm() {
                                                                 }
                                                             }}
                                                         />
-                                                        <label
-                                                            htmlFor="servidor-publico"
-                                                            className="text-primary font-bold text-sm"
-                                                        >
+                                                        <label htmlFor="servidor-publico" className={s.label}>
                                                             Servidor público
                                                         </label>
                                                     </div>
@@ -561,16 +538,13 @@ export function RegisterForm() {
                                                                 }
                                                             }}
                                                         />
-                                                        <label
-                                                            htmlFor="asesor-privado"
-                                                            className="text-primary font-bold text-sm"
-                                                        >
+                                                        <label htmlFor="asesor-privado" className={s.label}>
                                                             Asesor privado
                                                         </label>
                                                     </div>
                                                 </div>
                                             </FormControl>
-                                            <FormMessage className="text-red-500 font-medium text-xs mt-1" />
+                                            <FormMessage className={cn(s.messageError, 'mt-1')} />
                                         </FormItem>
                                     )}
                                 />
@@ -582,17 +556,15 @@ export function RegisterForm() {
                                             name="nombre_ente"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-primary font-bold text-sm">
-                                                        Ente/Institución
-                                                    </FormLabel>
+                                                    <FormLabel className={s.label}>Ente/Institución</FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             placeholder="Ej. Ministerio del Poder Popular..."
-                                                            className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
+                                                            className={s.input}
                                                             {...field}
                                                         />
                                                     </FormControl>
-                                                    <FormMessage className="text-red-500 font-medium text-xs" />
+                                                    <FormMessage className={s.messageError} />
                                                 </FormItem>
                                             )}
                                         />
@@ -604,17 +576,15 @@ export function RegisterForm() {
                                                     name="cargo"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel className="text-primary font-bold text-sm">
-                                                                Cargo
-                                                            </FormLabel>
+                                                            <FormLabel className={s.label}>Cargo</FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     placeholder="Ej. Director de..."
-                                                                    className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11"
+                                                                    className={s.input}
                                                                     {...field}
                                                                 />
                                                             </FormControl>
-                                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                                            <FormMessage className={s.messageError} />
                                                         </FormItem>
                                                     )}
                                                 />
@@ -624,7 +594,7 @@ export function RegisterForm() {
                                                     name="estatus_normativa_girs"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel className="text-primary font-bold text-sm">
+                                                            <FormLabel className={s.label}>
                                                                 ¿Posee tu ente normativa GIRS actualmente?
                                                             </FormLabel>
                                                             <Select
@@ -632,7 +602,7 @@ export function RegisterForm() {
                                                                 defaultValue={field.value}
                                                             >
                                                                 <FormControl>
-                                                                    <SelectTrigger className="bg-surface-light border-transparent focus:border-accent focus:ring-accent text-neutral-dark h-11">
+                                                                    <SelectTrigger className={s.input}>
                                                                         <SelectValue placeholder="Selecciona una opción" />
                                                                     </SelectTrigger>
                                                                 </FormControl>
@@ -648,7 +618,7 @@ export function RegisterForm() {
                                                                     </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
-                                                            <FormMessage className="text-red-500 font-medium text-xs" />
+                                                            <FormMessage className={s.messageError} />
                                                         </FormItem>
                                                     )}
                                                 />
@@ -661,34 +631,36 @@ export function RegisterForm() {
                                     control={form.control}
                                     name="termsAccepted"
                                     render={({ field }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-2 border border-surface-soft/40 rounded-lg mt-2 relative">
+                                        <FormItem className="relative mt-2 flex flex-row items-start space-y-0 space-x-3 rounded-lg border border-surface-soft/60 p-2">
                                             <FormControl>
                                                 <input
                                                     type="checkbox"
                                                     checked={field.value}
                                                     onChange={field.onChange}
-                                                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent cursor-pointer"
+                                                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-auth-accent focus:ring-auth-accent cursor-pointer"
                                                 />
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
-                                                <div className="text-sm font-medium text-neutral-dark/80 !block leading-normal mt-0">
+                                                <div className="!mt-0 block text-sm font-medium leading-normal text-neutral-dark/80">
                                                     He leído y acepto los{' '}
                                                     <span
-                                                        className="text-accent font-bold cursor-pointer hover:underline"
+                                                        className="text-auth-accent font-bold cursor-pointer hover:underline"
                                                         onClick={() => setIsTermsOpen(true)}
                                                     >
                                                         Términos y condiciones
                                                     </span>{' '}
                                                     y la{' '}
                                                     <span
-                                                        className="text-accent font-bold cursor-pointer hover:underline"
+                                                        className="text-auth-accent font-bold cursor-pointer hover:underline"
                                                         onClick={() => setIsPrivacyOpen(true)}
                                                     >
                                                         Política de privacidad
                                                     </span>
                                                     .
                                                 </div>
-                                                <FormMessage className="text-red-500 font-medium text-xs mt-1 absolute -bottom-5 left-0" />
+                                                <FormMessage
+                                                    className={cn(s.messageError, 'mt-1 absolute -bottom-5 left-0')}
+                                                />
                                             </div>
                                         </FormItem>
                                     )}
@@ -699,29 +671,29 @@ export function RegisterForm() {
                                         type="button"
                                         onClick={onPrevStep}
                                         variant="outline"
-                                        className="w-12 h-12 rounded-full border border-surface-soft/60 text-neutral-dark hover:bg-surface-soft/20 flex-shrink-0"
+                                        className="h-12 w-12 shrink-0 rounded-full border border-surface-soft/60 text-primary hover:bg-surface-soft/40"
                                     >
                                         <ChevronLeft size={20} />
                                     </Button>
-                                    <Button
-                                        type="submit"
-                                        className="flex-1 bg-accent hover:bg-accent/90 text-on-primary active:scale-95 transition-all text-base h-12 rounded-full font-bold shadow-lg shadow-accent/20"
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
+                                    <Button type="submit" className={cn(s.submitBtn, 'flex-1')} disabled={isSubmitting}>
+                                        {isSubmitting ? <Spinner size="sm" className="text-on-primary mr-2" /> : null}
                                         Crear cuenta
-                                        {!isLoading && <ArrowRight size={18} className="ml-2" />}
+                                        {!isSubmitting && <ArrowRight size={18} className="ml-2" />}
                                     </Button>
                                 </div>
                             </div>
                         )}
 
-                        <div className="pt-6 border-t border-surface-soft/30 text-center">
-                            <p className="text-sm text-neutral-dark/60">
+                        <div className={cn('border-t pt-6 text-center', s.divider)}>
+                            <p className={s.footerText}>
                                 ¿Ya tienes una cuenta?{' '}
-                                <Link href="/login" className="text-accent hover:underline font-bold">
+                                <button
+                                    type="button"
+                                    onClick={() => router.push('/login?panel=login')}
+                                    className="font-bold text-auth-accent hover:underline"
+                                >
                                     Iniciar sesión
-                                </Link>
+                                </button>
                             </p>
                         </div>
                     </form>

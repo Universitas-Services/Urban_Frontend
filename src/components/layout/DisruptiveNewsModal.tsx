@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAuth } from '@/store/auth.context';
-import { authService } from '@/lib/services/auth.service';
+import { useAuthStore } from '@/store/auth.store';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
+import { APP_CONFIG } from '@/config/app.config';
 
 export function DisruptiveNewsModal() {
-    const { user, updateUser } = useAuth();
+    const { user, acceptNews } = useAuthStore();
     const router = useRouter();
     const [isClosed, setIsClosed] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -22,12 +22,7 @@ export function DisruptiveNewsModal() {
     const handleAccept = async () => {
         setIsLoading(true);
         try {
-            await authService.acceptNews();
-            // Update local user state so it disappears instantly
-            updateUser({
-                ...user,
-                hasUnreadNews: false,
-            });
+            await acceptNews();
             setIsClosed(true);
             router.push('/acerca-de');
         } catch (error) {
@@ -39,24 +34,24 @@ export function DisruptiveNewsModal() {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-[320px] min-h-[320px] bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-300">
+            <div className="relative w-full max-w-[320px] min-h-80 bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-300">
                 <div className="p-6 flex flex-col gap-4 flex-1 justify-center">
                     <h2 className="text-base font-black text-slate-900 text-center">{title}</h2>
 
-                    <div className="text-[11px] text-slate-700 leading-relaxed text-center max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="text-[11px] text-slate-700 leading-relaxed text-center max-h-30 overflow-y-auto pr-1 custom-scrollbar">
                         {content}
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 mt-2">
                         <Avatar className="h-7 w-7 border-2 border-white shadow-sm">
-                            <AvatarImage src="/asset/Julio-AI-Fospuca.png" alt="Universitas" />
+                            <AvatarImage src={APP_CONFIG.AGENT_AVATAR_URL} alt={APP_CONFIG.AGENT_NAME} />
                             <AvatarFallback className="text-[9px] font-bold bg-slate-100 text-slate-600">
-                                UN
+                                {APP_CONFIG.AGENT_NAME.charAt(0)}
                             </AvatarFallback>
                         </Avatar>
                         <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">
@@ -69,7 +64,7 @@ export function DisruptiveNewsModal() {
                     <button
                         onClick={handleAccept}
                         disabled={isLoading}
-                        className="w-full h-10 rounded-xl bg-[#00B800] text-white font-black text-xs tracking-widest uppercase shadow-md shadow-green-900/10 hover:bg-[#009900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full h-10 rounded-xl bg-accent text-white font-black text-xs tracking-widest uppercase shadow-md shadow-accent/10 hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? 'CARGANDO...' : 'ACEPTAR'}
                     </button>

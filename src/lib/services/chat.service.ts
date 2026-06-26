@@ -1,200 +1,231 @@
-import { Conversation, Message } from '@/types/chat.types';
-import { api } from '@/lib/api/axios.instance';
+'use server';
 
-export const chatService = {
-    getConversations: async (): Promise<Conversation[]> => {
-        try {
-            const response = await api.get('/ai/conversations');
+import type { Conversation, Message } from '@/types/chat.types';
+import { getAuthHeader } from '@/lib/auth/session';
 
-            // The backend returns an array in response.data.conversacion
-            // OR an object in response.data.agrupadoPorFecha
-            let rawData = response.data?.conversacion;
+const API = process.env.API_URL;
 
-            if (!rawData && response.data?.agrupadoPorFecha) {
-                // Flatten the grouped object into a single array
-                rawData = Object.values(response.data.agrupadoPorFecha).flat();
-            }
+interface RawApiMessage {
+    id?: string;
+    tipo?: string;
+    contenido?: string;
+    timestamp?: string;
+    sessionId?: string;
+}
 
-            if (!Array.isArray(rawData)) {
-                return [];
-            }
+interface RawMessagePair {
+    id?: string;
+    userMessage?: string;
+    botResponse?: string;
+    createdAt?: string;
+}
 
-            interface RawConversationMessage {
-                sessionId?: string;
-                tipo?: string;
-                role?: string;
-                contenido?: string;
-                message?: string;
-                content?: string;
-                timestamp?: string;
-                createdAt?: string;
-            }
+function extractRawApiMessages(data: unknown): RawApiMessage[] {
+    if (!data || typeof data !== 'object') return [];
 
-            // We need to extract unique conversations based on sessionId
-            // because the backend returns individual messages here.
-            const uniqueSessions = new Map<string, Conversation>();
-            rawData.forEach((msg: RawConversationMessage) => {
-                const isUserMessage = msg.tipo === 'usuario' || msg.tipo === 'user';
-                const messageText = msg.contenido || 'Sin mensajes';
+    const payload = data as {
+        conversacion?: RawApiMessage[];
+        agrupadoPorFecha?: Record<string, RawApiMessage[]>;
+        mensajes?: RawApiMessage[] | RawMessagePair[];
+    };
 
-                if (msg.sessionId) {
-                    if (!uniqueSessions.has(msg.sessionId)) {
-                        // First time seeing this session, initialize with this message
-                        uniqueSessions.set(msg.sessionId, {
-                            id: msg.sessionId,
-                            title: isUserMessage
-                                ? messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '')
-                                : 'Nueva Conversación',
-                            lastMessage: messageText,
-                            lastMessageAt: msg.timestamp || new Date().toISOString(),
-                            messageCount: 1,
-                        });
-                    } else {
-                        // We already have this session, update it if this message is newer
-                        const existing = uniqueSessions.get(msg.sessionId)!;
-                        const msgDate = new Date(msg.timestamp || 0).getTime();
-                        const existingDate = new Date(existing.lastMessageAt).getTime();
+    if (Array.isArray(payload.conversacion)) {
+        return payload.conversacion;
+    }
 
-                        // If we find an older message and the current title is generic, update title to the first user question
-                        if (msgDate < existingDate && isUserMessage && existing.title === 'Nueva Conversación') {
-                            existing.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
-                        }
+    if (payload.agrupadoPorFecha) {
+        return Object.values(payload.agrupadoPorFecha).flat();
+    }
 
-                        // If this message is newer, it becomes the last message
-                        if (msgDate > existingDate) {
-                            if (!isUserMessage || existing.lastMessage === 'Sin mensajes') {
-                                existing.lastMessage = messageText;
-                            }
-                            existing.lastMessageAt = msg.timestamp || new Date().toISOString();
+    if (Array.isArray(payload.mensajes)) {
+        return payload.mensajes as RawApiMessage[];
+    }
 
-                            // Also try to grab a better title if it's the newest user message and we don't have one
-                            if (isUserMessage && existing.title === 'Nueva Conversación') {
-                                existing.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
-                            }
-                        }
+    if (Array.isArray(data)) {
+        return data as RawApiMessage[];
+    }
 
-                        existing.messageCount += 1;
-                    }
-                }
+    return [];
+}
+
+function truncateTitle(text: string, maxLength = 48): string {
+    const normalized = text.trim();
+    if (normalized.length <= maxLength) return normalized;
+    return `${normalized.slice(0, maxLength).trim()}…`;
+}
+
+function mapApiMessagesToConversations(messages: RawApiMessage[]): Conversation[] {
+    const sessions = new Map<string, RawApiMessage[]>();
+
+    for (const message of messages) {
+        const sessionId = message.sessionId;
+        if (!sessionId) continue;
+
+        const sessionMessages = sessions.get(sessionId) ?? [];
+        sessionMessages.push(message);
+        sessions.set(sessionId, sessionMessages);
+    }
+
+    const conversations: Conversation[] = [];
+
+    for (const [sessionId, sessionMessages] of sessions) {
+        const sortedMessages = [...sessionMessages].sort(
+            (a, b) => new Date(a.timestamp ?? 0).getTime() - new Date(b.timestamp ?? 0).getTime()
+        );
+
+        const userMessages = sortedMessages.filter((message) => message.tipo === 'usuario');
+        if (userMessages.length === 0) continue;
+
+        const firstUserMessage = userMessages[0];
+        const lastMessage = sortedMessages[sortedMessages.length - 1];
+
+        conversations.push({
+            id: sessionId,
+            title: truncateTitle(firstUserMessage.contenido ?? 'Conversación'),
+            lastMessage: lastMessage.contenido ?? '',
+            lastMessageAt: lastMessage.timestamp ?? new Date().toISOString(),
+            messageCount: userMessages.length,
+        });
+    }
+
+    return conversations.sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+}
+
+function mapFlatApiMessagesToMessages(messages: RawApiMessage[], conversationId: string): Message[] {
+    return [...messages]
+        .filter((message) => !message.sessionId || message.sessionId === conversationId)
+        .sort((a, b) => new Date(a.timestamp ?? 0).getTime() - new Date(b.timestamp ?? 0).getTime())
+        .map((message) => ({
+            id: message.id ?? crypto.randomUUID(),
+            conversationId: message.sessionId ?? conversationId,
+            role: message.tipo === 'usuario' ? 'user' : 'assistant',
+            content: message.contenido ?? '',
+            createdAt: message.timestamp ?? new Date().toISOString(),
+        }));
+}
+
+function mapPairedApiMessagesToMessages(pairs: RawMessagePair[], conversationId: string): Message[] {
+    const messages: Message[] = [];
+
+    pairs.forEach((pair) => {
+        const baseTime = new Date(pair.createdAt || Date.now());
+        const botTime = new Date(baseTime.getTime() + 1000);
+
+        if (pair.userMessage) {
+            messages.push({
+                id: `${pair.id || crypto.randomUUID()}-user`,
+                conversationId,
+                role: 'user',
+                content: pair.userMessage,
+                createdAt: baseTime.toISOString(),
             });
-
-            // Sort by latest message first
-            const grouped = Array.from(uniqueSessions.values());
-            return grouped.sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
-        } catch (error) {
-            const err = error as { response?: { status?: number } };
-            // Evitamos imprimir en consola si es error 403 (suspensión) para no detonar el Overlay de Next.js
-            if (err?.response?.status !== 403 && err?.response?.status !== 401) {
-                console.error('Error fetching conversations:', error);
-            }
-            return [];
         }
-    },
 
-    getMessages: async (id: string): Promise<Message[]> => {
-        try {
-            const response = await api.get(`/ai/conversations/${id}`);
-            // The backend returns an array of { userMessage, botResponse, createdAt } objects
-            const rawMessages = response.data?.mensajes || (Array.isArray(response.data) ? response.data : []);
-
-            const messages: Message[] = [];
-
-            interface RawMessagePair {
-                id?: string;
-                userMessage?: string;
-                botResponse?: string;
-                createdAt?: string;
-            }
-
-            rawMessages.forEach((pair: RawMessagePair) => {
-                // Determine base timestamp
-                const baseTime = new Date(pair.createdAt || Date.now());
-                const botTime = new Date(baseTime.getTime() + 1000); // add 1 sec for bot to preserve UI order
-
-                // 1. Add User Message
-                if (pair.userMessage) {
-                    messages.push({
-                        id: `${pair.id || crypto.randomUUID()}-user`,
-                        conversationId: id,
-                        role: 'user',
-                        content: pair.userMessage,
-                        createdAt: baseTime.toISOString(),
-                    });
-                }
-
-                // 2. Add Bot Response
-                if (pair.botResponse) {
-                    messages.push({
-                        id: `${pair.id || crypto.randomUUID()}-bot`,
-                        conversationId: id,
-                        role: 'assistant',
-                        content: pair.botResponse,
-                        createdAt: botTime.toISOString(),
-                    });
-                }
+        if (pair.botResponse) {
+            messages.push({
+                id: `${pair.id || crypto.randomUUID()}-bot`,
+                conversationId,
+                role: 'assistant',
+                content: pair.botResponse,
+                createdAt: botTime.toISOString(),
             });
-
-            return messages;
-        } catch (error) {
-            const err = error as { response?: { status?: number } };
-            if (err?.response?.status !== 403 && err?.response?.status !== 401) {
-                console.error('Error fetching messages for session', id, error);
-            }
-            return [];
         }
-    },
+    });
 
-    sendMessage: async (id: string, content: string): Promise<Message> => {
-        // Send the user message payload
-        const response = await api.post('/ai/message', {
-            sessionId: id,
-            message: content,
+    return messages;
+}
+
+async function handleResponse<T>(res: Response): Promise<T> {
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const message = Array.isArray(err.message) ? err.message[0] : err.message || err.error || 'Error del servidor';
+        const httpError = new Error(message) as Error & { status: number };
+        httpError.status = res.status;
+        throw httpError;
+    }
+    return res.json();
+}
+
+// ─── Conversaciones ───────────────────────────────────────────────────────────
+
+export async function getConversationsService(): Promise<Conversation[]> {
+    try {
+        const res = await fetch(`${API}/ai/conversations`, {
+            headers: await getAuthHeader(),
+            cache: 'no-store',
         });
 
-        const reply = response.data;
+        if (!res.ok) return [];
 
-        // The user says new messages get "..." meaning our current actualReplyContent parsing
-        // fails to find the right property. Let's make it very robust.
-        let actualReplyContent = '...';
+        const data = await res.json();
+        const rawMessages = extractRawApiMessages(data);
 
-        if (typeof reply === 'string') {
-            actualReplyContent = reply;
-        } else if (reply) {
-            actualReplyContent =
-                reply.respuesta ||
-                reply.response ||
-                reply.message ||
-                reply.botResponse ||
-                reply.content ||
-                reply.contenido ||
-                (typeof reply.data === 'string' ? reply.data : '...');
+        return mapApiMessagesToConversations(rawMessages);
+    } catch {
+        return [];
+    }
+}
+
+export async function getMessagesService(conversationId: string): Promise<Message[]> {
+    try {
+        const res = await fetch(`${API}/ai/conversations/${conversationId}`, {
+            headers: await getAuthHeader(),
+            cache: 'no-store',
+        });
+
+        if (!res.ok) return [];
+
+        const data = await res.json();
+        const rawMessages = extractRawApiMessages(data);
+
+        if (rawMessages.some((message) => message.tipo && message.contenido !== undefined)) {
+            return mapFlatApiMessagesToMessages(rawMessages, conversationId);
         }
 
-        return {
-            id: crypto.randomUUID(), // Bot reply ID
-            conversationId: typeof reply === 'object' && reply?.sessionId ? reply.sessionId : id,
-            role: 'assistant',
-            content: actualReplyContent,
-            createdAt: typeof reply === 'object' && reply?.timestamp ? reply.timestamp : new Date().toISOString(),
-        };
-    },
+        const pairedMessages = (data as { mensajes?: RawMessagePair[] })?.mensajes ?? [];
+        if (Array.isArray(pairedMessages) && pairedMessages.length > 0) {
+            return mapPairedApiMessagesToMessages(pairedMessages, conversationId);
+        }
 
-    createConversation: async (): Promise<Conversation> => {
-        // Generate a real client-side UUID for the new session
-        // until the first message is sent which persists it on the backend
-        const newId = crypto.randomUUID();
-        return {
-            id: newId,
-            title: 'Nueva conversación',
-            lastMessage: '',
-            lastMessageAt: new Date().toISOString(),
-            messageCount: 0,
-        };
-    },
+        return [];
+    } catch {
+        return [];
+    }
+}
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    deleteConversation: async (_id: string): Promise<void> => {
-        // Not implemented in backend user scope currently, no-op
-        return Promise.resolve();
-    },
-};
+export async function sendMessageService(sessionId: string, message: string): Promise<Message> {
+    const res = await fetch(`${API}/ai/message`, {
+        method: 'POST',
+        headers: await getAuthHeader(),
+        body: JSON.stringify({ sessionId, message }),
+        cache: 'no-store',
+    });
+
+    const reply = await handleResponse<{
+        respuesta?: string;
+        response?: string;
+        message?: string;
+        sessionId?: string;
+        timestamp?: string;
+    }>(res);
+
+    const content = reply.respuesta || reply.response || reply.message || '...';
+
+    return {
+        id: crypto.randomUUID(),
+        conversationId: reply.sessionId ?? sessionId,
+        role: 'assistant',
+        content,
+        createdAt: reply.timestamp ?? new Date().toISOString(),
+    };
+}
+
+export async function createConversationService(): Promise<Conversation> {
+    return {
+        id: crypto.randomUUID(),
+        title: 'Nueva conversación',
+        lastMessage: '',
+        lastMessageAt: new Date().toISOString(),
+        messageCount: 0,
+    };
+}

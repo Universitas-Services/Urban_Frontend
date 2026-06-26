@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { authService } from '@/lib/services/auth.service';
+import { updateProfileService } from '@/lib/services/auth.service';
 import { Loader2, UserPen, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -48,7 +48,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
 
         setIsSubmitting(true);
         try {
-            await authService.updateProfile({
+            await updateProfileService({
                 tipoUsuario: tipoUsuario,
                 nombre_ente: nombreEnte,
                 ...(tipoUsuario === 'SERVIDOR_PUBLICO' && {
@@ -61,8 +61,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
             onSuccess();
         } catch (error) {
             console.error('Error al actualizar el perfil', error);
-            const err = error as { response?: { data?: { message?: string } } };
-            const errorMessage = err.response?.data?.message || 'Ocurrió un error al guardar los datos.';
+            const errorMessage = (error as Error).message || 'Ocurrió un error al guardar los datos.';
             toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -72,15 +71,15 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
     return (
         <Dialog open={isOpen} onOpenChange={() => {}}>
             <DialogContent
-                className="sm:max-w-[480px] p-6 max-h-[95vh] overflow-y-auto rounded-[24px]"
+                className="sm:max-w-120 p-6 max-h-[95vh] overflow-y-auto rounded-[24px]"
                 showCloseButton={false}
             >
                 <div className="flex flex-col items-center w-full mb-4 relative z-10">
-                    <div className="flex items-center justify-center w-12 h-10 rounded-xl bg-[#124C5A] mb-3">
+                    <div className="flex items-center justify-center w-12 h-10 rounded-xl bg-primary mb-3">
                         <UserPen className="w-5 h-5 text-white" strokeWidth={2} />
                     </div>
                     <DialogHeader className="p-0">
-                        <DialogTitle className="text-[20px] sm:text-[22px] font-bold text-[#002D3A] text-center leading-tight">
+                        <DialogTitle className="text-[20px] sm:text-[22px] font-bold text-primary text-center leading-tight">
                             Indica la siguiente información para continuar:
                         </DialogTitle>
                     </DialogHeader>
@@ -88,13 +87,13 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1.5 relative z-20">
-                        <Label htmlFor="tipoUsuario" className="text-[#475569] font-bold text-sm">
+                        <Label htmlFor="tipoUsuario" className="text-gray-dark font-bold text-sm">
                             Tipo de usuario <span className="text-red-500">*</span>
                         </Label>
                         <Select value={tipoUsuario} onValueChange={setTipoUsuario}>
                             <SelectTrigger
                                 id="tipoUsuario"
-                                className="w-full rounded-md bg-[#F4F7FE] border-transparent h-10 px-4 focus:ring-[#124C5A]"
+                                className="w-full rounded-md bg-surface-light border-transparent h-10 px-4 focus:ring-primary"
                             >
                                 <SelectValue placeholder="Selecciona una opción" />
                             </SelectTrigger>
@@ -107,7 +106,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
 
                     {tipoUsuario && (
                         <div className="space-y-1.5 animate-in fade-in zoom-in duration-300">
-                            <Label htmlFor="nombreEnte" className="text-[#475569] font-bold text-sm">
+                            <Label htmlFor="nombreEnte" className="text-gray-dark font-bold text-sm">
                                 {tipoUsuario === 'ASESOR_PRIVADO'
                                     ? 'Ente/Institución a la que es asesor'
                                     : 'Ente/Institución'}
@@ -117,7 +116,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
                                 placeholder="Nombre de la institución"
                                 value={nombreEnte}
                                 onChange={(e) => setNombreEnte(e.target.value)}
-                                className="rounded-md bg-[#F4F7FE] border-transparent h-10 px-4 focus-visible:ring-[#124C5A]"
+                                className="rounded-md bg-surface-light border-transparent h-10 px-4 focus-visible:ring-primary"
                             />
                         </div>
                     )}
@@ -125,7 +124,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
                     {tipoUsuario === 'SERVIDOR_PUBLICO' && (
                         <>
                             <div className="space-y-1.5 animate-in fade-in zoom-in duration-300 delay-100">
-                                <Label htmlFor="cargo" className="text-[#475569] font-bold text-sm">
+                                <Label htmlFor="cargo" className="text-gray-dark font-bold text-sm">
                                     Cargo
                                 </Label>
                                 <Input
@@ -133,18 +132,18 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
                                     placeholder="Tu cargo actual"
                                     value={cargo}
                                     onChange={(e) => setCargo(e.target.value)}
-                                    className="rounded-md bg-[#F4F7FE] border-transparent h-10 px-4 focus-visible:ring-[#124C5A]"
+                                    className="rounded-md bg-surface-light border-transparent h-10 px-4 focus-visible:ring-primary"
                                 />
                             </div>
 
                             <div className="space-y-1.5 animate-in fade-in zoom-in duration-300 delay-150 relative z-30">
-                                <Label htmlFor="estatusNormativa" className="text-[#475569] font-bold text-sm">
+                                <Label htmlFor="estatusNormativa" className="text-gray-dark font-bold text-sm">
                                     ¿Posee tu ente normativa GIRS actualmente?
                                 </Label>
                                 <Select value={estatusNormativa} onValueChange={setEstatusNormativa}>
                                     <SelectTrigger
                                         id="estatusNormativa"
-                                        className="w-full rounded-md bg-[#F4F7FE] border-transparent h-10 px-4 focus:ring-[#124C5A]"
+                                        className="w-full rounded-md bg-surface-light border-transparent h-10 px-4 focus:ring-primary"
                                     >
                                         <SelectValue placeholder="Selecciona el estado normativo" />
                                     </SelectTrigger>
@@ -162,7 +161,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
                         <Button
                             type="submit"
                             disabled={isSubmitting || !tipoUsuario}
-                            className="w-full bg-[#124C5A] hover:bg-[#0E3A45] text-white rounded-md h-11 text-base font-semibold shadow-sm transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-primary hover:bg-primary-hover text-white rounded-md h-11 text-base font-semibold shadow-sm transition-all flex items-center justify-center gap-2"
                         >
                             {isSubmitting ? (
                                 <>

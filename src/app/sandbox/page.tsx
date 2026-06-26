@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { sdkApi } from '@/lib/api/universitas.sdk';
 import { MembershipExpiringModal } from '@/components/Modales/MembershipExpiringModal';
 import { ProfileIncompleteModal } from '@/components/Modales/ProfileIncompleteModal';
@@ -28,27 +28,23 @@ export default function SandboxPage() {
         }
     };
 
-    useEffect(() => {
-        testSDK();
-    }, []);
-
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-8">
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col gap-6 w-full max-w-md">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-surface-light p-8">
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-surface-soft flex flex-col gap-6 w-full max-w-md">
                 <div className="text-center space-y-1">
-                    <h1 className="text-2xl font-bold text-[#001D29]">UI Sandbox</h1>
-                    <p className="text-sm text-[#4B5E7C]">Panel de pruebas de componentes GIRS</p>
+                    <h1 className="font-display text-2xl font-bold text-primary">UI Sandbox</h1>
+                    <p className="text-sm text-gray-dark">Panel de pruebas de componentes GIRS</p>
                 </div>
 
                 <div className="space-y-4">
                     <div className="space-y-2 border-t pt-4">
-                        <label className="text-xs font-bold text-[#8C9BBA] uppercase tracking-wider">
+                        <label className="text-xs font-bold text-gray-soft uppercase tracking-wider">
                             SDK Universidad (BCV)
                         </label>
-                        {loading && <p className="text-sm text-gray-500">Cargando...</p>}
+                        {loading && <p className="text-sm text-gray-soft">Cargando...</p>}
                         {error && <p className="text-sm text-red-500">Error: {error}</p>}
                         {bcvData && (
-                            <div className="bg-gray-50 p-3 rounded-xl text-sm">
+                            <div className="bg-surface-light p-3 rounded-xl text-sm">
                                 <p>
                                     USD: <span className="font-bold">${bcvData.usd}</span>
                                 </p>
@@ -59,14 +55,14 @@ export default function SandboxPage() {
                         )}
                         <button
                             onClick={testSDK}
-                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-[#F4F7FF] text-[#003D52] hover:bg-[#e1e9ff] transition"
+                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-surface-light text-primary hover:bg-surface-soft transition"
                         >
                             Recargar BCV
                         </button>
                     </div>
 
                     <div className="space-y-2 border-t pt-4">
-                        <label className="text-xs font-bold text-[#8C9BBA] uppercase tracking-wider">
+                        <label className="text-xs font-bold text-gray-soft uppercase tracking-wider">
                             Estado de Membresía
                         </label>
                         <div className="flex gap-2">
@@ -75,7 +71,7 @@ export default function SandboxPage() {
                                     setDaysLeft(2);
                                     setActiveModal('expiring');
                                 }}
-                                className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-[#FFF9EB] text-[#D97706] hover:bg-[#fde6b3] transition"
+                                className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition"
                             >
                                 Por vencer (2 días)
                             </button>
@@ -92,24 +88,24 @@ export default function SandboxPage() {
                     </div>
 
                     <div className="space-y-2 border-t pt-4">
-                        <label className="text-xs font-bold text-[#8C9BBA] uppercase tracking-wider">
+                        <label className="text-xs font-bold text-gray-soft uppercase tracking-wider">
                             Actualización de Datos
                         </label>
                         <button
                             onClick={() => setActiveModal('profile')}
-                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-[#F4F7FF] text-[#003D52] hover:bg-[#e1e9ff] transition"
+                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-surface-light text-primary hover:bg-surface-soft transition"
                         >
                             Ver Perfil Incompleto
                         </button>
                     </div>
 
                     <div className="space-y-2 border-t pt-4">
-                        <label className="text-xs font-bold text-[#8C9BBA] uppercase tracking-wider">
+                        <label className="text-xs font-bold text-gray-soft uppercase tracking-wider">
                             Restricciones
                         </label>
                         <button
                             onClick={() => setActiveModal('blocked')}
-                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-[#F4F7FF] text-[#003D52] hover:bg-[#e1e9ff] transition"
+                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-surface-light text-primary hover:bg-surface-soft transition"
                         >
                             Ver Función Bloqueada
                         </button>
