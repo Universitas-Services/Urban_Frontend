@@ -57,6 +57,7 @@
     --color-territorial: #3e7d4a;
     --color-territorial-light: #e6f7f0;
     --color-surface-soft: #d9e1e8;
+    --color-inicio-hero-bg: var(--color-surface-soft);
     --color-auth-bubble: #d9e1e8;
     --color-surface-light: #f8f9fa;
     --color-neutral-dark: #253042;
@@ -502,6 +503,41 @@ a:hover .support-bounce-icon {
         transparent 55%
     );
     pointer-events: none;
+}
+
+/* Hero /inicio — card con imagen de fondo y texto superpuesto */
+.inicio-hero-card {
+    background-color: var(--color-inicio-hero-bg);
+}
+
+.inicio-hero-card__image {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: left center;
+    pointer-events: none;
+    user-select: none;
+    filter: brightness(1.12) saturate(1.05);
+}
+
+.inicio-hero-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+        105deg,
+        color-mix(in srgb, var(--color-on-primary) 96%, var(--color-inicio-hero-bg)) 0%,
+        color-mix(in srgb, var(--color-on-primary) 88%, var(--color-inicio-hero-bg)) 28%,
+        color-mix(in srgb, var(--color-on-primary) 45%, transparent) 52%,
+        transparent 72%
+    );
+}
+
+.inicio-hero-card__content {
+    padding-top: 1rem;
 }
 
 /* Auth — burbuja deslizante + landing */

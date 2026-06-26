@@ -130,7 +130,7 @@ export function Sidebar() {
                     )}
                 </div>
 
-                {/* Proyecto Ley Button */}
+                {/* Aula Ciudad Button */}
                 <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
                     {expanded ? (
                         <button
@@ -138,7 +138,7 @@ export function Sidebar() {
                             className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                         >
                             <FaGavel size={18} color="currentColor" className="shrink-0 gavel-icon" />
-                            <span className="font-medium text-[13px] ml-3">Proyecto ley</span>
+                            <span className="font-medium text-[13px] ml-3">Aula Ciudad</span>
                         </button>
                     ) : (
                         <Tooltip>
@@ -151,7 +151,7 @@ export function Sidebar() {
                                 </button>
                             </TooltipTrigger>
                             <TooltipContent side="right" sideOffset={15.4}>
-                                <p>Proyecto ley</p>
+                                <p>Aula Ciudad</p>
                             </TooltipContent>
                         </Tooltip>
                     )}
@@ -184,7 +184,7 @@ export function Sidebar() {
                     )}
                 </div>
 
-                {/* Biblioteca GIRS Button */}
+                {/* Biblioteca Legal Button */}
                 <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
                     {expanded ? (
                         <button
@@ -192,7 +192,7 @@ export function Sidebar() {
                             className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                         >
                             <IoMdBook size={18} color="currentColor" className="shrink-0" />
-                            <span className="font-medium text-[13px] ml-3">Biblioteca GIRS</span>
+                            <span className="font-medium text-[13px] ml-3">Biblioteca Legal</span>
                         </button>
                     ) : (
                         <Tooltip>
@@ -205,7 +205,7 @@ export function Sidebar() {
                                 </button>
                             </TooltipTrigger>
                             <TooltipContent side="right" sideOffset={15.4}>
-                                <p>Biblioteca GIRS</p>
+                                <p>Biblioteca Legal</p>
                             </TooltipContent>
                         </Tooltip>
                     )}
