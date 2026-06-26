@@ -5,8 +5,8 @@ import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
 import { MessageSquare, Settings, LogOut, Menu, User, Headset, HelpCircle } from 'lucide-react';
 import { IoMdBook, IoMdInformationCircleOutline } from 'react-icons/io';
-import { IoHomeSharp, IoAddCircleOutline } from 'react-icons/io5';
-import { FaGavel, FaBalanceScale } from 'react-icons/fa';
+import { IoHomeSharp, IoAddCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
+import { FaBalanceScale } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -137,7 +137,7 @@ export function Sidebar() {
                             onClick={() => router.push('/proyecto-ley')}
                             className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                         >
-                            <FaGavel size={18} color="currentColor" className="shrink-0 gavel-icon" />
+                            <IoPlayCircleOutline size={18} color="currentColor" className="shrink-0" />
                             <span className="font-medium text-[13px] ml-3">Aula Ciudad</span>
                         </button>
                     ) : (
@@ -147,7 +147,7 @@ export function Sidebar() {
                                     onClick={() => router.push('/proyecto-ley')}
                                     className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
                                 >
-                                    <FaGavel size={18} color="currentColor" className="shrink-0 gavel-icon" />
+                                    <IoPlayCircleOutline size={18} color="currentColor" className="shrink-0" />
                                 </button>
                             </TooltipTrigger>
                             <TooltipContent side="right" sideOffset={15.4}>

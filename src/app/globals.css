@@ -388,18 +388,6 @@
     );
 }
 
-/* Gavel Strike Animation */
-.gavel-icon {
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    cursor: pointer;
-}
-
-.gavel-icon:hover {
-    transform: rotate(45deg);
-}
-
-/* Remove :active animation */
-
 /* Gear/Settings Spin Animation */
 .gear-spin-icon {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
