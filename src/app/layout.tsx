@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     title: APP_CONFIG.DOCUMENT_TITLE,
     description: 'Plataforma de consultoría experta en Gestión Integral de Residuos Sólidos',
     icons: {
-        icon: '/asset/icons_12.png',
-        apple: '/asset/icons_12.png',
+        icon: APP_CONFIG.FAVICON_URL,
+        apple: APP_CONFIG.FAVICON_URL,
     },
 };
 

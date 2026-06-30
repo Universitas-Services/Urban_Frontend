@@ -3,20 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useChatStore } from '@/store/chat.store';
 import { MessageList, ChatInput, AgentAvatar } from '@/components/chat';
-import { Menu } from 'lucide-react';
 import { APP_CONFIG } from '@/config/app.config';
 import { FeatureBlockedModal } from '@/components/Modales';
 
 export default function ChatDashboardPage() {
-    const {
-        activeConversationId,
-        messages,
-        toggleSidebar,
-        sendMessage,
-        createConversation,
-        selectConversation,
-        loadConversations,
-    } = useChatStore();
+    const { activeConversationId, messages, sendMessage, createConversation, selectConversation, loadConversations } =
+        useChatStore();
 
     const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
 
@@ -44,26 +36,7 @@ export default function ChatDashboardPage() {
     };
 
     return (
-        <div className="flex-1 overflow-hidden p-6 flex flex-col min-h-0 relative animate-fade-in">
-            {/* Mobile Header */}
-            <div className="md:hidden sticky top-0 z-10 flex items-center p-4 bg-surface-light/95 backdrop-blur-sm border-b border-surface-soft/40 shadow-sm">
-                <button
-                    onClick={toggleSidebar}
-                    className="p-2 mr-3 bg-white rounded-lg border border-surface-soft shadow-sm hover:bg-surface-soft/20 active:scale-95 transition-all text-neutral-dark"
-                >
-                    <Menu size={20} />
-                </button>
-                <div className="flex flex-col">
-                    <h1 className="font-semibold text-neutral-dark text-base">{APP_CONFIG.AGENT_NAME}</h1>
-                    <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-(--color-status-online) animate-pulse" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-(--color-status-online)">
-                            En línea
-                        </span>
-                    </div>
-                </div>
-            </div>
-
+        <div className="flex-1 overflow-hidden p-4 md:p-6 flex flex-col min-h-0 relative animate-fade-in">
             {/* Main Chat Area */}
             <div className="flex-1 overflow-hidden flex flex-col min-h-0 pt-0">
                 {messages.length > 0 ? (
@@ -76,7 +49,7 @@ export default function ChatDashboardPage() {
                             </div>
                             <div className="flex flex-col">
                                 <h2 className="font-bold text-neutral-dark text-[17px] leading-tight">
-                                    {APP_CONFIG.AGENT_NAME} - Consultor IA
+                                    {APP_CONFIG.DOCUMENT_TITLE}
                                 </h2>
                                 <span className="text-[13px] font-medium text-(--color-status-online)">En línea</span>
                             </div>

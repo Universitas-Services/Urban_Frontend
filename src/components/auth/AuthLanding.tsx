@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { APP_CONFIG } from '@/config/app.config';
 import { cn } from '@/lib/utils';
 
 interface AuthLandingProps {
@@ -24,16 +25,12 @@ export function AuthLanding({ showActions = true, revealDelayed = false, classNa
             <div className="auth-landing-logo mt-6 flex w-full max-w-[220px] items-center justify-center sm:mt-8 sm:max-w-[260px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                    src="/asset/icons_11.png"
+                    src={APP_CONFIG.AUTH_LANDING_LOGO_URL}
                     alt="IUS Urbano"
                     draggable={false}
                     className="h-auto w-full object-contain"
                 />
             </div>
-
-            <p className="mt-4 max-w-sm text-base leading-relaxed text-neutral-dark/70 sm:mt-6 sm:text-lg">
-                Inteligencia jurídica para las ciudades del futuro
-            </p>
 
             <div
                 className={cn(
