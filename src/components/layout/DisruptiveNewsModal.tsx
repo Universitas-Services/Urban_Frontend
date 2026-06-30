@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
+import { APP_CONFIG } from '@/config/app.config';
 
 export function DisruptiveNewsModal() {
     const { user, acceptNews } = useAuthStore();
@@ -48,9 +49,9 @@ export function DisruptiveNewsModal() {
 
                     <div className="flex flex-col items-center gap-1.5 mt-2">
                         <Avatar className="h-7 w-7 border-2 border-white shadow-sm">
-                            <AvatarImage src="/asset/Julio-AI-Fospuca.png" alt="Universitas" />
+                            <AvatarImage src={APP_CONFIG.AGENT_AVATAR_URL} alt={APP_CONFIG.AGENT_NAME} />
                             <AvatarFallback className="text-[9px] font-bold bg-slate-100 text-slate-600">
-                                UN
+                                {APP_CONFIG.AGENT_NAME.charAt(0)}
                             </AvatarFallback>
                         </Avatar>
                         <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">
@@ -63,7 +64,7 @@ export function DisruptiveNewsModal() {
                     <button
                         onClick={handleAccept}
                         disabled={isLoading}
-                        className="w-full h-10 rounded-xl bg-[#00B800] text-white font-black text-xs tracking-widest uppercase shadow-md shadow-green-900/10 hover:bg-[#009900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full h-10 rounded-xl bg-accent text-white font-black text-xs tracking-widest uppercase shadow-md shadow-accent/10 hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? 'CARGANDO...' : 'ACEPTAR'}
                     </button>

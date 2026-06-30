@@ -7,8 +7,9 @@
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    --font-sans: var(--font-inter);
+    --font-display: var(--font-eb-garamond);
+    --font-mono: ui-monospace, monospace;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,33 +45,50 @@
     --radius-3xl: calc(var(--radius) + 12px);
     --radius-4xl: calc(var(--radius) + 16px);
 
-    /* Custom Theme Colors as specified */
-    --color-primary: oklch(0.337 0.066 228.778);
-    --color-primary-hover: oklch(0.267 0.053 229.3);
-    --color-accent: oklch(0.678 0.231 142.495);
-    --color-surface-soft: oklch(0.851 0.014 179.402);
-    --color-surface-light: oklch(0.918 0.017 174.028);
-    --color-neutral-dark: oklch(0.368 0.01 241.911);
-    --color-neutral-bg: oklch(0.516 0.002 197.08);
-    --color-on-primary: oklch(0.969 0.007 219.56);
-    --color-on-surface: oklch(0.252 0.015 211.197);
-    --color-white: oklch(1 0 0);
-    --color-gray-soft: oklch(0.566 0.021 243.202);
-    --color-gray-dark: oklch(0.518 0.022 243.262);
-    --color-status-online: oklch(0.761 0.198 150.905);
-    --color-chat-bg: oklch(0.934 0.008 157.083);
-    --color-consultant-text: oklch(0.379 0.07 221.116);
-    --color-msg-user-bg: oklch(0.947 0.008 145.508);
-    --color-msg-user-border: oklch(0.883 0.017 156.872);
-    --color-status-error: oklch(0.631 0.211 23.725);
-    --color-dashboard-bg: oklch(0.962 0.003 174.483);
-    --color-avatar-bg: oklch(0.86 0.042 70.788);
-    --color-btn-green: oklch(0.627 0.152 144.266);
-    --color-btn-green-hover: oklch(0.566 0.136 144.182);
-    --color-icon-green-bg: #bedabe;
-    --color-icon-green: #00b800;
-    --color-accent-bar: #6391c0;
-    --color-heading-dark: #003d52;
+    /* Paleta institucional */
+    --color-primary: #1a284b;
+    --color-primary-hover: #141f38;
+    --color-accent: #00ab6b;
+    --color-accent-hover: #00995c;
+    --color-accent-light: #e6f7f0;
+    --color-accent-light-end: #f0faf6;
+    --color-success: #00ab6b;
+    --color-success-hover: #00995c;
+    --color-territorial: #3e7d4a;
+    --color-territorial-light: #e6f7f0;
+    --color-surface-soft: #d9e1e8;
+    --color-inicio-hero-bg: var(--color-surface-soft);
+    --color-auth-bubble: #d9e1e8;
+    --color-surface-light: #f8f9fa;
+    --color-neutral-dark: #253042;
+    --color-neutral-bg: #d9e1e8;
+    --color-on-primary: #ffffff;
+    --color-on-surface: #253042;
+    --color-white: #ffffff;
+    --color-gray-soft: #8a96a3;
+    --color-gray-dark: #5c6773;
+    --color-status-online: #00ab6b;
+    --color-chat-bg: #f8f9fa;
+    --color-consultant-text: #1a284b;
+    --color-msg-user-bg: #e8f2ea;
+    --color-msg-user-border: #d9e1e8;
+    --color-agent-accent: #f28c28;
+    --color-agent-accent-hover: #d97a1f;
+    --color-auth-accent: #f28c28;
+    --color-auth-accent-hover: #d97a1f;
+    --color-msg-agent-bg: #fef3e8;
+    --color-msg-agent-border: #f5d4a8;
+    --color-status-error: #dc2626;
+    --color-dashboard-bg: #f8f9fa;
+    --color-avatar-bg: #00ab6b;
+    --color-icon-green-bg: #e6f7f0;
+    --color-icon-green: #00ab6b;
+    --color-accent-bar: #1a284b;
+    --color-heading-dark: #1a284b;
+    --color-sidebar-bg: #d9e1e8;
+    --color-sidebar-fg: #1a284b;
+    --color-btn-green: #00ab6b;
+    --color-btn-green-hover: #00995c;
 
     /* Legal Card Types */
     --color-legal-organica: #e3dbe2;
@@ -125,37 +143,94 @@
 
 :root {
     --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --dashboard-cityscape-opacity: 0.36;
+    --dashboard-cityscape-saturate: 1.65;
+
+    /* Admin: alias de la paleta Urban (un solo origen de color) */
+    --admin-text-title: var(--color-heading-dark);
+    --admin-card-1-text: var(--color-success);
+    --admin-card-1-bg: var(--color-accent-light);
+    --admin-card-2-text: var(--color-agent-accent);
+    --admin-card-2-bg: var(--color-msg-agent-bg);
+    --admin-card-3-text: var(--color-primary);
+    --admin-card-3-bg: var(--color-surface-soft);
+    --admin-card-4-text: var(--color-status-error);
+    --admin-card-4-bg: color-mix(in srgb, var(--color-status-error) 14%, var(--card));
+    --admin-card-5-text: var(--color-territorial);
+    --admin-card-5-bg: var(--color-territorial-light);
+    --admin-search-bg: var(--color-surface-light);
+    --admin-chart-bar: var(--color-territorial);
+    --admin-chart-bar-highlight: var(--color-accent);
+    --admin-toggle-bg: var(--color-surface-soft);
+    --admin-toggle-active-bg: var(--color-accent);
+    --admin-toggle-active-text: var(--color-on-primary);
+    --admin-badge-suscrito-bg: var(--color-accent-light);
+    --admin-badge-suscrito-text: var(--color-territorial);
+    --admin-badge-activo-bg: var(--secondary);
+    --admin-badge-activo-text: var(--color-heading-dark);
+    --admin-badge-porpagar-bg: var(--color-msg-agent-bg);
+    --admin-badge-porpagar-text: var(--color-agent-accent);
+    --admin-badge-suspendido-bg: color-mix(in srgb, var(--color-status-error) 14%, var(--card));
+    --admin-badge-suspendido-text: var(--color-status-error);
+    --admin-avatar-bg: var(--color-icon-green-bg);
+    --admin-avatar-text: var(--color-heading-dark);
+    --admin-text-link: var(--color-accent);
+    --admin-filter-bg: var(--secondary);
+    --admin-panel-bg: var(--color-accent-light);
+    --admin-id-badge-bg: var(--color-surface-soft);
+    --admin-id-badge-text: var(--color-primary);
+    --admin-card-blue-bg: var(--color-primary);
+    --admin-card-blue-border: var(--color-primary-hover);
+    --admin-log-gold-bg: var(--color-msg-agent-bg);
+    --admin-log-gold-text: var(--color-agent-accent);
+    --crm-label-por-contactar-bg: var(--color-msg-agent-bg);
+    --crm-label-por-contactar-text: var(--color-agent-accent);
+    --crm-label-contactado-bg: var(--color-surface-soft);
+    --crm-label-contactado-text: var(--color-primary);
+    --crm-label-pago-realizado-bg: var(--color-accent-light);
+    --crm-label-pago-realizado-text: var(--color-success);
+    --crm-label-por-enviar-doc-bg: var(--color-msg-agent-border);
+    --crm-label-por-enviar-doc-text: var(--color-agent-accent-hover);
+    --crm-label-envio-doc-bg: var(--color-territorial-light);
+    --crm-label-envio-doc-text: var(--color-territorial);
+    --crm-label-no-tiene-doc-bg: color-mix(in srgb, var(--color-status-error) 14%, var(--card));
+    --crm-label-no-tiene-doc-text: var(--color-status-error);
+    --crm-label-no-envio-doc-planificar-bg: color-mix(in srgb, var(--color-status-error) 22%, var(--card));
+    --crm-label-no-envio-doc-planificar-text: var(--color-status-error);
+    --chat-bubble: var(--color-primary);
+    --chat-bubble-foreground: var(--color-on-primary);
+
+    --background: #f8f9fa;
+    --foreground: #253042;
+    --card: #ffffff;
+    --card-foreground: #253042;
+    --popover: #ffffff;
+    --popover-foreground: #253042;
+    --primary: #1a284b;
+    --primary-foreground: #ffffff;
+    --secondary: #e8f2ea;
+    --secondary-foreground: #1a284b;
+    --muted: #f8f9fa;
+    --muted-foreground: #5c6773;
+    --accent: #e6f7f0;
+    --accent-foreground: #1a284b;
+    --destructive: #dc2626;
+    --border: #d9e1e8;
+    --input: #d9e1e8;
+    --ring: #00ab6b;
+    --chart-1: #1a284b;
+    --chart-2: #3e7d4a;
+    --chart-3: #00ab6b;
+    --chart-4: #00ab6b;
+    --chart-5: #253042;
+    --sidebar: var(--color-sidebar-bg);
+    --sidebar-foreground: var(--color-sidebar-fg);
+    --sidebar-primary: #00ab6b;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: color-mix(in srgb, var(--color-sidebar-fg) 8%, transparent);
+    --sidebar-accent-foreground: var(--color-sidebar-fg);
+    --sidebar-border: color-mix(in srgb, var(--color-sidebar-fg) 12%, transparent);
+    --sidebar-ring: var(--color-sidebar-fg);
 }
 
 .dark {
@@ -222,91 +297,140 @@
     background: rgba(255, 255, 255, 0.3);
 }
 
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-sidebar-fg) 20%, transparent);
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-sidebar-fg) 35%, transparent);
+}
+
 .titulos-cards {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
-    font-weight: 800;
+    font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
+    font-weight: 700;
     font-size: 23px;
     line-height: 40px;
-    color: #003d52;
+    color: var(--color-primary);
 }
 
 .titulos-cards-proyecto-ley {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
-    font-weight: 800;
+    font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
+    font-weight: 700;
     font-size: 18px;
     line-height: 22px;
-    color: #003d52;
+    color: var(--color-primary);
 }
 
 .descripcion-cards {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-style: italic;
     font-size: 15px;
     line-height: 22px;
-    color: #5b686c;
+    color: var(--color-gray-dark);
 }
 
 .descripcion-cards-proyecto-ley {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-style: italic;
     font-size: 12px;
     line-height: 14px;
-    color: #5b686c;
+    color: var(--color-gray-dark);
 }
 
 .descripcion-cards-small {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-style: italic;
     font-size: 13px;
-    color: #5b686c;
+    color: var(--color-gray-dark);
 }
 
 .descripcion-cards-small li::marker {
-    color: #00b800;
+    color: var(--color-accent);
 }
 
 .etiquetas {
-    font-family:
-        'Inter',
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-weight: 400;
     font-size: 14px;
     text-transform: uppercase;
 }
 
-/* Gavel Strike Animation */
-.gavel-icon {
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    cursor: pointer;
+.font-display {
+    font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
 }
 
-.gavel-icon:hover {
-    transform: rotate(45deg);
+/* Admin — misma tipografía que el dashboard de usuario (Inter + EB Garamond) */
+.admin-area {
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
 }
 
-/* Remove :active animation */
+.admin-area h1,
+.admin-area h2,
+.admin-area [data-slot='card-title'],
+.admin-area .admin-section-title {
+    font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
+    font-weight: 700;
+}
+
+.admin-area [data-sidebar='group-label'] {
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.icon-accent-box {
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-accent) 24%, white) 0%,
+        color-mix(in srgb, var(--color-accent) 10%, white) 100%
+    );
+}
+
+/* Biblioteca Legal — iconos de categoría */
+.biblioteca-category-icon {
+    color: var(--color-on-primary);
+}
+
+.biblioteca-category-icon--green {
+    background-color: var(--color-accent);
+}
+
+.biblioteca-category-icon--blue {
+    background-color: var(--color-primary);
+}
+
+.biblioteca-category-icon--territorial {
+    background-color: var(--color-territorial);
+}
+
+.biblioteca-category-icon--orange {
+    background-color: var(--color-agent-accent);
+}
+
+.biblioteca-category-icon--primary-deep {
+    background-color: var(--color-primary-hover);
+}
+
+.biblioteca-category-link {
+    color: var(--color-accent);
+}
+
+.biblioteca-coleccion-doc-icon {
+    background-color: var(--color-accent-light);
+    color: var(--color-primary);
+}
+
+.biblioteca-coleccion-badge--vigente {
+    background-color: color-mix(in srgb, var(--color-accent) 14%, white);
+    color: var(--color-accent);
+}
+
+.biblioteca-coleccion-badge--parcial {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, white);
+    color: var(--color-primary);
+}
 
 /* Gear/Settings Spin Animation */
 .gear-spin-icon {
@@ -356,5 +480,235 @@ a:hover .support-bounce-icon {
 
     50% {
         transform: translateY(-4px);
+    }
+}
+
+/* Fondo cityscape del dashboard (sidebar + contenido) */
+.dashboard-cityscape-layer {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+        to top,
+        #000 12%,
+        rgba(0, 0, 0, 0.92) 28%,
+        rgba(0, 0, 0, 0.55) 52%,
+        rgba(0, 0, 0, 0.18) 72%,
+        transparent 92%
+    );
+    mask-image: linear-gradient(
+        to top,
+        #000 12%,
+        rgba(0, 0, 0, 0.92) 28%,
+        rgba(0, 0, 0, 0.55) 52%,
+        rgba(0, 0, 0, 0.18) 72%,
+        transparent 92%
+    );
+}
+
+.dashboard-cityscape-layer img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: unset;
+    object-position: bottom center;
+    opacity: var(--dashboard-cityscape-opacity);
+    filter: saturate(var(--dashboard-cityscape-saturate)) contrast(1.2) brightness(1.08);
+}
+
+.dashboard-cityscape-tint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-primary) 12%, transparent) 0%,
+        color-mix(in srgb, var(--color-accent) 6%, transparent) 22%,
+        transparent 55%
+    );
+    pointer-events: none;
+}
+
+/* Hero /inicio — card con imagen de fondo y texto superpuesto */
+.inicio-hero-card {
+    background-color: var(--color-inicio-hero-bg);
+}
+
+.inicio-hero-card__image {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: left center;
+    pointer-events: none;
+    user-select: none;
+    filter: brightness(1.12) saturate(1.05);
+}
+
+.inicio-hero-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+        105deg,
+        color-mix(in srgb, var(--color-on-primary) 96%, var(--color-inicio-hero-bg)) 0%,
+        color-mix(in srgb, var(--color-on-primary) 88%, var(--color-inicio-hero-bg)) 28%,
+        color-mix(in srgb, var(--color-on-primary) 45%, transparent) 52%,
+        transparent 72%
+    );
+}
+
+.inicio-hero-card__content {
+    padding-top: 1rem;
+}
+
+/* Auth — burbuja deslizante + landing */
+.auth-icon-box {
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-auth-accent) 24%, white) 0%,
+        color-mix(in srgb, var(--color-auth-accent) 10%, white) 100%
+    );
+}
+
+.auth-landing-title {
+    font-family: var(--font-eb-garamond), 'EB Garamond', Georgia, serif;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.auth-landing-logo {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.auth-landing-logo img {
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.auth-landing-stage {
+    transition-property: left, right, width, transform, opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-landing-content {
+    transition:
+        opacity 650ms cubic-bezier(0.4, 0, 0.2, 1),
+        transform 650ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-landing-content--center {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.auth-slide-panel {
+    position: fixed;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    transition: transform 650ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    background-color: var(--color-auth-bubble);
+}
+
+/* Mobile: bordes rectos para no recortar el contenido */
+.auth-slide-panel--left {
+    left: 0;
+    right: auto;
+    width: 92%;
+    max-width: none;
+    transform: translate3d(-100%, 0, 0);
+    border-radius: 0;
+}
+
+.auth-slide-panel--right {
+    left: auto;
+    right: 0;
+    width: 92%;
+    max-width: none;
+    transform: translate3d(100%, 0, 0);
+    border-radius: 0;
+}
+
+@media (min-width: 768px) {
+    .auth-slide-panel--left,
+    .auth-slide-panel--right {
+        width: 52%;
+        max-width: 52rem;
+    }
+
+    /* Desktop: curva suave solo en esquinas del borde interior */
+    .auth-slide-panel--left {
+        border-radius: 0 min(36vh, 20rem) min(36vh, 20rem) 0;
+    }
+
+    .auth-slide-panel--right {
+        border-radius: min(36vh, 20rem) 0 0 min(36vh, 20rem);
+    }
+}
+
+.auth-slide-panel--open {
+    transform: translate3d(0, 0, 0);
+}
+
+.auth-slide-panel__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.auth-panel-input {
+    background-color: #ffffff;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+    color: var(--color-neutral-dark);
+}
+
+.auth-panel-input::placeholder {
+    color: color-mix(in srgb, var(--color-neutral-dark) 45%, transparent);
+}
+
+.auth-panel-input:focus-visible {
+    border-color: var(--color-auth-accent);
+    --tw-ring-color: color-mix(in srgb, var(--color-auth-accent) 25%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-slide-panel {
+        transition: opacity 200ms ease;
+    }
+
+    .auth-slide-panel--left:not(.auth-slide-panel--open),
+    .auth-slide-panel--right:not(.auth-slide-panel--open) {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .auth-slide-panel--left:not(.auth-slide-panel--open) {
+        transform: translate3d(-100%, 0, 0);
+    }
+
+    .auth-slide-panel--right:not(.auth-slide-panel--open) {
+        transform: translate3d(100%, 0, 0);
+    }
+
+    .auth-slide-panel--open {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
     }
 }

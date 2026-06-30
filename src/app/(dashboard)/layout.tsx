@@ -9,9 +9,15 @@ import { useChatStore } from '@/store/chat.store';
 import { UserProfile } from '@/types/auth.types';
 import { MembershipExpiringModal, ProfileIncompleteModal } from '@/components/Modales';
 import { DisruptiveNewsModal } from '@/components/layout/DisruptiveNewsModal';
+import { DashboardCityscapeBackground } from '@/components/layout/DashboardCityscapeBackground';
+import { DashboardMobileHeader } from '@/components/layout/DashboardMobileHeader';
+import { RouteGuard } from '@/components/auth/RouteGuard';
+import { getHomeByRole } from '@/lib/constants/routes';
+import { canAccessAdminArea } from '@/lib/auth/permissions';
+import { APP_CONFIG } from '@/config/app.config';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-    const { isLoading, initAuth, isAuthenticated, getFullProfile } = useAuthStore();
+    const { isLoading, initAuth, isAuthenticated, getFullProfile, user } = useAuthStore();
     const { loadConversations } = useChatStore();
     const router = useRouter();
 
@@ -33,9 +39,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }, [isLoading, isAuthenticated, router]);
 
     useEffect(() => {
-        if (isLoading || !isAuthenticated) return;
+        if (!isLoading && isAuthenticated && canAccessAdminArea(user?.role)) {
+            router.replace(getHomeByRole(user?.role ?? 'USER'));
+        }
+    }, [isLoading, isAuthenticated, user?.role, router]);
 
-        document.title = 'Consultor IA - GIRS';
+    useEffect(() => {
+        if (isLoading || !isAuthenticated || canAccessAdminArea(user?.role)) return;
+
+        document.title = APP_CONFIG.DOCUMENT_TITLE;
 
         let timeoutId: NodeJS.Timeout;
 
@@ -61,7 +73,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         return () => {
             if (timeoutId) clearTimeout(timeoutId);
         };
-    }, [isAuthenticated, isLoading, getFullProfile, loadConversations]);
+    }, [isAuthenticated, isLoading, user?.role, getFullProfile, loadConversations]);
 
     // Mostrar spinner mientras se verifica la sesión o durante la redirección al login
     if (isLoading || !isAuthenticated) {
@@ -73,23 +85,31 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
 
     return (
-        <div className="flex h-dvh overflow-hidden bg-surface-light text-neutral-dark">
-            <Sidebar />
-            <main className="flex-1 flex flex-col min-w-0 relative overflow-y-auto custom-scrollbar">
-                <div className="flex-1 flex flex-col">{children}</div>
-                <CopyrightFooter />
-            </main>
+        <RouteGuard allowedRoles={['USER']}>
+            <div className="relative flex h-dvh overflow-hidden bg-surface-light text-neutral-dark">
+                <DashboardCityscapeBackground />
+                <Sidebar />
+                <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
+                    <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden">
+                        <DashboardMobileHeader />
+                        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto custom-scrollbar">
+                            <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+                        </div>
+                        <CopyrightFooter />
+                    </main>
+                </div>
 
-            <MembershipExpiringModal
-                isOpen={isMembershipModalOpen}
-                onClose={() => setIsMembershipModalOpen(false)}
-                daysLeft={membershipDaysLeft}
-            />
+                <MembershipExpiringModal
+                    isOpen={isMembershipModalOpen}
+                    onClose={() => setIsMembershipModalOpen(false)}
+                    daysLeft={membershipDaysLeft}
+                />
 
-            <ProfileIncompleteModal isOpen={isProfileModalOpen} onSuccess={() => setIsProfileModalOpen(false)} />
+                <ProfileIncompleteModal isOpen={isProfileModalOpen} onSuccess={() => setIsProfileModalOpen(false)} />
 
-            <DisruptiveNewsModal />
-        </div>
+                <DisruptiveNewsModal />
+            </div>
+        </RouteGuard>
     );
 }
 

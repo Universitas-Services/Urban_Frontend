@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import { useChatStore } from '@/store/chat.store';
+import { APP_CONFIG } from '@/config/app.config';
 import { MessageBubble } from './MessageBubble';
 import { AgentAvatar } from './AgentAvatar';
 
@@ -30,11 +31,10 @@ export function MessageList() {
                         </span>
                     </div>
                     <h2 className="text-[32px] font-bold tracking-tight mb-2 text-center text-neutral-dark">
-                        Hola, soy tu <span className="text-(--color-consultant-text)">Consultor IA GIRS</span>
+                        Hola, soy tu <span className="text-(--color-consultant-text)">{APP_CONFIG.DOCUMENT_TITLE}</span>
                     </h2>
                     <p className="text-center text-neutral-dark max-w-150 text-[15px] mx-auto">
-                        Soy un agente IA experto en Gestión Integral de Residuos Sólidos - GIRS. Estoy aquí para
-                        resolver tus dudas técnicas, apoyarte en la planificación y asegurar el cumplimiento normativo.
+                        {APP_CONFIG.AGENT_WELCOME_INTRO}
                     </p>
                 </div>
             </div>
@@ -42,7 +42,7 @@ export function MessageList() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar relative">
+        <div className="flex-1 min-h-0 overflow-y-auto w-full custom-scrollbar relative">
             <div className="w-full mx-auto p-4 sm:p-6 space-y-6">
                 {/* Mocked Initial Date Separator */}
                 <div className="flex items-center justify-center my-6">

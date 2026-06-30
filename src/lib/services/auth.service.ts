@@ -91,6 +91,34 @@ export async function resetPasswordService(email: string, newPassword: string): 
 
 // ─── Usuarios (requieren sesión) ──────────────────────────────────────────────
 
+function normalizeUserProfile(raw: Record<string, unknown>): UserProfile {
+    const profile = (raw.profile ?? raw.user ?? raw) as Record<string, unknown>;
+
+    return {
+        id: String(profile.id ?? ''),
+        email: String(profile.email ?? ''),
+        nombre: (profile.nombre as string | null | undefined) ?? null,
+        apellido: (profile.apellido as string | null | undefined) ?? null,
+        telefono: (profile.telefono as string | null | undefined) ?? null,
+        role: String(profile.role ?? ''),
+        isEmailVerified: Boolean(profile.isEmailVerified),
+        isActive: Boolean(profile.isActive),
+        estado: (profile.estado as string | null | undefined) ?? null,
+        municipio: (profile.municipio as string | null | undefined) ?? null,
+        tipo_usuario: (profile.tipo_usuario as string | null | undefined) ?? null,
+        nombre_ente: (profile.nombre_ente as string | null | undefined) ?? null,
+        cargo: (profile.cargo as string | null | undefined) ?? null,
+        estatus_normativa_girs: (profile.estatus_normativa_girs as string | null | undefined) ?? null,
+        profileCompleted: Boolean(profile.profileCompleted),
+        estadoCuenta: profile.estadoCuenta as string | undefined,
+        hasUnreadNews: profile.hasUnreadNews as boolean | undefined,
+        latestNews: profile.latestNews as UserProfile['latestNews'],
+        alertaVencimiento: profile.alertaVencimiento as UserProfile['alertaVencimiento'],
+        createdAt: String(profile.createdAt ?? ''),
+        updatedAt: String(profile.updatedAt ?? ''),
+    };
+}
+
 export async function getProfileService(): Promise<User> {
     const res = await fetch(`${API}/users/my`, {
         headers: await getAuthHeader(),
@@ -104,7 +132,8 @@ export async function getFullProfileService(): Promise<UserProfile> {
         headers: await getAuthHeader(),
         cache: 'no-store',
     });
-    return handleResponse<UserProfile>(res);
+    const data = await handleResponse<Record<string, unknown>>(res);
+    return normalizeUserProfile(data);
 }
 
 export async function updateProfileService(data: UpdateProfileInput): Promise<User> {

@@ -18,13 +18,19 @@ export function AgentAvatar({ size = 'sm', className }: AgentAvatarProps) {
     return (
         <div
             className={cn(
-                'rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center relative overflow-hidden shrink-0 shadow-lg',
+                'rounded-full bg-gradient-to-br from-primary to-agent-accent flex items-center justify-center relative overflow-hidden shrink-0 shadow-lg',
                 sizeClasses,
                 className
             )}
         >
             {APP_CONFIG.AGENT_AVATAR_URL ? (
-                <Image src={APP_CONFIG.AGENT_AVATAR_URL} alt={APP_CONFIG.AGENT_NAME} fill className="object-cover" />
+                <Image
+                    src={APP_CONFIG.AGENT_AVATAR_URL}
+                    alt={APP_CONFIG.AGENT_NAME}
+                    fill
+                    sizes={isLarge ? '120px' : '32px'}
+                    className="object-cover"
+                />
             ) : (
                 <Sparkles size={iconSize} className="text-on-primary" />
             )}
