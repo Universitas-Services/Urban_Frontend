@@ -6,11 +6,12 @@ type AulaCiudadVideoListProps = {
     videos: AulaCiudadVideo[];
     selectedVideoId: string;
     onSelectVideo: (videoId: string) => void;
+    className?: string;
 };
 
-export function AulaCiudadVideoList({ videos, selectedVideoId, onSelectVideo }: AulaCiudadVideoListProps) {
+export function AulaCiudadVideoList({ videos, selectedVideoId, onSelectVideo, className }: AulaCiudadVideoListProps) {
     return (
-        <div className="flex flex-col gap-2 overflow-y-auto custom-scrollbar max-h-[520px] lg:max-h-none lg:h-full">
+        <div className={cn('flex min-h-0 flex-col gap-1.5', className)}>
             {videos.map((video) => {
                 const isActive = video.id === selectedVideoId;
 
@@ -20,13 +21,13 @@ export function AulaCiudadVideoList({ videos, selectedVideoId, onSelectVideo }: 
                         type="button"
                         onClick={() => onSelectVideo(video.id)}
                         className={cn(
-                            'flex w-full gap-3 rounded-xl border p-2.5 text-left transition-colors',
+                            'flex min-h-[3rem] w-full gap-2 rounded-lg border p-1.5 text-left transition-colors',
                             isActive
                                 ? 'border-primary bg-surface-soft/40 shadow-sm'
                                 : 'border-gray-200/70 bg-white hover:border-primary/20 hover:bg-surface-soft/20'
                         )}
                     >
-                        <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-lg bg-surface-soft">
+                        <div className="relative h-9 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-surface-soft">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={getYoutubeThumbnailUrl(video.youtubeVideoId)}
@@ -35,11 +36,11 @@ export function AulaCiudadVideoList({ videos, selectedVideoId, onSelectVideo }: 
                             />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="line-clamp-2 text-sm font-semibold leading-snug text-primary">
+                            <p className="line-clamp-2 text-xs font-semibold leading-snug text-primary">
                                 {video.title}
                             </p>
                             {video.durationLabel || video.publishedAt ? (
-                                <p className="mt-1 text-[11px] text-gray-soft">
+                                <p className="mt-0.5 text-[10px] text-gray-soft">
                                     {video.durationLabel ?? video.publishedAt}
                                 </p>
                             ) : null}

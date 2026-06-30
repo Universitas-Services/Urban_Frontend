@@ -1,7 +1,5 @@
-'use client';
-
-import { BibliotecaGirsView } from '@/components/bibliotecagirs';
+import { BibliotecaLegalPageContent } from '@/components/biblioteca-legal';
 
 export default function BibliotecaGirsPage() {
-    return <BibliotecaGirsView />;
+    return <BibliotecaLegalPageContent />;
 }

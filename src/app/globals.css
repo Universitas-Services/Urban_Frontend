@@ -388,6 +388,50 @@
     );
 }
 
+/* Biblioteca Legal — iconos de categoría */
+.biblioteca-category-icon {
+    color: var(--color-on-primary);
+}
+
+.biblioteca-category-icon--green {
+    background-color: var(--color-accent);
+}
+
+.biblioteca-category-icon--blue {
+    background-color: var(--color-primary);
+}
+
+.biblioteca-category-icon--territorial {
+    background-color: var(--color-territorial);
+}
+
+.biblioteca-category-icon--orange {
+    background-color: var(--color-agent-accent);
+}
+
+.biblioteca-category-icon--primary-deep {
+    background-color: var(--color-primary-hover);
+}
+
+.biblioteca-category-link {
+    color: var(--color-accent);
+}
+
+.biblioteca-coleccion-doc-icon {
+    background-color: var(--color-accent-light);
+    color: var(--color-primary);
+}
+
+.biblioteca-coleccion-badge--vigente {
+    background-color: color-mix(in srgb, var(--color-accent) 14%, white);
+    color: var(--color-accent);
+}
+
+.biblioteca-coleccion-badge--parcial {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, white);
+    color: var(--color-primary);
+}
+
 /* Gear/Settings Spin Animation */
 .gear-spin-icon {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);

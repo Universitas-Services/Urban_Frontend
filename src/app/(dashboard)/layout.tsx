@@ -10,6 +10,7 @@ import { UserProfile } from '@/types/auth.types';
 import { MembershipExpiringModal, ProfileIncompleteModal } from '@/components/Modales';
 import { DisruptiveNewsModal } from '@/components/layout/DisruptiveNewsModal';
 import { DashboardCityscapeBackground } from '@/components/layout/DashboardCityscapeBackground';
+import { DashboardMobileHeader } from '@/components/layout/DashboardMobileHeader';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { getHomeByRole } from '@/lib/constants/routes';
 import { canAccessAdminArea } from '@/lib/auth/permissions';
@@ -90,6 +91,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 <Sidebar />
                 <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
                     <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden">
+                        <DashboardMobileHeader />
                         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto custom-scrollbar">
                             <div className="flex min-h-0 flex-1 flex-col">{children}</div>
                         </div>

@@ -23,6 +23,10 @@ export function parseYoutubePlaylistFeed(xml: string, playlistId: string): AulaC
             const youtubeVideoId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1] ?? '';
             const title = entry.match(/<title>([^<]+)<\/title>/)?.[1] ?? '';
             const publishedAt = entry.match(/<published>([^<]+)<\/published>/)?.[1]?.split('T')[0];
+            const description =
+                entry.match(/<media:description>([^<]*)<\/media:description>/)?.[1]?.trim() ||
+                entry.match(/<summary>([^<]*)<\/summary>/)?.[1]?.trim() ||
+                undefined;
 
             if (!youtubeVideoId) return null;
 
@@ -30,6 +34,7 @@ export function parseYoutubePlaylistFeed(xml: string, playlistId: string): AulaC
                 id: youtubeVideoId,
                 youtubeVideoId,
                 title: decodeXmlEntities(title),
+                description: description ? decodeXmlEntities(description) : undefined,
                 publishedAt,
             };
         })

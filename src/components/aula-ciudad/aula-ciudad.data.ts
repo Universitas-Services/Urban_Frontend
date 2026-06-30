@@ -1,5 +1,8 @@
 export const AULA_CIUDAD_YOUTUBE_PLAYLIST_ID = 'PLRJBaSLMa1H0_4vzPAmrSDy-02VoGdW8_' as const;
 
+/** Altura compartida del área con scroll en descripción y lista de videos */
+export const AULA_CIUDAD_PANEL_SCROLL_HEIGHT = 'h-[10.5rem]';
+
 export const AULA_CIUDAD_INTRO = {
     title: 'Aula Ciudad',
     eyebrow: 'Formación académica',

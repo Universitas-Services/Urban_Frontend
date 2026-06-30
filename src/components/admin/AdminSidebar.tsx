@@ -46,6 +46,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import { APP_CONFIG } from '@/config/app.config';
 import { useAuthStore } from '@/store/auth.store';
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -95,7 +96,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                         <Link href="/admin" className="relative flex h-14 w-52 items-center justify-center">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="/asset/icons_11.png"
+                                src={APP_CONFIG.SIDEBAR_LOGO_URL}
                                 alt="IUS Urbano"
                                 className="h-full w-full scale-110 object-contain"
                             />
