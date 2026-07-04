@@ -1,5 +1,5 @@
 import { BibliotecaLegalPageContent } from '@/components/biblioteca-legal';
 
-export default function BibliotecaGirsPage() {
+export default function BibliotecaLegalPage() {
     return <BibliotecaLegalPageContent />;
 }

@@ -7,12 +7,12 @@ import { ExternalLink } from 'lucide-react';
 
 interface LegalCardProps {
     title: string;
-    description: string;
-    publishDate: string;
-    gacetaNumber: string;
-    gacetaLink: string;
+    description?: string;
+    publishDate?: string;
+    gacetaNumber?: string;
+    gacetaLink?: string;
     type: 'Ley Orgánica' | 'Ley Ordinaria' | 'Norma General' | 'Resolución';
-    downloadLink: string;
+    downloadLink?: string;
     className?: string;
 }
 
@@ -51,6 +51,8 @@ export function LegalCard({
 }: LegalCardProps) {
     const config = TYPE_CONFIGS[type] || TYPE_CONFIGS['Ley Orgánica'];
     const { Icon, bgColor, label } = config;
+    const hasGacetaLink = Boolean(gacetaNumber && gacetaLink);
+    const hasDownloadLink = Boolean(downloadLink);
 
     return (
         <div
@@ -82,7 +84,7 @@ export function LegalCard({
                         {title}
                     </h3>
                     <p className="descripcion-cards-proyecto-ley text-[11.5px] italic text-gray-500 leading-relaxed">
-                        {description}
+                        {description || 'Descripción disponible próximamente.'}
                     </p>
                 </div>
             </div>
@@ -95,31 +97,47 @@ export function LegalCard({
                 <div className="space-y-2">
                     <div className="flex justify-between items-center text-[12px]">
                         <span className="text-gray-400 font-medium">Fecha publicación</span>
-                        <span className="text-primary font-extrabold">{publishDate}</span>
+                        <span className="text-primary font-extrabold">{publishDate || 'Por confirmar'}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px]">
                         <span className="text-gray-400 font-medium font-bold">GACETA OFICIAL</span>
-                        <a
-                            href={gacetaLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-1 transition-colors uppercase"
-                        >
-                            {gacetaNumber}
-                            <ExternalLink size={8} />
-                        </a>
+                        {hasGacetaLink ? (
+                            <a
+                                href={gacetaLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-1 transition-colors uppercase"
+                            >
+                                {gacetaNumber}
+                                <ExternalLink size={8} />
+                            </a>
+                        ) : (
+                            <span className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">
+                                Por confirmar
+                            </span>
+                        )}
                     </div>
                 </div>
 
                 {/* Action Button */}
-                <a
-                    href={downloadLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center h-10 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-primary/10 text-sm"
-                >
-                    Descargar
-                </a>
+                {hasDownloadLink ? (
+                    <a
+                        href={downloadLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center h-10 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-primary/10 text-sm"
+                    >
+                        Descargar
+                    </a>
+                ) : (
+                    <button
+                        type="button"
+                        disabled
+                        className="w-full flex items-center justify-center h-10 bg-gray-200 text-gray-500 font-bold rounded-xl text-sm cursor-not-allowed"
+                    >
+                        Próximamente
+                    </button>
+                )}
             </div>
         </div>
     );

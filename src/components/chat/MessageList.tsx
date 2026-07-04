@@ -26,16 +26,28 @@ export function MessageList() {
                     <div className="relative mb-6">
                         <AgentAvatar size="lg" className="shadow-xl ring-[6px] ring-white/60" />
                         <span className="absolute bottom-1 right-1 flex h-4.5 w-4.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-(--color-status-online) opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-4.5 w-4.5 bg-(--color-status-online) border-[3px] border-(--color-chat-bg)"></span>
+                            {APP_CONFIG.AGENT_UNDER_CONSTRUCTION ? (
+                                <span className="relative inline-flex h-4.5 w-4.5 rounded-full bg-amber-500 border-[3px] border-(--color-chat-bg)" />
+                            ) : (
+                                <>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-(--color-status-online) opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-4.5 w-4.5 bg-(--color-status-online) border-[3px] border-(--color-chat-bg)"></span>
+                                </>
+                            )}
                         </span>
                     </div>
                     <h2 className="text-[32px] font-bold tracking-tight mb-2 text-center text-neutral-dark">
                         Hola, soy tu <span className="text-(--color-consultant-text)">{APP_CONFIG.DOCUMENT_TITLE}</span>
                     </h2>
-                    <p className="text-center text-neutral-dark max-w-150 text-[15px] mx-auto">
-                        {APP_CONFIG.AGENT_WELCOME_INTRO}
-                    </p>
+                    {APP_CONFIG.AGENT_UNDER_CONSTRUCTION ? (
+                        <p className="text-center text-neutral-dark max-w-150 text-[15px] mx-auto">
+                            En proceso de entrenamiento.
+                        </p>
+                    ) : (
+                        <p className="text-center text-neutral-dark max-w-150 text-[15px] mx-auto">
+                            {APP_CONFIG.AGENT_WELCOME_INTRO}
+                        </p>
+                    )}
                 </div>
             </div>
         );

@@ -23,6 +23,7 @@ export const registerSchema = z
             .regex(/^(?=.*[A-Z])(?=.*\d)/, 'Debe tener al menos una mayúscula y un número'),
         confirmPassword: z.string(),
         termsAccepted: z.boolean().refine((val) => val === true, 'Debes aceptar los términos y condiciones'),
+        emailCommunicationsAccepted: z.boolean().optional(),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: 'Las contraseñas no coinciden',
