@@ -26,7 +26,9 @@ export default function ChatDashboardPage() {
         }
         try {
             await sendMessage(content);
-            await loadConversations();
+            if (!APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+                await loadConversations();
+            }
         } catch (error) {
             const err = error as Error & { status?: number };
             if (err.status === 403) {
@@ -45,13 +47,21 @@ export default function ChatDashboardPage() {
                         <div className="flex items-center px-6 py-4 border-b border-surface-soft/60 bg-white md:rounded-t-[24px] shrink-0 z-10 transition-all">
                             <div className="relative mr-3 flex shrink-0">
                                 <AgentAvatar size="sm" className="ring-2 ring-white shadow-sm" />
-                                <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-(--color-status-online) ring-[1.5px] ring-white shadow-sm"></span>
+                                <span
+                                    className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-[1.5px] ring-white shadow-sm ${
+                                        APP_CONFIG.AGENT_UNDER_CONSTRUCTION
+                                            ? 'bg-amber-500'
+                                            : 'bg-(--color-status-online)'
+                                    }`}
+                                />
                             </div>
                             <div className="flex flex-col">
                                 <h2 className="font-bold text-neutral-dark text-[17px] leading-tight">
                                     {APP_CONFIG.DOCUMENT_TITLE}
                                 </h2>
-                                <span className="text-[13px] font-medium text-(--color-status-online)">En línea</span>
+                                <span className="text-[13px] font-medium text-amber-600">
+                                    {APP_CONFIG.AGENT_UNDER_CONSTRUCTION ? 'En proceso de entrenamiento' : 'En línea'}
+                                </span>
                             </div>
                         </div>
 

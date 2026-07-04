@@ -2,11 +2,13 @@
 
 import { create } from 'zustand';
 import type { Conversation, Message } from '@/types/chat.types';
+import { APP_CONFIG } from '@/config/app.config';
 import {
     getConversationsService,
     getMessagesService,
     sendMessageService,
     createConversationService,
+    deleteConversationService,
 } from '@/lib/services/chat.service';
 
 interface ChatState {
@@ -27,6 +29,7 @@ interface ChatActions {
     addMessage: (message: Message) => void;
     reset: () => void;
     startNewChat: () => void;
+    deleteConversation: (sessionId: string) => Promise<void>;
 }
 
 const initialState: ChatState = {
@@ -41,12 +44,22 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
     ...initialState,
 
     loadConversations: async () => {
+        if (APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+            set({ conversations: [] });
+            return;
+        }
+
         const conversations = await getConversationsService();
         set({ conversations });
     },
 
     selectConversation: async (id) => {
         set({ activeConversationId: id, messages: [] });
+
+        if (APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+            return;
+        }
+
         const messages = await getMessagesService(id);
         set({ messages });
     },
@@ -55,7 +68,6 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
         const { activeConversationId, conversations } = get();
         if (!activeConversationId || !content.trim()) return;
 
-        // Optimistic UI — agregar el mensaje del usuario inmediatamente
         const optimisticUserMsg: Message = {
             id: `temp-user-${Date.now()}`,
             conversationId: activeConversationId,
@@ -66,14 +78,27 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
         set((s) => ({ messages: [...s.messages, optimisticUserMsg], isSending: true }));
 
         try {
-            const botMessage = await sendMessageService(activeConversationId, content);
+            let botMessage: Message;
+
+            if (APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+                botMessage = {
+                    id: `temp-bot-${Date.now()}`,
+                    conversationId: activeConversationId,
+                    role: 'assistant',
+                    content: APP_CONFIG.AGENT_UNDER_CONSTRUCTION_REPLY,
+                    createdAt: new Date().toISOString(),
+                };
+            } else {
+                botMessage = await sendMessageService(activeConversationId, content);
+            }
+
             set((s) => ({ messages: [...s.messages, botMessage], isSending: false }));
 
-            // Actualizar el lastMessage de la conversación activa en la lista
             const updatedConversations = conversations.map((c) =>
                 c.id === activeConversationId
                     ? {
                           ...c,
+                          title: c.messageCount === 0 ? content.slice(0, 48) : c.title,
                           lastMessage: content,
                           lastMessageAt: new Date().toISOString(),
                           messageCount: c.messageCount + 1,
@@ -82,7 +107,6 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
             );
             set({ conversations: updatedConversations });
         } catch (error) {
-            // Revertir el optimistic update si falla
             set((s) => ({
                 messages: s.messages.filter((m) => m.id !== optimisticUserMsg.id),
                 isSending: false,
@@ -109,4 +133,18 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
     reset: () => set(initialState),
 
     startNewChat: () => set({ activeConversationId: null, messages: [] }),
+
+    deleteConversation: async (sessionId) => {
+        if (!APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+            await deleteConversationService(sessionId);
+        }
+
+        const { activeConversationId, conversations } = get();
+        const wasActive = activeConversationId === sessionId;
+
+        set({
+            conversations: conversations.filter((c) => c.id !== sessionId),
+            ...(wasActive ? { activeConversationId: null, messages: [] } : {}),
+        });
+    },
 }));

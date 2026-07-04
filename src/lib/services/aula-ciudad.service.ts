@@ -1,21 +1,43 @@
 'use server';
 
-import type { AulaCiudadPlaylist } from '@/components/aula-ciudad/aula-ciudad.types';
-import { AULA_CIUDAD_YOUTUBE_PLAYLIST_ID } from '@/components/aula-ciudad/aula-ciudad.data';
-import { parseYoutubePlaylistFeed } from '@/lib/youtube/parse-playlist-feed';
+import { mapYoutubePlaylistToAulaCiudad } from '@/components/aula-ciudad/aula-ciudad.mapper';
+import type { AulaCiudadPlaylist, YoutubePlaylistVideoDto } from '@/components/aula-ciudad/aula-ciudad.types';
+import { getAuthHeader } from '@/lib/auth/session';
 
-const PLAYLIST_FEED_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${AULA_CIUDAD_YOUTUBE_PLAYLIST_ID}`;
+const API = process.env.API_URL;
 
-// GET /aula-ciudad/playlist → AulaCiudadPlaylist
+type ApiError = Error & { status?: number };
+
+async function handleResponse<T>(res: Response): Promise<T> {
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const message = Array.isArray(err.message) ? err.message[0] : err.message || err.error || 'Error del servidor';
+        const error = new Error(message) as ApiError;
+        error.status = res.status;
+        throw error;
+    }
+    if (res.status === 204) return undefined as T;
+    return res.json();
+}
+
+// GET /youtube/playlist → AulaCiudadPlaylist
 export async function getAulaCiudadPlaylistService(): Promise<AulaCiudadPlaylist> {
-    const response = await fetch(PLAYLIST_FEED_URL, {
-        next: { revalidate: 3600 },
+    const res = await fetch(`${API}/youtube/playlist`, {
+        headers: await getAuthHeader(),
+        cache: 'no-store',
     });
 
-    if (!response.ok) {
-        throw new Error('No se pudo cargar la playlist de Aula Ciudad.');
-    }
+    const dtos = await handleResponse<YoutubePlaylistVideoDto[]>(res);
+    return mapYoutubePlaylistToAulaCiudad(dtos);
+}
 
-    const xml = await response.text();
-    return parseYoutubePlaylistFeed(xml, AULA_CIUDAD_YOUTUBE_PLAYLIST_ID);
+// DELETE /youtube/cache — solo administradores; sin UI por ahora
+export async function invalidateYoutubeCacheService(): Promise<{ message: string }> {
+    const res = await fetch(`${API}/youtube/cache`, {
+        method: 'DELETE',
+        headers: await getAuthHeader(),
+        cache: 'no-store',
+    });
+
+    return handleResponse<{ message: string }>(res);
 }

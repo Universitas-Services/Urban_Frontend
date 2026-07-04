@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { BibliotecaLegalColeccionViewMode } from './BibliotecaLegalColeccionDocumentCard';
+import type { BibliotecaLegalMateriaOption, BibliotecaLegalSortBy } from './biblioteca-legal.types';
 
 type BibliotecaLegalColeccionToolbarProps = {
     categoryTitle: string;
@@ -26,10 +27,13 @@ type BibliotecaLegalColeccionToolbarProps = {
     onMunicipioChange: (value: string) => void;
     selectedMateria: string;
     onMateriaChange: (value: string) => void;
+    materiaOptions: BibliotecaLegalMateriaOption[];
     hasActiveFilters: boolean;
     onClearFilters: () => void;
     viewMode: BibliotecaLegalColeccionViewMode;
     onViewModeChange: (mode: BibliotecaLegalColeccionViewMode) => void;
+    sortBy: BibliotecaLegalSortBy;
+    onSortByChange: (value: BibliotecaLegalSortBy) => void;
 };
 
 export function BibliotecaLegalColeccionToolbar({
@@ -50,10 +54,13 @@ export function BibliotecaLegalColeccionToolbar({
     onMunicipioChange,
     selectedMateria,
     onMateriaChange,
+    materiaOptions,
     hasActiveFilters,
     onClearFilters,
     viewMode,
     onViewModeChange,
+    sortBy,
+    onSortByChange,
 }: BibliotecaLegalColeccionToolbarProps) {
     return (
         <div className="rounded-xl border border-gray-200/70 bg-white p-4 shadow-sm md:p-5">
@@ -66,7 +73,7 @@ export function BibliotecaLegalColeccionToolbar({
                     type="search"
                     value={searchQuery}
                     onChange={(event) => onSearchQueryChange(event.target.value)}
-                    placeholder="Buscar por título, municipio, materia o palabra clave..."
+                    placeholder="Buscar por título, emisor, tipo, materia o palabra clave..."
                     className="h-11 border-gray-200/80 bg-surface-light/60 pl-10 text-sm"
                     aria-label={`Buscar en ${categoryTitle}`}
                 />
@@ -124,9 +131,11 @@ export function BibliotecaLegalColeccionToolbar({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="todas">Materia: Todas</SelectItem>
-                            <SelectItem value="uso-suelo">Uso del suelo</SelectItem>
-                            <SelectItem value="ambiental">Protección ambiental</SelectItem>
-                            <SelectItem value="construccion">Construcción</SelectItem>
+                            {materiaOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -161,7 +170,10 @@ export function BibliotecaLegalColeccionToolbar({
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-2">
                         <span className="descripcion-cards-small shrink-0 text-neutral-dark/70">Ordenar por:</span>
-                        <Select defaultValue="recientes">
+                        <Select
+                            value={sortBy}
+                            onValueChange={(value) => onSortByChange(value as BibliotecaLegalSortBy)}
+                        >
                             <SelectTrigger className="h-9 w-[10.5rem] border-gray-200/80 bg-white text-sm">
                                 <SelectValue />
                             </SelectTrigger>

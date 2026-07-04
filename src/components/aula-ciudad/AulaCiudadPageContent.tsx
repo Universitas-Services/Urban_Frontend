@@ -20,8 +20,12 @@ export function AulaCiudadPageContent() {
                 setPlaylist(data);
                 setSelectedVideoId(data.videos[0]?.id ?? null);
             })
-            .catch(() => {
-                setError('No se pudo cargar la playlist. Intenta de nuevo más tarde.');
+            .catch((err: Error & { status?: number }) => {
+                if (err.status === 500) {
+                    setError('Error al consultar la playlist. Intenta de nuevo más tarde.');
+                    return;
+                }
+                setError(err.message || 'No se pudo cargar la playlist. Intenta de nuevo más tarde.');
             });
     }, []);
 
