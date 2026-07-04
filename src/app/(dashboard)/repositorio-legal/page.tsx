@@ -37,9 +37,6 @@ export default function RepositorioLegalPage() {
                                 type={documento.legalType}
                                 title={documento.title}
                                 description={documento.description}
-                                publishDate={documento.publishDate}
-                                gacetaNumber={documento.gacetaNumber}
-                                gacetaLink={documento.gacetaLink}
                                 downloadLink={documento.downloadLink}
                                 className="h-full flex flex-col"
                             />
