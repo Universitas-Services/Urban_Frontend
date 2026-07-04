@@ -3,7 +3,7 @@
 import { useChatStore } from '@/store/chat.store';
 import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
-import { MessageSquare, Settings, LogOut, Menu, User, Headset, HelpCircle } from 'lucide-react';
+import { MessageSquare, Settings, LogOut, Menu, User, Headset, HelpCircle, Trash2 } from 'lucide-react';
 import { IoMdBook, IoMdInformationCircleOutline } from 'react-icons/io';
 import { IoHomeSharp, IoAddCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
 import { FaBalanceScale } from 'react-icons/fa';
@@ -28,14 +28,25 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { APP_CONFIG } from '@/config/app.config';
+import type { Conversation } from '@/types/chat.types';
+import { toast } from 'sonner';
 
 export function Sidebar() {
-    const { isSidebarOpen, toggleSidebar, conversations, activeConversationId, startNewChat, selectConversation } =
-        useChatStore();
+    const {
+        isSidebarOpen,
+        toggleSidebar,
+        conversations,
+        activeConversationId,
+        startNewChat,
+        selectConversation,
+        deleteConversation,
+    } = useChatStore();
     const { user, logout } = useAuthStore();
     const router = useRouter();
     const [isMobile, setIsMobile] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+    const [conversationToDelete, setConversationToDelete] = useState<Conversation | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const checkViewport = () => {
@@ -54,6 +65,21 @@ export function Sidebar() {
 
     const handleLogout = async () => {
         await logout();
+    };
+
+    const handleConfirmDeleteConversation = async () => {
+        if (!conversationToDelete) return;
+
+        setIsDeleting(true);
+        try {
+            await deleteConversation(conversationToDelete.id);
+            toast.success('Conversación eliminada correctamente.');
+            setConversationToDelete(null);
+        } catch {
+            toast.error('No se pudo eliminar la conversación. Intenta de nuevo.');
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const expanded = isSidebarOpen;
@@ -341,7 +367,7 @@ export function Sidebar() {
                                                                 router.push('/chat');
                                                             }}
                                                             className={cn(
-                                                                'group flex items-center justify-between px-3 py-1 rounded-lg text-[13px] cursor-pointer transition-colors whitespace-nowrap overflow-hidden',
+                                                                'group flex items-center justify-between gap-1 px-3 py-1 rounded-lg text-[13px] cursor-pointer transition-colors whitespace-nowrap overflow-hidden',
                                                                 isActive
                                                                     ? 'bg-primary/10 border-l-2 border-sidebar-foreground text-sidebar-foreground'
                                                                     : 'text-sidebar-foreground/80 hover:bg-sidebar-accent border-l-2 border-transparent'
@@ -349,12 +375,30 @@ export function Sidebar() {
                                                         >
                                                             <span
                                                                 className={cn(
-                                                                    'truncate transition-opacity duration-300',
+                                                                    'min-w-0 flex-1 truncate transition-opacity duration-300',
                                                                     expanded ? 'opacity-100' : 'opacity-0'
                                                                 )}
                                                             >
                                                                 {conv.title}
                                                             </span>
+                                                            {expanded ? (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(event) => {
+                                                                        event.stopPropagation();
+                                                                        setConversationToDelete(conv);
+                                                                    }}
+                                                                    className={cn(
+                                                                        'shrink-0 rounded p-1 text-sidebar-foreground/50 transition-opacity hover:bg-red-50 hover:text-red-600',
+                                                                        isMobile
+                                                                            ? 'opacity-100'
+                                                                            : 'opacity-0 group-hover:opacity-100'
+                                                                    )}
+                                                                    aria-label="Eliminar conversación"
+                                                                >
+                                                                    <Trash2 className="h-3.5 w-3.5" aria-hidden />
+                                                                </button>
+                                                            ) : null}
                                                         </div>
                                                     );
                                                 })}
@@ -554,6 +598,44 @@ export function Sidebar() {
                         </div>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                <AlertDialog
+                    open={conversationToDelete !== null}
+                    onOpenChange={(open) => {
+                        if (!open && !isDeleting) {
+                            setConversationToDelete(null);
+                        }
+                    }}
+                >
+                    <AlertDialogContent className="sm:max-w-md bg-white border border-surface-soft shadow-2xl rounded-2xl">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="text-neutral-dark text-xl font-bold">
+                                ¿Eliminar esta conversación?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-neutral-dark/70 mt-2">
+                                La conversación se eliminará de tu historial y no podrás recuperarla.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mt-6 gap-2 sm:gap-0">
+                            <AlertDialogCancel
+                                disabled={isDeleting}
+                                className="bg-transparent text-neutral-dark hover:bg-surface-soft/20 border border-surface-soft/60 rounded-lg"
+                            >
+                                Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    void handleConfirmDeleteConversation();
+                                }}
+                                disabled={isDeleting}
+                                className="bg-red-600 hover:bg-red-700 text-white border-transparent shadow shadow-red-600/20 font-bold rounded-lg disabled:opacity-50"
+                            >
+                                {isDeleting ? 'Eliminando...' : 'Sí, eliminar'}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
                 <AlertDialog open={isLogoutOpen} onOpenChange={setIsLogoutOpen}>
                     <AlertDialogContent className="sm:max-w-md bg-white border border-surface-soft shadow-2xl rounded-2xl">

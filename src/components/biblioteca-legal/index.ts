@@ -6,9 +6,4 @@ export { BibliotecaLegalColeccionToolbar } from './BibliotecaLegalColeccionToolb
 export { BibliotecaLegalColeccionDocumentCard } from './BibliotecaLegalColeccionDocumentCard';
 export { BibliotecaLegalDocumentCard } from './BibliotecaLegalDocumentCard';
 export { BibliotecaLegalPreviewModal } from './BibliotecaLegalPreviewModal';
-export {
-    getBibliotecaLegalCategoryById,
-    getBibliotecaLegalColeccionDocumentos,
-    getBibliotecaLegalColeccionMeta,
-    filterBibliotecaLegalColeccionDocumentos,
-} from './biblioteca-legal.coleccion.data';
+export { getBibliotecaLegalCategoryById } from './biblioteca-legal.coleccion.data';

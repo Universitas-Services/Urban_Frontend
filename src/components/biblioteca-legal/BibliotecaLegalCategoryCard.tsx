@@ -5,6 +5,7 @@ import { getBibliotecaCategoryIconClass, type BibliotecaLegalCategory } from './
 
 type BibliotecaLegalCategoryCardProps = {
     category: BibliotecaLegalCategory;
+    documentCount?: number;
     className?: string;
 };
 
@@ -17,7 +18,7 @@ const CATEGORY_ICONS = {
     'instrumentos-internacionales': Globe,
 } as const;
 
-export function BibliotecaLegalCategoryCard({ category, className }: BibliotecaLegalCategoryCardProps) {
+export function BibliotecaLegalCategoryCard({ category, documentCount, className }: BibliotecaLegalCategoryCardProps) {
     const Icon = CATEGORY_ICONS[category.id as keyof typeof CATEGORY_ICONS] ?? BookOpen;
     const iconClassName = getBibliotecaCategoryIconClass(category.accent);
 
@@ -43,7 +44,14 @@ export function BibliotecaLegalCategoryCard({ category, className }: BibliotecaL
                 </div>
 
                 <div className="flex flex-1 flex-col p-5">
-                    <h2 className="titulos-cards-proyecto-ley leading-snug">{category.title}</h2>
+                    <div className="flex items-start justify-between gap-2">
+                        <h2 className="titulos-cards-proyecto-ley leading-snug">{category.title}</h2>
+                        {documentCount !== undefined ? (
+                            <span className="descripcion-cards-small shrink-0 rounded-full bg-surface-soft px-2.5 py-0.5 font-medium text-neutral-dark/80">
+                                {documentCount} {documentCount === 1 ? 'documento' : 'documentos'}
+                            </span>
+                        ) : null}
+                    </div>
                     <p className="descripcion-cards-small mt-2 flex-1 leading-relaxed">{category.description}</p>
                     <span className="biblioteca-category-link mt-4 inline-flex items-center gap-1.5 text-sm font-semibold">
                         Explorar colección

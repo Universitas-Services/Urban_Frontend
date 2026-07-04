@@ -4,28 +4,36 @@ import type {
     BibliotecaLegalDocumento,
     BibliotecaLegalPreview,
 } from '@/components/biblioteca-legal/biblioteca-legal.types';
+import {
+    normalizeBibliotecaDocumentosResponse,
+    normalizeBibliotecaPreviewResponse,
+} from '@/components/biblioteca-legal/biblioteca-legal.mapper';
 import { getAuthHeader } from '@/lib/auth/session';
 
-const API = process.env.API_URL;
+const API = process.env.API_URL?.replace(/\/+$/, '') ?? '';
 
 type ApiError = Error & { status?: number };
 
+async function parseErrorMessage(res: Response): Promise<string> {
+    const err = await res.json().catch(() => ({}));
+    const body = err as { message?: string | string[]; error?: string };
+
+    if (Array.isArray(body.message)) return body.message[0] ?? 'Error del servidor';
+    if (typeof body.message === 'string' && body.message.trim()) return body.message;
+    if (typeof body.error === 'string' && body.error.trim()) return body.error;
+
+    return 'Error del servidor';
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
     if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        const message = Array.isArray(err.message) ? err.message[0] : err.message || err.error || 'Error del servidor';
+        const message = await parseErrorMessage(res);
         const error = new Error(message) as ApiError;
         error.status = res.status;
         throw error;
     }
     if (res.status === 204) return undefined as T;
     return res.json();
-}
-
-function normalizeDocumentosList(
-    data: BibliotecaLegalDocumento[] | { data: BibliotecaLegalDocumento[] }
-): BibliotecaLegalDocumento[] {
-    return Array.isArray(data) ? data : data.data;
 }
 
 export async function getBibliotecaLegalDocumentosService(): Promise<BibliotecaLegalDocumento[]> {
@@ -42,29 +50,54 @@ export async function getBibliotecaLegalDocumentosService(): Promise<BibliotecaL
         throw error;
     }
 
-    const data = await handleResponse<BibliotecaLegalDocumento[] | { data: BibliotecaLegalDocumento[] }>(res);
-    return normalizeDocumentosList(data);
+    const data = await handleResponse<unknown>(res);
+    return normalizeBibliotecaDocumentosResponse(data);
 }
 
 export async function getBibliotecaLegalPreviewService(id: string): Promise<BibliotecaLegalPreview> {
-    const res = await fetch(`${API}/biblioteca-legal/documentos/preview/${id}`, {
+    const trimmedId = id.trim();
+    if (!trimmedId) {
+        throw new Error('No se recibió un ID de documento válido para la previsualización.');
+    }
+
+    const res = await fetch(`${API}/biblioteca-legal/documentos/preview/${encodeURIComponent(trimmedId)}`, {
         headers: await getAuthHeader(),
         cache: 'no-store',
     });
 
-    if (res.status === 404) {
-        const error = new Error('No existe un documento con ese ID en la biblioteca legal.') as ApiError;
-        error.status = 404;
-        throw error;
+    if (!res.ok) {
+        const message = await parseErrorMessage(res);
+
+        if (res.status === 404) {
+            throw new Error(message || 'No existe un documento con ese ID en la biblioteca legal.');
+        }
+
+        if (res.status === 500) {
+            throw new Error(
+                message || 'No se pudo generar la URL de previsualización. El archivo puede no estar disponible.'
+            );
+        }
+
+        throw new Error(message);
     }
 
-    if (res.status === 500) {
-        const error = new Error(
-            'No se pudo generar la URL de previsualización. El archivo puede no estar disponible.'
-        ) as ApiError;
-        error.status = 500;
-        throw error;
+    const rawBody = await res.text();
+    const signedUrl = normalizeBibliotecaPreviewResponse(parsePreviewResponseBody(rawBody));
+
+    return { signedUrl };
+}
+
+function parsePreviewResponseBody(rawBody: string): unknown {
+    const trimmed = rawBody.trim();
+    if (!trimmed) return null;
+
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return trimmed;
     }
 
-    return handleResponse<BibliotecaLegalPreview>(res);
+    try {
+        return JSON.parse(trimmed) as unknown;
+    } catch {
+        return trimmed;
+    }
 }

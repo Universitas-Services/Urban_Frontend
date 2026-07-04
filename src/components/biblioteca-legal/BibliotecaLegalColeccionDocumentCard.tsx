@@ -1,36 +1,27 @@
+import { FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { BibliotecaLegalColeccionDocumento } from './biblioteca-legal.coleccion.data';
+import {
+    formatBibliotecaDisplayValue,
+    formatBibliotecaFecha,
+    getBibliotecaDocumentoDescripcion,
+    getBibliotecaDocumentoReferencia,
+} from './biblioteca-legal.filters';
+import type { BibliotecaLegalDocumento } from './biblioteca-legal.types';
 
 export type BibliotecaLegalColeccionViewMode = 'grid' | 'list';
 
 type BibliotecaLegalColeccionDocumentCardProps = {
-    documento: BibliotecaLegalColeccionDocumento;
+    documento: BibliotecaLegalDocumento;
     viewMode?: BibliotecaLegalColeccionViewMode;
+    onPreview: (documento: BibliotecaLegalDocumento) => void;
     className?: string;
 };
 
-const STATUS_LABELS = {
-    vigente: 'Vigente',
-    'parcialmente-vigente': 'Parcialmente vigente',
-} as const;
-
-function StatusBadge({ status }: { status: BibliotecaLegalColeccionDocumento['status'] }) {
-    return (
-        <span
-            className={cn(
-                'shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
-                status === 'vigente' ? 'biblioteca-coleccion-badge--vigente' : 'biblioteca-coleccion-badge--parcial'
-            )}
-        >
-            {STATUS_LABELS[status]}
-        </span>
-    );
-}
-
-function VerDocumentoButton() {
+function VerDocumentoButton({ onClick }: { onClick: () => void }) {
     return (
         <button
             type="button"
+            onClick={onClick}
             className="biblioteca-category-link inline-flex shrink-0 items-center gap-1 text-sm font-semibold"
         >
             Ver documento
@@ -42,9 +33,14 @@ function VerDocumentoButton() {
 export function BibliotecaLegalColeccionDocumentCard({
     documento,
     viewMode = 'grid',
+    onPreview,
     className,
 }: BibliotecaLegalColeccionDocumentCardProps) {
-    const Icon = documento.icon;
+    const tipo = formatBibliotecaDisplayValue(documento.tipoNorma);
+    const emisor = formatBibliotecaDisplayValue(documento.enteEmisor);
+    const referencia = getBibliotecaDocumentoReferencia(documento);
+    const fecha = formatBibliotecaFecha(documento.fechaPublicacion);
+    const descripcion = getBibliotecaDocumentoDescripcion(documento);
 
     if (viewMode === 'list') {
         return (
@@ -56,46 +52,48 @@ export function BibliotecaLegalColeccionDocumentCard({
             >
                 <div className="flex min-w-0 flex-1 gap-3">
                     <div className="biblioteca-coleccion-doc-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-lg">
-                        <Icon className="h-5 w-5" aria-hidden />
+                        <FileText className="h-5 w-5" aria-hidden />
                     </div>
                     <div className="min-w-0 flex-1">
-                        <h3 className="titulos-cards-proyecto-ley text-[15px] leading-snug">{documento.title}</h3>
+                        <h3 className="titulos-cards-proyecto-ley text-[15px] leading-snug">{documento.titulo}</h3>
+                        {descripcion ? (
+                            <p className="descripcion-cards-small mt-1 line-clamp-2 text-gray-soft">{descripcion}</p>
+                        ) : null}
                         <dl className="descripcion-cards-small mt-2 grid gap-x-4 gap-y-1 text-gray-soft sm:grid-cols-2 lg:grid-cols-4">
                             <div className="min-w-0">
-                                <dt className="sr-only">Municipio</dt>
+                                <dt className="sr-only">Tipo</dt>
                                 <dd className="truncate">
-                                    <span className="font-medium text-neutral-dark/70">Municipio: </span>
-                                    {documento.municipio}
+                                    <span className="font-medium text-neutral-dark/70">Tipo: </span>
+                                    {tipo}
                                 </dd>
                             </div>
                             <div className="min-w-0">
-                                <dt className="sr-only">Estado</dt>
+                                <dt className="sr-only">Emisor</dt>
                                 <dd className="truncate">
-                                    <span className="font-medium text-neutral-dark/70">Estado: </span>
-                                    {documento.estado}
+                                    <span className="font-medium text-neutral-dark/70">Emisor: </span>
+                                    {emisor}
                                 </dd>
                             </div>
                             <div className="min-w-0">
-                                <dt className="sr-only">Gaceta</dt>
+                                <dt className="sr-only">Referencia</dt>
                                 <dd className="truncate">
-                                    <span className="font-medium text-neutral-dark/70">Gaceta: </span>
-                                    {documento.gaceta}
+                                    <span className="font-medium text-neutral-dark/70">Referencia: </span>
+                                    {referencia}
                                 </dd>
                             </div>
                             <div>
                                 <dt className="sr-only">Fecha</dt>
                                 <dd>
                                     <span className="font-medium text-neutral-dark/70">Fecha: </span>
-                                    {documento.fecha}
+                                    {fecha}
                                 </dd>
                             </div>
                         </dl>
                     </div>
                 </div>
 
-                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-gray-100 pt-3 sm:flex-col sm:items-end sm:justify-center sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4">
-                    <StatusBadge status={documento.status} />
-                    <VerDocumentoButton />
+                <div className="flex shrink-0 items-center justify-end border-t border-gray-100 pt-3 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4">
+                    <VerDocumentoButton onClick={() => onPreview(documento)} />
                 </div>
             </article>
         );
@@ -110,35 +108,38 @@ export function BibliotecaLegalColeccionDocumentCard({
         >
             <div className="flex gap-3">
                 <div className="biblioteca-coleccion-doc-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-lg">
-                    <Icon className="h-5 w-5" aria-hidden />
+                    <FileText className="h-5 w-5" aria-hidden />
                 </div>
                 <h3 className="titulos-cards-proyecto-ley line-clamp-3 min-w-0 flex-1 text-[15px] leading-snug">
-                    {documento.title}
+                    {documento.titulo}
                 </h3>
             </div>
 
+            {descripcion ? (
+                <p className="descripcion-cards-small mt-2 line-clamp-3 text-gray-soft">{descripcion}</p>
+            ) : null}
+
             <dl className="descripcion-cards-small mt-3 space-y-1 text-gray-soft">
                 <div className="flex gap-1">
-                    <dt className="shrink-0 font-medium text-neutral-dark/70">Municipio:</dt>
-                    <dd className="min-w-0 truncate">{documento.municipio}</dd>
+                    <dt className="shrink-0 font-medium text-neutral-dark/70">Tipo:</dt>
+                    <dd className="min-w-0 truncate">{tipo}</dd>
                 </div>
                 <div className="flex gap-1">
-                    <dt className="shrink-0 font-medium text-neutral-dark/70">Estado:</dt>
-                    <dd className="min-w-0 truncate">{documento.estado}</dd>
+                    <dt className="shrink-0 font-medium text-neutral-dark/70">Emisor:</dt>
+                    <dd className="min-w-0 truncate">{emisor}</dd>
                 </div>
                 <div className="flex gap-1">
-                    <dt className="shrink-0 font-medium text-neutral-dark/70">Gaceta:</dt>
-                    <dd className="min-w-0 truncate">{documento.gaceta}</dd>
+                    <dt className="shrink-0 font-medium text-neutral-dark/70">Referencia:</dt>
+                    <dd className="min-w-0 truncate">{referencia}</dd>
                 </div>
                 <div className="flex gap-1">
                     <dt className="shrink-0 font-medium text-neutral-dark/70">Fecha:</dt>
-                    <dd>{documento.fecha}</dd>
+                    <dd>{fecha}</dd>
                 </div>
             </dl>
 
-            <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
-                <StatusBadge status={documento.status} />
-                <VerDocumentoButton />
+            <div className="mt-4 flex items-center justify-end gap-3 border-t border-gray-100 pt-3">
+                <VerDocumentoButton onClick={() => onPreview(documento)} />
             </div>
         </article>
     );

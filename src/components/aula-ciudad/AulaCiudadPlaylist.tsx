@@ -14,6 +14,7 @@ export function AulaCiudadVideoList({ videos, selectedVideoId, onSelectVideo, cl
         <div className={cn('flex min-h-0 flex-col gap-1.5', className)}>
             {videos.map((video) => {
                 const isActive = video.id === selectedVideoId;
+                const thumbnailSrc = video.thumbnail?.trim() || getYoutubeThumbnailUrl(video.youtubeVideoId);
 
                 return (
                     <button
@@ -29,11 +30,7 @@ export function AulaCiudadVideoList({ videos, selectedVideoId, onSelectVideo, cl
                     >
                         <div className="relative h-9 w-[4.5rem] shrink-0 overflow-hidden rounded-md bg-surface-soft">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src={getYoutubeThumbnailUrl(video.youtubeVideoId)}
-                                alt=""
-                                className="h-full w-full object-cover"
-                            />
+                            <img src={thumbnailSrc} alt="" className="h-full w-full object-cover" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="line-clamp-2 text-xs font-semibold leading-snug text-primary">

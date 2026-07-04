@@ -143,7 +143,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
         httpError.status = res.status;
         throw httpError;
     }
-    return res.json();
+    if (res.status === 204) return undefined as T;
+    const text = await res.text();
+    if (!text) return undefined as T;
+    return JSON.parse(text) as T;
 }
 
 // ─── Conversaciones ───────────────────────────────────────────────────────────
@@ -228,4 +231,14 @@ export async function createConversationService(): Promise<Conversation> {
         lastMessageAt: new Date().toISOString(),
         messageCount: 0,
     };
+}
+
+export async function deleteConversationService(sessionId: string): Promise<void> {
+    const res = await fetch(`${API}/ai/conversations/${sessionId}`, {
+        method: 'DELETE',
+        headers: await getAuthHeader(),
+        cache: 'no-store',
+    });
+
+    await handleResponse<void>(res);
 }

@@ -7,8 +7,10 @@ export const APP_CONFIG = {
     FAVICON_URL: '/asset/icons_12 copia.png',
     SIDEBAR_LOGO_URL: '/asset/Historico_12 copia 5.png',
     AGENT_NAME: 'Consultor IA',
-    AGENT_WELCOME_INTRO:
-        'Soy un agente IA experto en Derecho Urbanístico. Estoy aquí para resolver tus dudas jurídicas, apoyarte en la planificación territorial y asegurar el cumplimiento normativo.',
+    /** Desactiva el chat con el backend hasta que el agente esté listo en producción. */
+    AGENT_UNDER_CONSTRUCTION: true,
+    AGENT_WELCOME_INTRO: 'En proceso de entrenamiento.',
+    AGENT_UNDER_CONSTRUCTION_REPLY: 'En proceso de entrenamiento. Aún no puedo responder consultas; vuelve pronto.',
     AGENT_DESCRIPTION: '¿En qué puedo ayudarte hoy?',
     AGENT_AVATAR_URL: '/asset/LOS_URBANOS.png',
     API_BASE_URL: process.env.NEXT_PUBLIC_API_URL ?? '',
