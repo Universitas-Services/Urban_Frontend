@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (isLoading || !isAuthenticated || canAccessAdminArea(user?.role)) return;
 
-        document.title = APP_CONFIG.DOCUMENT_TITLE;
+        document.title = APP_CONFIG.PROJECT_NAME;
 
         let timeoutId: NodeJS.Timeout;
 

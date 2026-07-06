@@ -71,3 +71,7 @@ export function countDocumentosByCategory(documentos: BibliotecaLegalDocumento[]
 
     return counts;
 }
+
+export function getBibliotecaEnteEmisorLabel(categoryId: string): string {
+    return categoryId === 'doctrina' ? 'Autor' : 'Emisor';
+}

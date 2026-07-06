@@ -27,7 +27,6 @@ import {
     type BibliotecaLegalColeccionViewMode,
 } from './BibliotecaLegalColeccionDocumentCard';
 import { BibliotecaLegalPreviewModal } from './BibliotecaLegalPreviewModal';
-import { useBibliotecaLegalTerritorioFilters } from './useBibliotecaLegalTerritorioFilters';
 import {
     getBibliotecaLegalDocumentosService,
     getBibliotecaLegalPreviewService,
@@ -55,19 +54,6 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
     const [signedUrl, setSignedUrl] = useState<string | null>(null);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [previewError, setPreviewError] = useState<string | null>(null);
-
-    const {
-        estados,
-        municipios,
-        selectedEstadoId,
-        selectedEstadoNombre,
-        selectedMunicipioNombre,
-        isLoadingEstados,
-        isLoadingMunicipios,
-        handleEstadoChange,
-        handleMunicipioChange,
-        resetTerritorioFilters,
-    } = useBibliotecaLegalTerritorioFilters();
 
     useEffect(() => {
         let cancelled = false;
@@ -97,28 +83,23 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
 
     const materiaOptions = useMemo(() => extractMateriaOptions(categoryDocumentos), [categoryDocumentos]);
 
-    const hasActiveFilters =
-        searchQuery.trim() !== '' ||
-        selectedEstadoId !== null ||
-        selectedMunicipioNombre !== 'all' ||
-        selectedMateria !== 'todas';
+    const hasActiveFilters = searchQuery.trim() !== '' || selectedMateria !== 'todas';
 
     const handleClearFilters = () => {
         setSearchQuery('');
         setSelectedMateria('todas');
-        resetTerritorioFilters();
         setCurrentPage(1);
     };
 
     const filteredDocumentos = useMemo(() => {
         const filtered = filterBibliotecaLegalDocumentos(categoryDocumentos, {
             searchQuery,
-            estadoNombre: selectedEstadoNombre,
-            municipioNombre: selectedMunicipioNombre,
+            estadoNombre: null,
+            municipioNombre: null,
             selectedMateria,
         });
         return sortBibliotecaDocumentos(filtered, sortBy);
-    }, [categoryDocumentos, searchQuery, selectedEstadoNombre, selectedMunicipioNombre, selectedMateria, sortBy]);
+    }, [categoryDocumentos, searchQuery, selectedMateria, sortBy]);
 
     const totalPages = Math.max(1, Math.ceil(filteredDocumentos.length / perPage));
     const effectivePage = Math.min(currentPage, totalPages);
@@ -210,20 +191,6 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
                                 setSearchQuery(value);
                                 setCurrentPage(1);
                             }}
-                            estados={estados}
-                            municipios={municipios}
-                            selectedEstadoId={selectedEstadoId}
-                            selectedMunicipioNombre={selectedMunicipioNombre}
-                            isLoadingEstados={isLoadingEstados}
-                            isLoadingMunicipios={isLoadingMunicipios}
-                            onEstadoChange={(value) => {
-                                handleEstadoChange(value);
-                                setCurrentPage(1);
-                            }}
-                            onMunicipioChange={(value) => {
-                                handleMunicipioChange(value);
-                                setCurrentPage(1);
-                            }}
                             selectedMateria={selectedMateria}
                             onMateriaChange={(value) => {
                                 setSelectedMateria(value);
@@ -253,6 +220,7 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
                                 <BibliotecaLegalColeccionDocumentCard
                                     key={documento.id}
                                     documento={documento}
+                                    categoryId={category.id}
                                     viewMode={viewMode}
                                     onPreview={handlePreview}
                                 />

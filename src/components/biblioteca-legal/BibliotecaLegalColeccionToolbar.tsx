@@ -1,7 +1,6 @@
 'use client';
 
 import { LayoutGrid, List, RotateCcw, Search } from 'lucide-react';
-import type { Estado, Municipio } from '@universitas/sdk-global';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,14 +16,6 @@ type BibliotecaLegalColeccionToolbarProps = {
     filteredTotal: number;
     searchQuery: string;
     onSearchQueryChange: (value: string) => void;
-    estados: Estado[];
-    municipios: Municipio[];
-    selectedEstadoId: number | null;
-    selectedMunicipioNombre: string;
-    isLoadingEstados: boolean;
-    isLoadingMunicipios: boolean;
-    onEstadoChange: (value: string) => void;
-    onMunicipioChange: (value: string) => void;
     selectedMateria: string;
     onMateriaChange: (value: string) => void;
     materiaOptions: BibliotecaLegalMateriaOption[];
@@ -44,14 +35,6 @@ export function BibliotecaLegalColeccionToolbar({
     filteredTotal,
     searchQuery,
     onSearchQueryChange,
-    estados,
-    municipios,
-    selectedEstadoId,
-    selectedMunicipioNombre,
-    isLoadingEstados,
-    isLoadingMunicipios,
-    onEstadoChange,
-    onMunicipioChange,
     selectedMateria,
     onMateriaChange,
     materiaOptions,
@@ -73,72 +56,26 @@ export function BibliotecaLegalColeccionToolbar({
                     type="search"
                     value={searchQuery}
                     onChange={(event) => onSearchQueryChange(event.target.value)}
-                    placeholder="Buscar por título, emisor, tipo, materia o palabra clave..."
+                    placeholder="Buscar por título, emisor, tipo, categoría o palabra clave..."
                     className="h-11 border-gray-200/80 bg-surface-light/60 pl-10 text-sm"
                     aria-label={`Buscar en ${categoryTitle}`}
                 />
             </div>
 
             <div className="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center">
-                <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
-                    <Select
-                        value={selectedEstadoId?.toString() ?? 'all'}
-                        onValueChange={onEstadoChange}
-                        disabled={isLoadingEstados}
-                    >
-                        <SelectTrigger className="h-10 w-full border-gray-200/80 bg-white text-sm">
-                            <SelectValue placeholder={isLoadingEstados ? 'Cargando estados...' : 'Estado: Todos'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Estado: Todos</SelectItem>
-                            {estados.map((estado) => (
-                                <SelectItem key={estado.id} value={estado.id.toString()}>
-                                    {estado.nombre}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select
-                        value={selectedMunicipioNombre}
-                        onValueChange={onMunicipioChange}
-                        disabled={!selectedEstadoId || isLoadingMunicipios}
-                    >
-                        <SelectTrigger className="h-10 w-full border-gray-200/80 bg-white text-sm">
-                            <SelectValue
-                                placeholder={
-                                    !selectedEstadoId
-                                        ? 'Selecciona un estado'
-                                        : isLoadingMunicipios
-                                          ? 'Cargando municipios...'
-                                          : 'Municipio: Todos'
-                                }
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Municipio: Todos</SelectItem>
-                            {municipios.map((municipio) => (
-                                <SelectItem key={municipio.id} value={municipio.nombre}>
-                                    {municipio.nombre}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select value={selectedMateria} onValueChange={onMateriaChange}>
-                        <SelectTrigger className="h-10 w-full border-gray-200/80 bg-white text-sm">
-                            <SelectValue placeholder="Materia" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="todas">Materia: Todas</SelectItem>
-                            {materiaOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <Select value={selectedMateria} onValueChange={onMateriaChange}>
+                    <SelectTrigger className="h-10 w-full border-gray-200/80 bg-white text-sm lg:max-w-xs">
+                        <SelectValue placeholder="Categorías" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="todas">Categorías: Todas</SelectItem>
+                        {materiaOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
                 <Button
                     type="button"
