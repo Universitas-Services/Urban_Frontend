@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { RegisterTermsDialog } from '@/components/auth/RegisterTermsDialog';
 import { RegisterPrivacyDialog } from '@/components/auth/RegisterPrivacyDialog';
+import { APP_CONFIG } from '@/config/app.config';
 
 export default function AcercaDePage() {
     const [isTermsOpen, setIsTermsOpen] = useState(false);
@@ -14,19 +15,16 @@ export default function AcercaDePage() {
                 {/* ── Un solo card conteniendo todo el contenido ── */}
                 <div className="w-full rounded-xl bg-white border border-gray-200/70 shadow-sm p-6 md:p-8 flex flex-col gap-6">
                     {/* Header: logo + título */}
-                    <div className="flex items-center gap-5">
+                    <div className="relative flex min-h-[5.5rem] items-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src="/asset/LOGO UNIVERSITAS LEGAL.png"
-                            alt="Universitas Legal"
-                            className="h-14 w-auto object-contain shrink-0"
+                            src={APP_CONFIG.SIDEBAR_LOGO_URL}
+                            alt="IUS Urbano"
+                            className="relative z-10 h-16 w-auto shrink-0 object-contain md:h-[4.75rem]"
                         />
-                        <div>
-                            <h1 className="titulos-cards leading-tight mb-0 text-xl md:text-[23px]">
-                                Acerca de la{' '}
-                                <span style={{ color: 'var(--color-primary)' }}>Plataforma Ius Urbano</span>
-                            </h1>
-                        </div>
+                        <h1 className="titulos-cards pointer-events-none absolute inset-x-0 mb-0 text-center text-xl leading-tight md:text-[23px]">
+                            Acerca de <span style={{ color: 'var(--color-primary)' }}>Ius Urbano</span>
+                        </h1>
                     </div>
 
                     {/* Contenido principal */}

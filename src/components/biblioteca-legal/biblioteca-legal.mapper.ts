@@ -2,6 +2,8 @@ import { resolveBibliotecaCategorySlug } from './biblioteca-legal.category';
 import type {
     BibliotecaLegalCategoriaMateria,
     BibliotecaLegalDocumento,
+    BibliotecaLegalDocumentosQuery,
+    BibliotecaLegalDocumentosResponse,
     BibliotecaLegalMetadatos,
 } from './biblioteca-legal.types';
 
@@ -77,8 +79,16 @@ function parseMetadatos(raw: unknown): BibliotecaLegalMetadatos | null {
         nombreRevista: readScalar(record.nombreRevista),
         rango: readScalar(record.rango),
         numeroGaceta: readScalar(record.numeroGaceta),
+        numeroGacetaMunicipal: readScalar(record.numeroGacetaMunicipal),
         ambitoGeografico: readScalar(record.ambitoGeografico),
         fechaPromulgacion: readScalar(record.fechaPromulgacion),
+        estadoGeografico: readScalar(record.estadoGeografico),
+        municipio: readScalar(record.municipio),
+        sala: readScalar(record.sala),
+        fechaSentencia: readScalar(record.fechaSentencia),
+        numeroSentencia: readScalar(record.numeroSentencia),
+        tribunalInternacional: readScalar(record.tribunalInternacional),
+        organismoInternacional: readScalar(record.organismoInternacional),
     };
 }
 
@@ -138,14 +148,21 @@ function buildDocumento(item: RawRecord, lookup: Map<string, unknown>): Bibliote
             'gaceta_numero',
         ]);
     const ambitoGeografico = metadatos?.ambitoGeografico ?? null;
+    const titulo =
+        readScalar(item.titulo) ??
+        readScalar(item.title) ??
+        pickField(lookup, ['titulo', 'title', 'nombre', 'name']) ??
+        'Sin título';
+    const tituloIntegro =
+        readScalar(item.tituloIntegro) ??
+        readScalar(item.titulo_integro) ??
+        pickField(lookup, ['titulointegro', 'titulo_integro']) ??
+        titulo;
 
     const documento: BibliotecaLegalDocumento = {
         id,
-        titulo:
-            readScalar(item.titulo) ??
-            readScalar(item.title) ??
-            pickField(lookup, ['titulo', 'title', 'nombre', 'name']) ??
-            'Sin título',
+        titulo: titulo.trim(),
+        tituloIntegro: tituloIntegro.trim(),
         descripcion,
         gcpFileName,
         fechaPublicacion:
@@ -158,6 +175,7 @@ function buildDocumento(item: RawRecord, lookup: Map<string, unknown>): Bibliote
             coerceNullable(item.municipio) ??
             coerceNullable(item.municipioNombre) ??
             coerceNullable(item.municipio_nombre) ??
+            metadatos?.municipio ??
             pickField(lookup, [
                 'municipio',
                 'municipionombre',
@@ -171,7 +189,6 @@ function buildDocumento(item: RawRecord, lookup: Map<string, unknown>): Bibliote
         enteEmisor:
             coerceNullable(item.enteEmisor) ??
             coerceNullable(item.ente_emisor) ??
-            metadatos?.autor ??
             pickField(lookup, ['enteemisor', 'ente_emisor', 'emisor']),
         pais: coerceNullable(item.pais) ?? pickField(lookup, ['pais', 'country']),
         resumen,
@@ -201,6 +218,40 @@ export function mapRawBibliotecaDocumento(raw: unknown): BibliotecaLegalDocument
 export function normalizeBibliotecaDocumentosResponse(data: unknown): BibliotecaLegalDocumento[] {
     const items = extractDocumentosArray(data);
     return items.map(mapRawBibliotecaDocumento).filter((doc): doc is BibliotecaLegalDocumento => doc !== null);
+}
+
+function readNumber(value: unknown, fallback: number): number {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim()) {
+        const parsed = Number(value);
+        if (Number.isFinite(parsed)) return parsed;
+    }
+    return fallback;
+}
+
+export function normalizeBibliotecaDocumentosPaginatedResponse(
+    data: unknown,
+    params?: BibliotecaLegalDocumentosQuery
+): BibliotecaLegalDocumentosResponse {
+    const items = normalizeBibliotecaDocumentosResponse(data);
+
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        return {
+            items,
+            total: items.length,
+            page: params?.page ?? 1,
+            limit: params?.limit ?? (items.length || 20),
+            totalPages: 1,
+        };
+    }
+
+    const record = data as RawRecord;
+    const total = readNumber(record.total, items.length);
+    const page = readNumber(record.page, params?.page ?? 1);
+    const limit = readNumber(record.limit, params?.limit ?? 20);
+    const totalPages = readNumber(record.totalPages, Math.max(1, Math.ceil(total / limit)));
+
+    return { items, total, page, limit, totalPages };
 }
 
 function extractDocumentosArray(data: unknown): unknown[] {

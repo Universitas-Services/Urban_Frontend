@@ -1,11 +1,11 @@
 export const APP_CONFIG = {
     DOCUMENT_TITLE: 'Consultor IA - Derecho Urbanístico',
-    ADMIN_DOCUMENT_TITLE: 'Panel - Consultor IA - Derecho Urbanístico',
+    ADMIN_DOCUMENT_TITLE: 'Panel | Ius Urbano',
     PROJECT_NAME: 'Ius Urbano',
     PROJECT_LOGO_URL: '/asset/LOGO UNIVERSITAS LEGAL (BLANCO).png',
-    AUTH_LANDING_LOGO_URL: '/asset/icons_12 copia 3.png',
+    AUTH_LANDING_LOGO_URL: '/asset/logo_def.png',
     FAVICON_URL: '/asset/icons_12 copia.png',
-    SIDEBAR_LOGO_URL: '/asset/Historico_12 copia 5.png',
+    SIDEBAR_LOGO_URL: '/asset/Sidebar_def.png',
     AGENT_NAME: 'Consultor IA',
     /** Desactiva el chat con el backend hasta que el agente esté listo en producción. */
     AGENT_UNDER_CONSTRUCTION: true,

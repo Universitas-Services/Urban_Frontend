@@ -13,7 +13,10 @@ const ebGaramond = EB_Garamond({
 });
 
 export const metadata: Metadata = {
-    title: APP_CONFIG.DOCUMENT_TITLE,
+    title: {
+        default: APP_CONFIG.PROJECT_NAME,
+        template: `%s | ${APP_CONFIG.PROJECT_NAME}`,
+    },
     description: 'Plataforma de consultoría experta en Gestión Integral de Residuos Sólidos',
     icons: {
         icon: APP_CONFIG.FAVICON_URL,

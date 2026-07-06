@@ -45,14 +45,17 @@ export function InicioConocenos() {
                     {INICIO_CONOCENOS_REDES.map((red) => {
                         const Icon = SOCIAL_ICONS[red.id as keyof typeof SOCIAL_ICONS];
                         return (
-                            <span
+                            <a
                                 key={red.id}
-                                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary/80"
+                                href={red.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary/80 transition-colors hover:text-primary"
                                 title={red.label}
                             >
                                 <Icon size={18} className="shrink-0" />
                                 <span>{red.label}</span>
-                            </span>
+                            </a>
                         );
                     })}
                 </div>
