@@ -1,7 +1,19 @@
 import { BIBLIOTECA_LEGAL_CATEGORIES } from './biblioteca-legal.data';
+import { resolveBibliotecaDocumentVariant } from './biblioteca-legal.document-variant';
 import type { BibliotecaLegalDocumento } from './biblioteca-legal.types';
+import type { BibliotecaLegalDocumentVariant } from './biblioteca-legal.types';
 
 const VALID_CATEGORY_IDS = new Set(BIBLIOTECA_LEGAL_CATEGORIES.map((c) => c.id));
+
+const VARIANT_TO_CATEGORY_ID: Record<BibliotecaLegalDocumentVariant, string | null> = {
+    legislacion: 'legislacion',
+    ordenanza: 'ordenanzas',
+    'sentencia-nacional': 'sentencias-nacionales',
+    'sentencia-internacional': 'sentencias-internacionales',
+    doctrina: 'doctrina',
+    'instrumentos-internacionales': 'instrumentos-internacionales',
+    generico: null,
+};
 
 const TIPO_NORMA_TO_SLUG: Record<string, string> = {
     legislacion: 'legislacion',
@@ -49,11 +61,22 @@ export function resolveBibliotecaCategorySlug(gcpFileName: string, tipoNorma: st
     return null;
 }
 
+export function resolveBibliotecaDocumentCategoryId(documento: BibliotecaLegalDocumento): string | null {
+    const fromVariant = VARIANT_TO_CATEGORY_ID[resolveBibliotecaDocumentVariant(documento)];
+    if (fromVariant) return fromVariant;
+
+    if (documento.categorySlug && VALID_CATEGORY_IDS.has(documento.categorySlug)) {
+        return documento.categorySlug;
+    }
+
+    return null;
+}
+
 export function filterDocumentosByCategory(
     documentos: BibliotecaLegalDocumento[],
     categoryId: string
 ): BibliotecaLegalDocumento[] {
-    return documentos.filter((doc) => doc.categorySlug === categoryId);
+    return documentos.filter((doc) => resolveBibliotecaDocumentCategoryId(doc) === categoryId);
 }
 
 export function countDocumentosByCategory(documentos: BibliotecaLegalDocumento[]): Record<string, number> {
@@ -64,8 +87,9 @@ export function countDocumentosByCategory(documentos: BibliotecaLegalDocumento[]
     }
 
     for (const doc of documentos) {
-        if (doc.categorySlug && counts[doc.categorySlug] !== undefined) {
-            counts[doc.categorySlug] += 1;
+        const categoryId = resolveBibliotecaDocumentCategoryId(doc);
+        if (categoryId && counts[categoryId] !== undefined) {
+            counts[categoryId] += 1;
         }
     }
 

@@ -27,7 +27,9 @@ export function formatBibliotecaFecha(fechaPublicacion: string): string {
 }
 
 export function formatBibliotecaDisplayValue(value: string | null | undefined): string {
-    return value?.trim() ? value.trim() : '—';
+    const trimmed = value?.trim();
+    if (!trimmed || trimmed === '--' || trimmed === '—') return '—';
+    return trimmed;
 }
 
 export function getBibliotecaDocumentoDescripcion(documento: BibliotecaLegalDocumento): string {

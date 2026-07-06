@@ -1,18 +1,20 @@
+'use client';
+
 import { FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getBibliotecaDocumentoDescripcion } from './biblioteca-legal.filters';
 import {
-    formatBibliotecaDisplayValue,
-    formatBibliotecaFecha,
-    getBibliotecaDocumentoDescripcion,
-} from './biblioteca-legal.filters';
-import { getBibliotecaEnteEmisorLabel } from './biblioteca-legal.category';
+    getBibliotecaDocumentoDisplayFields,
+    getBibliotecaDocumentoDisplayTitle,
+    getBibliotecaDocumentVariantLabel,
+    resolveBibliotecaDocumentVariant,
+} from './biblioteca-legal.document-variant';
 import type { BibliotecaLegalDocumento } from './biblioteca-legal.types';
 
 export type BibliotecaLegalColeccionViewMode = 'grid' | 'list';
 
 type BibliotecaLegalColeccionDocumentCardProps = {
     documento: BibliotecaLegalDocumento;
-    categoryId: string;
     viewMode?: BibliotecaLegalColeccionViewMode;
     onPreview: (documento: BibliotecaLegalDocumento) => void;
     className?: string;
@@ -31,17 +33,33 @@ function VerDocumentoButton({ onClick }: { onClick: () => void }) {
     );
 }
 
+function DocumentFields({ documento }: { documento: BibliotecaLegalDocumento }) {
+    const fields = getBibliotecaDocumentoDisplayFields(documento).filter((field) => field.label !== 'Título');
+
+    return (
+        <dl className="descripcion-cards-small space-y-2 text-gray-soft">
+            {fields.map((field) => (
+                <div key={field.label} className="min-w-0">
+                    <dt className="sr-only">{field.label}</dt>
+                    <dd className="break-words">
+                        <span className="font-medium text-neutral-dark/70">{field.label}: </span>
+                        {field.value}
+                    </dd>
+                </div>
+            ))}
+        </dl>
+    );
+}
+
 export function BibliotecaLegalColeccionDocumentCard({
     documento,
-    categoryId,
     viewMode = 'grid',
     onPreview,
     className,
 }: BibliotecaLegalColeccionDocumentCardProps) {
-    const tipo = formatBibliotecaDisplayValue(documento.tipoNorma);
-    const emisor = formatBibliotecaDisplayValue(documento.enteEmisor);
-    const emisorLabel = getBibliotecaEnteEmisorLabel(categoryId);
-    const fecha = formatBibliotecaFecha(documento.fechaPublicacion);
+    const variant = resolveBibliotecaDocumentVariant(documento);
+    const variantLabel = getBibliotecaDocumentVariantLabel(variant);
+    const title = getBibliotecaDocumentoDisplayTitle(documento);
     const descripcion = getBibliotecaDocumentoDescripcion(documento);
 
     if (viewMode === 'list') {
@@ -57,35 +75,16 @@ export function BibliotecaLegalColeccionDocumentCard({
                         <FileText className="h-5 w-5" aria-hidden />
                     </div>
                     <div className="min-w-0 flex-1">
-                        <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">
-                            {documento.titulo}
-                        </h3>
+                        <span className="mb-2 inline-flex rounded-full bg-surface-soft px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary/80">
+                            {variantLabel}
+                        </span>
+                        <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">{title}</h3>
                         {descripcion ? (
                             <p className="descripcion-cards-small mt-1 break-words text-gray-soft">{descripcion}</p>
                         ) : null}
-                        <dl className="descripcion-cards-small mt-2 grid gap-x-4 gap-y-2 text-gray-soft sm:grid-cols-2 lg:grid-cols-3">
-                            <div className="min-w-0">
-                                <dt className="sr-only">Tipo</dt>
-                                <dd className="break-words">
-                                    <span className="font-medium text-neutral-dark/70">Tipo: </span>
-                                    {tipo}
-                                </dd>
-                            </div>
-                            <div className="min-w-0">
-                                <dt className="sr-only">{emisorLabel}</dt>
-                                <dd className="break-words">
-                                    <span className="font-medium text-neutral-dark/70">{emisorLabel}: </span>
-                                    {emisor}
-                                </dd>
-                            </div>
-                            <div>
-                                <dt className="sr-only">Fecha</dt>
-                                <dd>
-                                    <span className="font-medium text-neutral-dark/70">Fecha: </span>
-                                    {fecha}
-                                </dd>
-                            </div>
-                        </dl>
+                        <div className="mt-2">
+                            <DocumentFields documento={documento} />
+                        </div>
                     </div>
                 </div>
 
@@ -107,38 +106,21 @@ export function BibliotecaLegalColeccionDocumentCard({
                 <div className="biblioteca-coleccion-doc-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-lg">
                     <FileText className="h-5 w-5" aria-hidden />
                 </div>
-                <h3 className="titulos-cards-proyecto-ley min-w-0 flex-1 break-words text-[15px] leading-snug">
-                    {documento.titulo}
-                </h3>
+                <div className="min-w-0 flex-1">
+                    <span className="mb-2 inline-flex rounded-full bg-surface-soft px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary/80">
+                        {variantLabel}
+                    </span>
+                    <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">{title}</h3>
+                </div>
             </div>
 
             {descripcion ? (
                 <p className="descripcion-cards-small mt-2 break-words text-gray-soft">{descripcion}</p>
             ) : null}
 
-            <dl className="descripcion-cards-small mt-3 space-y-2 text-gray-soft">
-                <div className="min-w-0">
-                    <dt className="sr-only">Tipo</dt>
-                    <dd className="break-words">
-                        <span className="font-medium text-neutral-dark/70">Tipo: </span>
-                        {tipo}
-                    </dd>
-                </div>
-                <div className="min-w-0">
-                    <dt className="sr-only">{emisorLabel}</dt>
-                    <dd className="break-words">
-                        <span className="font-medium text-neutral-dark/70">{emisorLabel}: </span>
-                        {emisor}
-                    </dd>
-                </div>
-                <div>
-                    <dt className="sr-only">Fecha</dt>
-                    <dd className="break-words">
-                        <span className="font-medium text-neutral-dark/70">Fecha: </span>
-                        {fecha}
-                    </dd>
-                </div>
-            </dl>
+            <div className="mt-3 flex-1">
+                <DocumentFields documento={documento} />
+            </div>
 
             <div className="mt-4 flex items-center justify-end gap-3 border-t border-gray-100 pt-3">
                 <VerDocumentoButton onClick={() => onPreview(documento)} />

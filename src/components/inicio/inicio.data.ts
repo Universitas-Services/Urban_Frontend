@@ -12,7 +12,7 @@ export const INICIO_BIBLIOTECA = {
     description: 'El repositorio especializado en Derecho Urbanístico y Ordenación Territorial.',
     accedeLabel: 'Accede a:',
     buttonLabel: 'Ir a Biblioteca Legal',
-    href: '/biblioteca-girs',
+    href: '/biblioteca-legal',
 } as const;
 
 export const INICIO_CONSULTOR_IA = {

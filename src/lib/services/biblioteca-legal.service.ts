@@ -1,11 +1,12 @@
 'use server';
 
 import type {
-    BibliotecaLegalDocumento,
+    BibliotecaLegalDocumentosQuery,
+    BibliotecaLegalDocumentosResponse,
     BibliotecaLegalPreview,
 } from '@/components/biblioteca-legal/biblioteca-legal.types';
 import {
-    normalizeBibliotecaDocumentosResponse,
+    normalizeBibliotecaDocumentosPaginatedResponse,
     normalizeBibliotecaPreviewResponse,
 } from '@/components/biblioteca-legal/biblioteca-legal.mapper';
 import { getAuthHeader } from '@/lib/auth/session';
@@ -36,8 +37,27 @@ async function handleResponse<T>(res: Response): Promise<T> {
     return res.json();
 }
 
-export async function getBibliotecaLegalDocumentosService(): Promise<BibliotecaLegalDocumento[]> {
-    const res = await fetch(`${API}/biblioteca-legal/documentos`, {
+function buildDocumentosQuery(params?: BibliotecaLegalDocumentosQuery): string {
+    const searchParams = new URLSearchParams();
+
+    if (params?.search?.trim()) {
+        searchParams.set('search', params.search.trim());
+    }
+    if (params?.page && params.page > 0) {
+        searchParams.set('page', String(params.page));
+    }
+    if (params?.limit && params.limit > 0) {
+        searchParams.set('limit', String(Math.min(params.limit, 100)));
+    }
+
+    const query = searchParams.toString();
+    return query ? `?${query}` : '';
+}
+
+export async function getBibliotecaLegalDocumentosService(
+    params?: BibliotecaLegalDocumentosQuery
+): Promise<BibliotecaLegalDocumentosResponse> {
+    const res = await fetch(`${API}/biblioteca-legal/documentos${buildDocumentosQuery(params)}`, {
         headers: await getAuthHeader(),
         cache: 'no-store',
     });
@@ -51,7 +71,7 @@ export async function getBibliotecaLegalDocumentosService(): Promise<BibliotecaL
     }
 
     const data = await handleResponse<unknown>(res);
-    return normalizeBibliotecaDocumentosResponse(data);
+    return normalizeBibliotecaDocumentosPaginatedResponse(data, params);
 }
 
 export async function getBibliotecaLegalPreviewService(id: string): Promise<BibliotecaLegalPreview> {

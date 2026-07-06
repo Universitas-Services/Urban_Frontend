@@ -6,7 +6,7 @@ export const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/verif
 export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     '/inicio': ['USER'],
     '/chat': ['USER'],
-    '/biblioteca-girs': ['USER'],
+    '/biblioteca-legal': ['USER'],
     '/proyecto-ley': ['USER'],
     '/repositorio-legal': ['USER'],
     '/perfil': ['USER'],

@@ -22,7 +22,7 @@ export function BibliotecaLegalCategoryCard({ category, className }: BibliotecaL
     const iconClassName = getBibliotecaCategoryIconClass(category.accent);
 
     return (
-        <Link href={`/biblioteca-girs/${category.id}`} className={cn('group block h-full', className)}>
+        <Link href={`/biblioteca-legal/${category.id}`} className={cn('group block h-full', className)}>
             <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200/70 bg-white shadow-sm transition-shadow group-hover:shadow-md">
                 <div className="relative h-44 overflow-hidden border-b border-gray-100 bg-surface-soft/30 sm:h-48">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
