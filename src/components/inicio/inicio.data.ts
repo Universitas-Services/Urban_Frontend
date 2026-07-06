@@ -12,7 +12,7 @@ export const INICIO_BIBLIOTECA = {
     description: 'El repositorio especializado en Derecho Urbanístico y Ordenación Territorial.',
     accedeLabel: 'Accede a:',
     buttonLabel: 'Ir a Biblioteca Legal',
-    href: '/biblioteca-girs',
+    href: '/biblioteca-legal',
 } as const;
 
 export const INICIO_CONSULTOR_IA = {
@@ -47,25 +47,25 @@ export const INICIO_ACTUALIDAD = {
     title: 'Actualidad Jurídica Territorial',
     description:
         'Consulta normativa, leyes orgánicas, resoluciones y documentos de interés para la gestión pública y el ordenamiento territorial.',
-    buttonLabel: 'Ver artículos',
+    buttonLabel: 'Ver repositorio legal',
     href: '/repositorio-legal',
 } as const;
 
 export const INICIO_ACTUALIDAD_DESTACADOS = [
     {
-        id: '1',
+        id: 'ley-ordenacion-territorio',
         category: 'Ley Orgánica',
-        title: 'Ley Orgánica del Poder Público Municipal',
+        title: 'Ley Orgánica para la Ordenación del Territorio',
     },
     {
-        id: '2',
-        category: 'Ley Ordinaria',
-        title: 'Ley de Gestión Integral de la Basura',
+        id: 'ley-ordenacion-urbanistica',
+        category: 'Ley Orgánica',
+        title: 'Ley Orgánica de Ordenación Urbanística',
     },
     {
-        id: '3',
-        category: 'Norma General',
-        title: 'Normas para la planificación y gestión del territorio',
+        id: 'reglamento-ley-ordenacion-urbanistica',
+        category: 'Reglamento',
+        title: 'Reglamento de la Ley Orgánica de Ordenación Urbanística',
     },
 ] as const;
 
@@ -84,11 +84,11 @@ export const INICIO_CONOCENOS_ITEMS = [
 ] as const;
 
 export const INICIO_CONOCENOS_REDES = [
-    { id: 'instagram', label: 'Instagram' },
-    { id: 'threads', label: 'Threads' },
-    { id: 'linkedin', label: 'LinkedIn' },
-    { id: 'facebook', label: 'Facebook' },
-    { id: 'x', label: 'X' },
+    { id: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/ContratarVe' },
+    { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/universitas.legal/' },
+    { id: 'threads', label: 'Threads', href: 'https://www.threads.com/@universitas.legal' },
+    { id: 'x', label: 'X', href: 'https://twitter.com/contratarve' },
+    { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/universitas-legal/' },
 ] as const;
 
 export type InicioAccent = 'green' | 'blue' | 'gold';

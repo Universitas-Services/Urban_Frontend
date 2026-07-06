@@ -222,7 +222,7 @@ export function Sidebar() {
                     <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
                         {expanded ? (
                             <button
-                                onClick={() => router.push('/biblioteca-girs')}
+                                onClick={() => router.push('/biblioteca-legal')}
                                 className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                             >
                                 <IoMdBook size={18} color="currentColor" className="shrink-0" />
@@ -232,7 +232,7 @@ export function Sidebar() {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button
-                                        onClick={() => router.push('/biblioteca-girs')}
+                                        onClick={() => router.push('/biblioteca-legal')}
                                         className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
                                     >
                                         <IoMdBook size={18} color="currentColor" className="shrink-0" />

@@ -1,4 +1,5 @@
 export { BibliotecaLegalPageContent } from './BibliotecaLegalPageContent';
+export { BibliotecaLegalDocumentosPageContent } from './BibliotecaLegalDocumentosPageContent';
 export { BibliotecaLegalHero } from './BibliotecaLegalHero';
 export { BibliotecaLegalCategoryCard } from './BibliotecaLegalCategoryCard';
 export { BibliotecaLegalColeccionPageContent } from './BibliotecaLegalColeccionPageContent';
