@@ -46,28 +46,44 @@ export const INICIO_BIBLIOTECA_ITEMS = [
 export const INICIO_ACTUALIDAD = {
     title: 'Actualidad Jurídica Territorial',
     description:
-        'Consulta normativa, leyes orgánicas, resoluciones y documentos de interés para la gestión pública y el ordenamiento territorial.',
+        'Consulta artículos, publicaciones y documentos de interés para la gestión pública y el ordenamiento territorial.',
     buttonLabel: 'Ver repositorio legal',
     href: '/repositorio-legal',
 } as const;
 
-export const INICIO_ACTUALIDAD_DESTACADOS = [
+export type InicioActualidadDestacado = {
+    id: string;
+    category: string;
+    title: string;
+    pdfPath: string;
+};
+
+export const INICIO_ACTUALIDAD_DESTACADOS: InicioActualidadDestacado[] = [
     {
-        id: 'ley-ordenacion-territorio',
-        category: 'Ley Orgánica',
-        title: 'Ley Orgánica para la Ordenación del Territorio',
+        id: 'ciudades-inteligentes-privacidad',
+        category: 'Artículo',
+        title: 'Ciudades Inteligentes: El dilema entre privacidad de datos o bien común',
+        pdfPath: '/pdfs/ciudades-inteligentes-privacidad-datos.pdf',
     },
     {
-        id: 'ley-ordenacion-urbanistica',
-        category: 'Ley Orgánica',
-        title: 'Ley Orgánica de Ordenación Urbanística',
+        id: 'nuevas-tendencias-derecho-urbanistico-global',
+        category: 'Artículo',
+        title: 'Las nuevas tendencias del Derecho Urbanístico global en el contexto de la sociedad del riesgo global. ¿Puede hablarse de un Derecho Urbanístico algorítmico, post COVID-19?',
+        pdfPath: '/pdfs/nuevas-tendencias-derecho-urbanistico-global.pdf',
     },
     {
-        id: 'reglamento-ley-ordenacion-urbanistica',
-        category: 'Reglamento',
-        title: 'Reglamento de la Ley Orgánica de Ordenación Urbanística',
+        id: 'derecho-urbanistico-inteligencia-artificial',
+        category: 'Artículo',
+        title: 'El Derecho Urbanístico y la Inteligencia Artificial: ¿Nuevas oportunidades para la ciudad?',
+        pdfPath: '/pdfs/derecho-urbanistico-inteligencia-artificial.pdf',
     },
-] as const;
+    {
+        id: 'norma-urbanistica-plurifuncional',
+        category: 'Artículo',
+        title: 'La nueva norma urbanística plurifuncional. El fin del paradigma estructural de la monofuncionalidad en el Derecho Urbanístico',
+        pdfPath: '/pdfs/norma-urbanistica-plurifuncional.pdf',
+    },
+];
 
 export const INICIO_CONOCENOS = {
     description: 'Forma parte de nuestra comunidad de conocimiento jurídico territorial.',
