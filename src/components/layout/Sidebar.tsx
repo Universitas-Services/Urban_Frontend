@@ -3,7 +3,17 @@
 import { useChatStore } from '@/store/chat.store';
 import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
-import { MessageSquare, Settings, LogOut, Menu, User, Headset, HelpCircle, Trash2 } from 'lucide-react';
+import {
+    MessageSquare,
+    Settings,
+    LogOut,
+    Menu,
+    User,
+    Headset,
+    HelpCircle,
+    Trash2,
+    LayoutDashboard,
+} from 'lucide-react';
 import { IoMdBook, IoMdInformationCircleOutline } from 'react-icons/io';
 import { IoHomeSharp, IoAddCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
 import { FaBalanceScale } from 'react-icons/fa';
@@ -28,6 +38,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { APP_CONFIG } from '@/config/app.config';
+import { usePermissions } from '@/hooks/usePermissions';
 import type { Conversation } from '@/types/chat.types';
 import { toast } from 'sonner';
 
@@ -42,6 +53,7 @@ export function Sidebar() {
         deleteConversation,
     } = useChatStore();
     const { user, logout } = useAuthStore();
+    const { isAdminVisualizador } = usePermissions();
     const router = useRouter();
     const [isMobile, setIsMobile] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
@@ -134,116 +146,153 @@ export function Sidebar() {
                         </p>
                     </div>
 
-                    {/* Home Button */}
-                    <div className={cn('shrink-0 mb-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <button
-                                onClick={() => router.push('/inicio')}
-                                className={cn(
-                                    'flex items-center py-1 rounded-lg transition-colors cursor-pointer',
-                                    'w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent'
-                                )}
-                            >
-                                <IoHomeSharp size={18} color="currentColor" className="shrink-0" />
-                                <span className="font-medium text-[13px] ml-3">Inicio</span>
-                            </button>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                    {isAdminVisualizador ? (
+                        <div className={cn('shrink-0 mb-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                            {expanded ? (
+                                <button
+                                    onClick={() => router.push('/admin')}
+                                    className={cn(
+                                        'flex items-center py-1 rounded-lg transition-colors cursor-pointer',
+                                        'w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent'
+                                    )}
+                                >
+                                    <LayoutDashboard size={18} color="currentColor" className="shrink-0" />
+                                    <span className="font-medium text-[13px] ml-3">Volver al panel</span>
+                                </button>
+                            ) : (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            onClick={() => router.push('/admin')}
+                                            className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        >
+                                            <LayoutDashboard size={18} color="currentColor" className="shrink-0" />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" sideOffset={15.4}>
+                                        <p>Volver al panel</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            {/* Home Button */}
+                            <div className={cn('shrink-0 mb-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                                {expanded ? (
                                     <button
                                         onClick={() => router.push('/inicio')}
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        className={cn(
+                                            'flex items-center py-1 rounded-lg transition-colors cursor-pointer',
+                                            'w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent'
+                                        )}
                                     >
                                         <IoHomeSharp size={18} color="currentColor" className="shrink-0" />
+                                        <span className="font-medium text-[13px] ml-3">Inicio</span>
                                     </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>Inicio</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => router.push('/inicio')}
+                                                className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                            >
+                                                <IoHomeSharp size={18} color="currentColor" className="shrink-0" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" sideOffset={15.4}>
+                                            <p>Inicio</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
 
-                    {/* Aula Ciudad Button */}
-                    <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <button
-                                onClick={() => router.push('/proyecto-ley')}
-                                className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
-                            >
-                                <IoPlayCircleOutline size={18} color="currentColor" className="shrink-0" />
-                                <span className="font-medium text-[13px] ml-3">Aula Ciudad</span>
-                            </button>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                            {/* Aula Ciudad Button */}
+                            <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                                {expanded ? (
                                     <button
                                         onClick={() => router.push('/proyecto-ley')}
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                                     >
                                         <IoPlayCircleOutline size={18} color="currentColor" className="shrink-0" />
+                                        <span className="font-medium text-[13px] ml-3">Aula Ciudad</span>
                                     </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>Aula Ciudad</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => router.push('/proyecto-ley')}
+                                                className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                            >
+                                                <IoPlayCircleOutline
+                                                    size={18}
+                                                    color="currentColor"
+                                                    className="shrink-0"
+                                                />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" sideOffset={15.4}>
+                                            <p>Aula Ciudad</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
 
-                    {/* Repositorio Legal Button */}
-                    <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <button
-                                onClick={() => router.push('/repositorio-legal')}
-                                className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
-                            >
-                                <FaBalanceScale size={18} color="currentColor" className="shrink-0" />
-                                <span className="font-medium text-[13px] ml-3">Repositorio legal</span>
-                            </button>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                            {/* Repositorio Legal Button */}
+                            <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                                {expanded ? (
                                     <button
                                         onClick={() => router.push('/repositorio-legal')}
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                                     >
                                         <FaBalanceScale size={18} color="currentColor" className="shrink-0" />
+                                        <span className="font-medium text-[13px] ml-3">Repositorio legal</span>
                                     </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>Repositorio legal</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => router.push('/repositorio-legal')}
+                                                className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                            >
+                                                <FaBalanceScale size={18} color="currentColor" className="shrink-0" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" sideOffset={15.4}>
+                                            <p>Repositorio legal</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
 
-                    {/* Biblioteca Legal Button */}
-                    <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <button
-                                onClick={() => router.push('/biblioteca-legal')}
-                                className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
-                            >
-                                <IoMdBook size={18} color="currentColor" className="shrink-0" />
-                                <span className="font-medium text-[13px] ml-3">Biblioteca Legal</span>
-                            </button>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                            {/* Biblioteca Legal Button */}
+                            <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                                {expanded ? (
                                     <button
                                         onClick={() => router.push('/biblioteca-legal')}
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
                                     >
                                         <IoMdBook size={18} color="currentColor" className="shrink-0" />
+                                        <span className="font-medium text-[13px] ml-3">Biblioteca Legal</span>
                                     </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>Biblioteca Legal</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => router.push('/biblioteca-legal')}
+                                                className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                            >
+                                                <IoMdBook size={18} color="currentColor" className="shrink-0" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" sideOffset={15.4}>
+                                            <p>Biblioteca Legal</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Navigation / History */}
@@ -412,102 +461,104 @@ export function Sidebar() {
                 </div>
 
                 {/* Otros Servicios Section */}
-                <div className="w-full flex-shrink-0 mb-1 mt-2 pt-2 border-t border-sidebar-border">
-                    <div className={cn('shrink-0 mb-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <button
-                                onClick={() => router.push('/acerca-de')}
-                                className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
-                            >
-                                <IoMdInformationCircleOutline
-                                    size={18}
-                                    color="currentColor"
-                                    className="shrink-0 info-flash-icon"
-                                />
-                                <span className="font-medium text-[13px] ml-3">Acerca de</span>
-                            </button>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={() => router.push('/acerca-de')}
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
-                                    >
-                                        <IoMdInformationCircleOutline
-                                            size={18}
-                                            color="currentColor"
-                                            className="shrink-0 info-flash-icon"
-                                        />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>Acerca de</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                {!isAdminVisualizador ? (
+                    <div className="w-full flex-shrink-0 mb-1 mt-2 pt-2 border-t border-sidebar-border">
+                        <div className={cn('shrink-0 mb-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                            {expanded ? (
+                                <button
+                                    onClick={() => router.push('/acerca-de')}
+                                    className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
+                                >
+                                    <IoMdInformationCircleOutline
+                                        size={18}
+                                        color="currentColor"
+                                        className="shrink-0 info-flash-icon"
+                                    />
+                                    <span className="font-medium text-[13px] ml-3">Acerca de</span>
+                                </button>
+                            ) : (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            onClick={() => router.push('/acerca-de')}
+                                            className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        >
+                                            <IoMdInformationCircleOutline
+                                                size={18}
+                                                color="currentColor"
+                                                className="shrink-0 info-flash-icon"
+                                            />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" sideOffset={15.4}>
+                                        <p>Acerca de</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
 
-                    {/* FAQ Button */}
-                    <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <button
-                                onClick={() => router.push('/faq')}
-                                className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
-                            >
-                                <HelpCircle size={18} color="currentColor" className="shrink-0" />
-                                <span className="font-medium text-[13px] ml-3">FAQ</span>
-                            </button>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={() => router.push('/faq')}
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
-                                    >
-                                        <HelpCircle size={18} color="currentColor" className="shrink-0" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>FAQ</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                        {/* FAQ Button */}
+                        <div className={cn('shrink-0 my-0.5', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                            {expanded ? (
+                                <button
+                                    onClick={() => router.push('/faq')}
+                                    className="flex items-center py-1 rounded-lg transition-colors cursor-pointer w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent"
+                                >
+                                    <HelpCircle size={18} color="currentColor" className="shrink-0" />
+                                    <span className="font-medium text-[13px] ml-3">FAQ</span>
+                                </button>
+                            ) : (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            onClick={() => router.push('/faq')}
+                                            className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        >
+                                            <HelpCircle size={18} color="currentColor" className="shrink-0" />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" sideOffset={15.4}>
+                                        <p>FAQ</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
 
-                    <div className={cn('shrink-0 mb-0', expanded ? 'px-3' : 'w-full flex justify-center')}>
-                        {expanded ? (
-                            <a
-                                href="https://wa.me/584145051716"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center py-1.5 rounded-lg transition-colors border-transparent w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent border cursor-pointer"
-                            >
-                                <Headset size={18} color="currentColor" className="shrink-0 support-bounce-icon" />
-                                <span className="font-medium text-[13px] ml-3">Soporte técnico</span>
-                            </a>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <a
-                                        href="https://wa.me/584145051716"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
-                                    >
-                                        <Headset
-                                            size={18}
-                                            color="currentColor"
-                                            className="shrink-0 support-bounce-icon"
-                                        />
-                                    </a>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={15.4}>
-                                    <p>Soporte técnico</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
+                        <div className={cn('shrink-0 mb-0', expanded ? 'px-3' : 'w-full flex justify-center')}>
+                            {expanded ? (
+                                <a
+                                    href="https://wa.me/584145051716"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center py-1.5 rounded-lg transition-colors border-transparent w-full px-3 text-sidebar-foreground/80 hover:bg-sidebar-accent border cursor-pointer"
+                                >
+                                    <Headset size={18} color="currentColor" className="shrink-0 support-bounce-icon" />
+                                    <span className="font-medium text-[13px] ml-3">Soporte técnico</span>
+                                </a>
+                            ) : (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <a
+                                            href="https://wa.me/584145051716"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center w-10 h-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+                                        >
+                                            <Headset
+                                                size={18}
+                                                color="currentColor"
+                                                className="shrink-0 support-bounce-icon"
+                                            />
+                                        </a>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" sideOffset={15.4}>
+                                        <p>Soporte técnico</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
                     </div>
-                </div>
+                ) : null}
             </div>
 
             {/* Footer Settings / User */}
@@ -578,15 +629,19 @@ export function Sidebar() {
                         <DropdownMenuSeparator className="m-0 bg-surface-soft/10" />
 
                         <div className="p-1">
-                            <DropdownMenuItem
-                                className="px-3 py-2.5 cursor-pointer text-neutral-dark focus:bg-surface-soft/20 rounded-lg font-medium transition-colors"
-                                onClick={() => router.push('/perfil')}
-                            >
-                                <User className="mr-3 h-[18px] w-[18px]" />
-                                Perfil
-                            </DropdownMenuItem>
+                            {!isAdminVisualizador ? (
+                                <>
+                                    <DropdownMenuItem
+                                        className="px-3 py-2.5 cursor-pointer text-neutral-dark focus:bg-surface-soft/20 rounded-lg font-medium transition-colors"
+                                        onClick={() => router.push('/perfil')}
+                                    >
+                                        <User className="mr-3 h-[18px] w-[18px]" />
+                                        Perfil
+                                    </DropdownMenuItem>
 
-                            <DropdownMenuSeparator className="my-1 bg-surface-soft/10" />
+                                    <DropdownMenuSeparator className="my-1 bg-surface-soft/10" />
+                                </>
+                            ) : null}
 
                             <DropdownMenuItem
                                 className="px-3 py-2.5 cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 rounded-lg font-medium transition-colors"

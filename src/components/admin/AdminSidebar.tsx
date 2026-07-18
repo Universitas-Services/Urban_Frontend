@@ -3,7 +3,17 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, LogOut, ChevronsUpDown, ChevronRight, MessageSquare, Bell, Menu } from 'lucide-react';
+import {
+    LayoutDashboard,
+    Users,
+    LogOut,
+    ChevronsUpDown,
+    ChevronRight,
+    MessageSquare,
+    Bell,
+    Menu,
+    Bot,
+} from 'lucide-react';
 
 import {
     Sidebar,
@@ -48,11 +58,13 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { APP_CONFIG } from '@/config/app.config';
 import { useAuthStore } from '@/store/auth.store';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter();
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
     const { user, logout } = useAuthStore();
+    const { isAdminVisualizador } = usePermissions();
     const { state, toggleSidebar } = useSidebar();
     const expanded = state === 'expanded';
 
@@ -172,7 +184,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
-                            {/* Historial de Chats (Movido al final) */}
+                            {/* Historial de Chats */}
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild tooltip="Historial de Chats">
                                     <Link href="/admin/chats">
@@ -181,6 +193,17 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+
+                            {isAdminVisualizador ? (
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild tooltip="Consultor IA">
+                                        <Link href="/chat">
+                                            <Bot />
+                                            <span>Consultor IA</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ) : null}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

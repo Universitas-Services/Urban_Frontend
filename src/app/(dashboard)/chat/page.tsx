@@ -5,10 +5,12 @@ import { useChatStore } from '@/store/chat.store';
 import { MessageList, ChatInput, AgentAvatar } from '@/components/chat';
 import { APP_CONFIG } from '@/config/app.config';
 import { FeatureBlockedModal } from '@/components/Modales';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export default function ChatDashboardPage() {
     const { activeConversationId, messages, sendMessage, createConversation, selectConversation, loadConversations } =
         useChatStore();
+    const { isAgentBlocked } = usePermissions();
 
     const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
 
@@ -26,7 +28,7 @@ export default function ChatDashboardPage() {
         }
         try {
             await sendMessage(content);
-            if (!APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+            if (!isAgentBlocked) {
                 await loadConversations();
             }
         } catch (error) {
@@ -49,9 +51,7 @@ export default function ChatDashboardPage() {
                                 <AgentAvatar size="sm" className="ring-2 ring-white shadow-sm" />
                                 <span
                                     className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-[1.5px] ring-white shadow-sm ${
-                                        APP_CONFIG.AGENT_UNDER_CONSTRUCTION
-                                            ? 'bg-amber-500'
-                                            : 'bg-(--color-status-online)'
+                                        isAgentBlocked ? 'bg-amber-500' : 'bg-(--color-status-online)'
                                     }`}
                                 />
                             </div>
@@ -59,8 +59,12 @@ export default function ChatDashboardPage() {
                                 <h2 className="font-bold text-neutral-dark text-[17px] leading-tight">
                                     {APP_CONFIG.DOCUMENT_TITLE}
                                 </h2>
-                                <span className="text-[13px] font-medium text-amber-600">
-                                    {APP_CONFIG.AGENT_UNDER_CONSTRUCTION ? 'En proceso de entrenamiento' : 'En línea'}
+                                <span
+                                    className={`text-[13px] font-medium ${
+                                        isAgentBlocked ? 'text-amber-600' : 'text-(--color-status-online)'
+                                    }`}
+                                >
+                                    {isAgentBlocked ? 'En proceso de entrenamiento' : 'En línea'}
                                 </span>
                             </div>
                         </div>

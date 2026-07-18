@@ -50,6 +50,7 @@ import {
 } from '@/lib/services/admin.service';
 import { User, CRMNotesResponse, CRMNote } from '@/types/admin.types';
 import { ACCOUNT_STATUS_CONFIG, getAccountStatusStyle } from '@/lib/constants/admin-ui';
+import { usePermissions } from '@/hooks/usePermissions';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -57,6 +58,7 @@ export default function UserDetailsPage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id as string;
+    const { canWrite } = usePermissions();
 
     const statusConfig = ACCOUNT_STATUS_CONFIG;
 
@@ -513,7 +515,7 @@ export default function UserDetailsPage() {
                                     </span>
                                 </div>
                                 <Switch
-                                    disabled={isUpdating}
+                                    disabled={isUpdating || !canWrite}
                                     checked={
                                         user.tipoUsuario === 'SERVIDOR_PUBLICO'
                                             ? user.estadoCuenta === 'ACTIVO'
@@ -540,72 +542,85 @@ export default function UserDetailsPage() {
                                         {user.isActive ? 'Cuenta Activa' : 'Cuenta Inactiva'}
                                     </span>
                                 </div>
-                                <Popover
-                                    open={popoverActiveOpen}
-                                    onOpenChange={(open) => {
-                                        setPopoverActiveOpen(open);
-                                        if (!open) setPendingActiveState(null);
-                                    }}
-                                >
-                                    <PopoverTrigger asChild>
-                                        <button
-                                            disabled={isUpdating}
-                                            onClick={() => setPendingActiveState(!user.isActive)}
-                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${user.isActive ? 'bg-indigo-500' : 'bg-slate-200'} scale-75 origin-right`}
-                                        >
-                                            <span
-                                                className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${user.isActive ? 'translate-x-5' : 'translate-x-0'}`}
-                                            />
-                                        </button>
-                                    </PopoverTrigger>
-                                    <PopoverContent
-                                        className="w-72 p-4 rounded-xl shadow-xl border-slate-100"
-                                        align="end"
-                                        sideOffset={5}
+                                {canWrite ? (
+                                    <Popover
+                                        open={popoverActiveOpen}
+                                        onOpenChange={(open) => {
+                                            setPopoverActiveOpen(open);
+                                            if (!open) setPendingActiveState(null);
+                                        }}
                                     >
-                                        <div className="flex flex-col gap-3">
-                                            <div className="flex items-start gap-3">
-                                                <div
-                                                    className={`h-8 w-8 rounded-full ${pendingActiveState ? 'bg-indigo-100' : 'bg-slate-100'} flex items-center justify-center shrink-0`}
-                                                >
-                                                    <ShieldCheck
-                                                        className={`h-4 w-4 ${pendingActiveState ? 'text-indigo-600' : 'text-slate-600'}`}
-                                                    />
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                disabled={isUpdating}
+                                                onClick={() => setPendingActiveState(!user.isActive)}
+                                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${user.isActive ? 'bg-indigo-500' : 'bg-slate-200'} scale-75 origin-right`}
+                                            >
+                                                <span
+                                                    className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${user.isActive ? 'translate-x-5' : 'translate-x-0'}`}
+                                                />
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                            className="w-72 p-4 rounded-xl shadow-xl border-slate-100"
+                                            align="end"
+                                            sideOffset={5}
+                                        >
+                                            <div className="flex flex-col gap-3">
+                                                <div className="flex items-start gap-3">
+                                                    <div
+                                                        className={`h-8 w-8 rounded-full ${pendingActiveState ? 'bg-indigo-100' : 'bg-slate-100'} flex items-center justify-center shrink-0`}
+                                                    >
+                                                        <ShieldCheck
+                                                            className={`h-4 w-4 ${pendingActiveState ? 'text-indigo-600' : 'text-slate-600'}`}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <h4 className="font-bold text-slate-900 text-sm">
+                                                            {pendingActiveState
+                                                                ? 'Activar Cuenta'
+                                                                : 'Desactivar Cuenta'}
+                                                        </h4>
+                                                        <p className="text-xs text-slate-500 mt-0.5">
+                                                            {pendingActiveState
+                                                                ? 'El usuario recuperará el acceso al sistema inmediatamente.'
+                                                                : 'El usuario perderá el acceso al sistema hasta que se reactive.'}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <h4 className="font-bold text-slate-900 text-sm">
-                                                        {pendingActiveState ? 'Activar Cuenta' : 'Desactivar Cuenta'}
-                                                    </h4>
-                                                    <p className="text-xs text-slate-500 mt-0.5">
-                                                        {pendingActiveState
-                                                            ? 'El usuario recuperará el acceso al sistema inmediatamente.'
-                                                            : 'El usuario perderá el acceso al sistema hasta que se reactive.'}
-                                                    </p>
+                                                <div className="flex justify-end gap-2 mt-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="h-7 text-xs px-4 shadow-none text-slate-600 font-bold"
+                                                        onClick={() => {
+                                                            setPopoverActiveOpen(false);
+                                                            setPendingActiveState(null);
+                                                        }}
+                                                    >
+                                                        Cancelar
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        className={`h-7 text-xs px-4 shadow-none text-white font-bold ${pendingActiveState ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-800 hover:bg-slate-900'}`}
+                                                        onClick={handleToggleActive}
+                                                    >
+                                                        Confirmar
+                                                    </Button>
                                                 </div>
                                             </div>
-                                            <div className="flex justify-end gap-2 mt-2">
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="h-7 text-xs px-4 shadow-none text-slate-600 font-bold"
-                                                    onClick={() => {
-                                                        setPopoverActiveOpen(false);
-                                                        setPendingActiveState(null);
-                                                    }}
-                                                >
-                                                    Cancelar
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    className={`h-7 text-xs px-4 shadow-none text-white font-bold ${pendingActiveState ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-800 hover:bg-slate-900'}`}
-                                                    onClick={handleToggleActive}
-                                                >
-                                                    Confirmar
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
+                                        </PopoverContent>
+                                    </Popover>
+                                ) : (
+                                    <span
+                                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent opacity-70 ${user.isActive ? 'bg-indigo-500' : 'bg-slate-200'} scale-75 origin-right`}
+                                        aria-hidden
+                                    >
+                                        <span
+                                            className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 ${user.isActive ? 'translate-x-5' : 'translate-x-0'}`}
+                                        />
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -796,7 +811,7 @@ export default function UserDetailsPage() {
                                 })()}
 
                             <div className="flex gap-2 p-1.5 bg-white shadow-sm rounded-2xl border border-slate-100 mt-2">
-                                {user.tipoUsuario === 'ASESOR_PRIVADO' && !isUpdating ? (
+                                {user.tipoUsuario === 'ASESOR_PRIVADO' && !isUpdating && canWrite ? (
                                     <Popover open={popoverPublicoOpen} onOpenChange={setPopoverPublicoOpen}>
                                         <PopoverTrigger asChild>
                                             <button className="flex-1 flex items-center justify-center p-3 rounded-xl transition-all bg-transparent text-slate-400 font-medium hover:bg-slate-50 cursor-pointer">
@@ -855,7 +870,7 @@ export default function UserDetailsPage() {
                                     </div>
                                 )}
 
-                                {user.tipoUsuario === 'SERVIDOR_PUBLICO' && !isUpdating ? (
+                                {user.tipoUsuario === 'SERVIDOR_PUBLICO' && !isUpdating && canWrite ? (
                                     <Popover open={popoverConvertirOpen} onOpenChange={setPopoverConvertirOpen}>
                                         <PopoverTrigger asChild>
                                             <button className="flex-1 flex items-center justify-center p-3 rounded-xl transition-all bg-transparent text-slate-400 font-medium hover:bg-slate-50 cursor-pointer">
@@ -932,7 +947,7 @@ export default function UserDetailsPage() {
                                     </div>
                                 </div>
 
-                                {user.tipoUsuario === 'ASESOR_PRIVADO' && (
+                                {user.tipoUsuario === 'ASESOR_PRIVADO' && canWrite && (
                                     <div className="flex items-center gap-2 mt-2 z-10 w-full">
                                         <Popover open={popoverAddDaysOpen} onOpenChange={setPopoverAddDaysOpen}>
                                             <PopoverTrigger asChild>
@@ -1075,49 +1090,53 @@ export default function UserDetailsPage() {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <div className="flex flex-wrap gap-2">
-                                    {getEtiqOptions().map((opt) => (
-                                        <button
-                                            key={opt.value}
-                                            onClick={() =>
-                                                setNuevaEtiqueta(opt.value === nuevaEtiqueta ? '' : opt.value)
-                                            }
-                                            className={`px-3 py-1 text-xs font-bold rounded-lg border transition-all ${nuevaEtiqueta === opt.value ? 'border-gray-300 ring-2 ring-offset-1 ring-gray-200' : 'border-transparent opacity-60 hover:opacity-100'}`}
-                                            style={{ backgroundColor: opt.bg, color: opt.text }}
-                                        >
-                                            {opt.label}
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="relative">
-                                    <textarea
-                                        value={nuevoMensaje}
-                                        onChange={(e) => setNuevoMensaje(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                if (nuevoMensaje.trim() && !isCrmLoading) {
-                                                    handleAddNote();
-                                                }
-                                            }
-                                        }}
-                                        disabled={isCrmLoading}
-                                        className="w-full bg-[var(--admin-filter-bg)] border-none rounded-2xl p-5 min-h-[120px] text-sm font-medium resize-none text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all"
-                                        placeholder={`Añadir una nota sobre este usuario${nuevaEtiqueta ? ' con la etiqueta seleccionada' : ''}... (Presiona Enter para enviar)`}
-                                    ></textarea>
-                                    <Button
-                                        disabled={isCrmLoading || !nuevoMensaje.trim()}
-                                        onClick={handleAddNote}
-                                        size="icon"
-                                        className="absolute bottom-4 right-4 bg-white hover:bg-gray-50 text-slate-900 rounded-xl shadow-sm border border-gray-100 h-10 w-10"
-                                    >
-                                        {isCrmLoading ? (
-                                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900"></div>
-                                        ) : (
-                                            <Send className="h-4 w-4" />
-                                        )}
-                                    </Button>
-                                </div>
+                                {canWrite ? (
+                                    <>
+                                        <div className="flex flex-wrap gap-2">
+                                            {getEtiqOptions().map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() =>
+                                                        setNuevaEtiqueta(opt.value === nuevaEtiqueta ? '' : opt.value)
+                                                    }
+                                                    className={`px-3 py-1 text-xs font-bold rounded-lg border transition-all ${nuevaEtiqueta === opt.value ? 'border-gray-300 ring-2 ring-offset-1 ring-gray-200' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                                    style={{ backgroundColor: opt.bg, color: opt.text }}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className="relative">
+                                            <textarea
+                                                value={nuevoMensaje}
+                                                onChange={(e) => setNuevoMensaje(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                        e.preventDefault();
+                                                        if (nuevoMensaje.trim() && !isCrmLoading) {
+                                                            handleAddNote();
+                                                        }
+                                                    }
+                                                }}
+                                                disabled={isCrmLoading}
+                                                className="w-full bg-[var(--admin-filter-bg)] border-none rounded-2xl p-5 min-h-[120px] text-sm font-medium resize-none text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all"
+                                                placeholder={`Añadir una nota sobre este usuario${nuevaEtiqueta ? ' con la etiqueta seleccionada' : ''}... (Presiona Enter para enviar)`}
+                                            ></textarea>
+                                            <Button
+                                                disabled={isCrmLoading || !nuevoMensaje.trim()}
+                                                onClick={handleAddNote}
+                                                size="icon"
+                                                className="absolute bottom-4 right-4 bg-white hover:bg-gray-50 text-slate-900 rounded-xl shadow-sm border border-gray-100 h-10 w-10"
+                                            >
+                                                {isCrmLoading ? (
+                                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900"></div>
+                                                ) : (
+                                                    <Send className="h-4 w-4" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : null}
                             </div>
                         </div>
 
@@ -1174,7 +1193,7 @@ export default function UserDetailsPage() {
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                {!isEditingThis && (
+                                                                {canWrite && !isEditingThis && (
                                                                     <>
                                                                         <button
                                                                             onClick={() => startEditing(note)}

@@ -14,10 +14,12 @@ import Link from 'next/link';
 
 import { getAbandonedRegistrationsAction, deleteAbandonedRegistrationAction } from '@/lib/services/admin.service';
 import { PaginationMeta, AbandonedRegistration } from '@/types/admin.types';
+import { usePermissions } from '@/hooks/usePermissions';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function AbandonedRegistrationsPage() {
+    const { canWrite } = usePermissions();
     const [users, setUsers] = useState<AbandonedRegistration[]>([]);
     const [meta, setMeta] = useState<PaginationMeta | null>(null);
     const [loading, setLoading] = useState(true);
@@ -255,54 +257,58 @@ export default function AbandonedRegistrationsPage() {
                                             })}
                                         </TableCell>
                                         <TableCell className="py-5 pr-6 text-right">
-                                            <Popover
-                                                open={popoverId === user.id}
-                                                onOpenChange={(open: boolean) => setPopoverId(open ? user.id : null)}
-                                            >
-                                                <PopoverTrigger asChild>
-                                                    <button className="p-2 bg-red-50 border border-red-100 shadow-sm text-red-500 hover:text-red-700 hover:border-red-300 hover:bg-red-100 rounded-lg transition-all group/trash">
-                                                        <Trash2 className="h-4 w-4 transition-transform group-hover/trash:scale-110" />
-                                                    </button>
-                                                </PopoverTrigger>
-                                                <PopoverContent
-                                                    className="w-64 p-4 rounded-xl shadow-xl border-slate-100"
-                                                    align="end"
-                                                    sideOffset={5}
+                                            {canWrite ? (
+                                                <Popover
+                                                    open={popoverId === user.id}
+                                                    onOpenChange={(open: boolean) =>
+                                                        setPopoverId(open ? user.id : null)
+                                                    }
                                                 >
-                                                    <div className="flex flex-col gap-3 cursor-default">
-                                                        <div className="flex items-start gap-3">
-                                                            <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                                                                <Trash2 className="h-4 w-4 text-red-600" />
+                                                    <PopoverTrigger asChild>
+                                                        <button className="p-2 bg-red-50 border border-red-100 shadow-sm text-red-500 hover:text-red-700 hover:border-red-300 hover:bg-red-100 rounded-lg transition-all group/trash">
+                                                            <Trash2 className="h-4 w-4 transition-transform group-hover/trash:scale-110" />
+                                                        </button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent
+                                                        className="w-64 p-4 rounded-xl shadow-xl border-slate-100"
+                                                        align="end"
+                                                        sideOffset={5}
+                                                    >
+                                                        <div className="flex flex-col gap-3 cursor-default">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                                                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <h4 className="font-bold text-slate-900 text-sm">
+                                                                        Eliminar Registro
+                                                                    </h4>
+                                                                    <p className="text-xs text-slate-500 mt-0.5">
+                                                                        ¿Seguro? Esta acción es irreversible.
+                                                                    </p>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex flex-col">
-                                                                <h4 className="font-bold text-slate-900 text-sm">
-                                                                    Eliminar Registro
-                                                                </h4>
-                                                                <p className="text-xs text-slate-500 mt-0.5">
-                                                                    ¿Seguro? Esta acción es irreversible.
-                                                                </p>
+                                                            <div className="flex justify-end gap-2 mt-1">
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="h-7 text-xs px-3 shadow-none text-slate-600 font-bold"
+                                                                    onClick={() => setPopoverId(null)}
+                                                                >
+                                                                    Cancelar
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="h-7 text-xs px-3 shadow-none bg-red-600 hover:bg-red-700 text-white font-bold"
+                                                                    onClick={() => ejecutarEliminar(user.id)}
+                                                                >
+                                                                    Eliminar
+                                                                </Button>
                                                             </div>
                                                         </div>
-                                                        <div className="flex justify-end gap-2 mt-1">
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="h-7 text-xs px-3 shadow-none text-slate-600 font-bold"
-                                                                onClick={() => setPopoverId(null)}
-                                                            >
-                                                                Cancelar
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                className="h-7 text-xs px-3 shadow-none bg-red-600 hover:bg-red-700 text-white font-bold"
-                                                                onClick={() => ejecutarEliminar(user.id)}
-                                                            >
-                                                                Eliminar
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            ) : null}
                                         </TableCell>
                                     </TableRow>
                                 ))

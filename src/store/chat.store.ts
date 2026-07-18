@@ -3,6 +3,8 @@
 import { create } from 'zustand';
 import type { Conversation, Message } from '@/types/chat.types';
 import { APP_CONFIG } from '@/config/app.config';
+import { isAgentBlockedForRole } from '@/lib/auth/permissions';
+import { useAuthStore } from '@/store/auth.store';
 import {
     getConversationsService,
     getMessagesService,
@@ -17,6 +19,8 @@ interface ChatState {
     messages: Message[];
     isSending: boolean;
     isSidebarOpen: boolean;
+    /** Solo anima tipeo en respuestas recién recibidas, no al abrir historial. */
+    typingMessageId: string | null;
 }
 
 interface ChatActions {
@@ -38,13 +42,18 @@ const initialState: ChatState = {
     messages: [],
     isSending: false,
     isSidebarOpen: false,
+    typingMessageId: null,
 };
+
+function isAgentBlocked(): boolean {
+    return isAgentBlockedForRole(useAuthStore.getState().user?.role);
+}
 
 export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
     ...initialState,
 
     loadConversations: async () => {
-        if (APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+        if (isAgentBlocked()) {
             set({ conversations: [] });
             return;
         }
@@ -54,14 +63,14 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
     },
 
     selectConversation: async (id) => {
-        set({ activeConversationId: id, messages: [] });
+        set({ activeConversationId: id, messages: [], typingMessageId: null });
 
-        if (APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+        if (isAgentBlocked()) {
             return;
         }
 
         const messages = await getMessagesService(id);
-        set({ messages });
+        set({ messages, typingMessageId: null });
     },
 
     sendMessage: async (content) => {
@@ -80,7 +89,7 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
         try {
             let botMessage: Message;
 
-            if (APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+            if (isAgentBlocked()) {
                 botMessage = {
                     id: `temp-bot-${Date.now()}`,
                     conversationId: activeConversationId,
@@ -91,8 +100,6 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
             } else {
                 botMessage = await sendMessageService(activeConversationId, content);
             }
-
-            set((s) => ({ messages: [...s.messages, botMessage], isSending: false }));
 
             const updatedConversations = conversations.map((c) =>
                 c.id === activeConversationId
@@ -105,7 +112,12 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
                       }
                     : c
             );
-            set({ conversations: updatedConversations });
+            set((s) => ({
+                messages: [...s.messages, botMessage],
+                isSending: false,
+                typingMessageId: isAgentBlocked() ? null : botMessage.id,
+                conversations: updatedConversations,
+            }));
         } catch (error) {
             set((s) => ({
                 messages: s.messages.filter((m) => m.id !== optimisticUserMsg.id),
@@ -121,6 +133,7 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
             conversations: [newConversation, ...s.conversations],
             activeConversationId: newConversation.id,
             messages: [],
+            typingMessageId: null,
         }));
     },
 
@@ -132,10 +145,10 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
 
     reset: () => set(initialState),
 
-    startNewChat: () => set({ activeConversationId: null, messages: [] }),
+    startNewChat: () => set({ activeConversationId: null, messages: [], typingMessageId: null }),
 
     deleteConversation: async (sessionId) => {
-        if (!APP_CONFIG.AGENT_UNDER_CONSTRUCTION) {
+        if (!isAgentBlocked()) {
             await deleteConversationService(sessionId);
         }
 
@@ -144,7 +157,7 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
 
         set({
             conversations: conversations.filter((c) => c.id !== sessionId),
-            ...(wasActive ? { activeConversationId: null, messages: [] } : {}),
+            ...(wasActive ? { activeConversationId: null, messages: [], typingMessageId: null } : {}),
         });
     },
 }));

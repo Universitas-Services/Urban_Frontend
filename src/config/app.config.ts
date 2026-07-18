@@ -7,7 +7,7 @@ export const APP_CONFIG = {
     FAVICON_URL: '/asset/icons_12 copia.png',
     SIDEBAR_LOGO_URL: '/asset/Sidebar_def.png',
     AGENT_NAME: 'Consultor IA',
-    /** Desactiva el chat con el backend hasta que el agente esté listo en producción. */
+    /** Bloquea el agente para usuarios comunes; ADMIN_VISUALIZADOR puede seguir probando. */
     AGENT_UNDER_CONSTRUCTION: true,
     AGENT_WELCOME_INTRO: 'En proceso de entrenamiento.',
     AGENT_UNDER_CONSTRUCTION_REPLY: 'En proceso de entrenamiento. Aún no puedo responder consultas; vuelve pronto.',
