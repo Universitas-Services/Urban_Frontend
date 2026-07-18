@@ -1,6 +1,7 @@
 'use server';
 
 import { getAuthHeader } from '@/lib/auth/session';
+import { sdkApi } from '@/lib/api/universitas.sdk';
 import type {
     AbandonedRegistration,
     AbandonedRegistrationsResponse,
@@ -190,21 +191,20 @@ export interface TerritorioItem {
 }
 
 export async function getEstadosAction(): Promise<TerritorioItem[]> {
-    const res = await fetch(`${API}/territorio/estados`, {
-        headers: await getAuthHeader(),
-        cache: 'no-store',
-    });
-    const data = await handleResponse<TerritorioItem[] | { data: TerritorioItem[] }>(res);
-    return Array.isArray(data) ? data : data.data;
+    const response = await sdkApi.territorio.getEstados();
+    return response.data.map((estado) => ({
+        id: estado.id,
+        nombre: estado.nombre,
+    }));
 }
 
 export async function getMunicipiosAction(estadoId: number): Promise<TerritorioItem[]> {
-    const res = await fetch(`${API}/territorio/municipios/${estadoId}`, {
-        headers: await getAuthHeader(),
-        cache: 'no-store',
-    });
-    const data = await handleResponse<TerritorioItem[] | { data: TerritorioItem[] }>(res);
-    return Array.isArray(data) ? data : data.data;
+    const response = await sdkApi.territorio.getMunicipios(estadoId);
+    return response.data.map((municipio) => ({
+        id: municipio.id,
+        nombre: municipio.nombre,
+        estado_id: estadoId,
+    }));
 }
 
 export async function addSubscriptionDaysAction(id: string): Promise<AdminManagedUser> {

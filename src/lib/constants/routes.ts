@@ -5,18 +5,18 @@ export const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/verif
 
 export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     '/inicio': ['USER'],
-    '/chat': ['USER'],
+    '/chat': ['USER', 'ADMIN_VISUALIZADOR'],
     '/biblioteca-legal': ['USER'],
     '/proyecto-ley': ['USER'],
     '/repositorio-legal': ['USER'],
     '/perfil': ['USER'],
     '/acerca-de': ['USER'],
     '/faq': ['USER'],
-    '/admin': ['ADMIN', 'AUDITOR'],
-    '/admin/usuarios': ['ADMIN', 'AUDITOR'],
-    '/admin/noticias': ['ADMIN', 'AUDITOR'],
-    '/admin/avisos': ['ADMIN', 'AUDITOR'],
-    '/admin/chats': ['ADMIN', 'AUDITOR'],
+    '/admin': ['ADMIN', 'ADMIN_VISUALIZADOR'],
+    '/admin/usuarios': ['ADMIN', 'ADMIN_VISUALIZADOR'],
+    '/admin/noticias': ['ADMIN', 'ADMIN_VISUALIZADOR'],
+    '/admin/avisos': ['ADMIN', 'ADMIN_VISUALIZADOR'],
+    '/admin/chats': ['ADMIN', 'ADMIN_VISUALIZADOR'],
 };
 
 export function getHomeByRole(role: string): string {

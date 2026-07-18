@@ -9,29 +9,46 @@ import { APP_CONFIG } from '@/config/app.config';
 interface MessageBubbleProps {
     message: Message;
     isLast: boolean;
+    /** Solo true para respuestas recién enviadas; el historial se muestra completo. */
+    animateTyping?: boolean;
 }
 
-export function MessageBubble({ message, isLast }: MessageBubbleProps) {
+const TYPING_CHARS_PER_TICK = 12;
+const TYPING_INTERVAL_MS = 12;
+
+export function MessageBubble({ message, isLast, animateTyping = false }: MessageBubbleProps) {
     const isAgent = message.role === 'assistant';
-    const [displayedText, setDisplayedText] = useState(isAgent && isLast ? '' : message.content);
-    const [isTyping, setIsTyping] = useState(isAgent && isLast);
+    const shouldType = isAgent && isLast && animateTyping;
+    const [typedText, setTypedText] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
 
     useEffect(() => {
-        if (isAgent && isLast && isTyping) {
-            let currentIndex = 1; // start at 1 to show first char, or 0
-            const interval = setInterval(() => {
-                if (currentIndex <= message.content.length) {
-                    setDisplayedText(message.content.substring(0, currentIndex));
-                    currentIndex++;
-                } else {
-                    setIsTyping(false);
-                    clearInterval(interval);
-                }
-            }, 20); // 20ms per character typing effect
+        if (!shouldType) return;
 
-            return () => clearInterval(interval);
-        }
-    }, [message.content, isAgent, isLast, isTyping]);
+        let currentIndex = 0;
+        let cancelled = false;
+
+        // Diferir el primer setState al callback del interval para evitar set-state-in-effect
+        const interval = setInterval(() => {
+            if (cancelled) return;
+
+            currentIndex = Math.min(currentIndex + TYPING_CHARS_PER_TICK, message.content.length);
+            setTypedText(message.content.substring(0, currentIndex));
+            setIsTyping(currentIndex < message.content.length);
+
+            if (currentIndex >= message.content.length) {
+                clearInterval(interval);
+            }
+        }, TYPING_INTERVAL_MS);
+
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, [message.content, message.id, shouldType]);
+
+    const displayedText = shouldType ? typedText : message.content;
+    const showCursor = shouldType && isTyping;
 
     const dateObj = new Date(message.createdAt);
     const dateStr = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -63,7 +80,7 @@ export function MessageBubble({ message, isLast }: MessageBubbleProps) {
                     >
                         <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
                             {displayedText}
-                            {isTyping && (
+                            {showCursor && (
                                 <span className="inline-block w-1.5 h-4 ml-1 bg-agent-accent animate-pulse align-middle" />
                             )}
                         </p>

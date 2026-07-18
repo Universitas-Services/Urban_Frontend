@@ -142,7 +142,7 @@ export default function AvisosPage() {
                     </div>
                 ) : (
                     <div className="lg:col-span-3 flex items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-sm text-muted-foreground">
-                        Como auditor solo puedes consultar avisos publicados; no puedes crear nuevos.
+                        Como visualizador solo puedes consultar avisos publicados; no puedes crear nuevos.
                     </div>
                 )}
 

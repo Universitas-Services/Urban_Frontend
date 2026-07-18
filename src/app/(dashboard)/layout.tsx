@@ -1,8 +1,8 @@
 'use client';
 
 import { CopyrightFooter } from '@/components/layout/CopyrightFooter';
-import { ReactNode, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { useAuthStore } from '@/store/auth.store';
 import { useChatStore } from '@/store/chat.store';
@@ -13,17 +13,29 @@ import { DashboardCityscapeBackground } from '@/components/layout/DashboardCitys
 import { DashboardMobileHeader } from '@/components/layout/DashboardMobileHeader';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { getHomeByRole } from '@/lib/constants/routes';
-import { canAccessAdminArea } from '@/lib/auth/permissions';
+import { canAccessAdminArea, isAdminVisualizador } from '@/lib/auth/permissions';
 import { APP_CONFIG } from '@/config/app.config';
+import type { UserRole } from '@/types/roles';
+
+const USER_ONLY_ROLES: UserRole[] = ['USER'];
+const CHAT_VISUALIZADOR_ROLES: UserRole[] = ['USER', 'ADMIN_VISUALIZADOR'];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const { isLoading, initAuth, isAuthenticated, getFullProfile, user } = useAuthStore();
     const { loadConversations } = useChatStore();
     const router = useRouter();
+    const pathname = usePathname();
 
     const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
     const [membershipDaysLeft, setMembershipDaysLeft] = useState<number>(0);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+    const role = user?.role;
+    const isVisualizadorOnChat = isAdminVisualizador(role) && pathname === '/chat';
+    const allowedRoles = useMemo(
+        () => (isVisualizadorOnChat ? CHAT_VISUALIZADOR_ROLES : USER_ONLY_ROLES),
+        [isVisualizadorOnChat]
+    );
 
     // Inicializar sesión desde la cookie al montar
     useEffect(() => {
@@ -31,27 +43,35 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }, [initAuth]);
 
     // Gate de autenticación: si la sesión termina (logout, expiración), redirigir al login.
-    // Centraliza la redirección para todas las salidas, sin parchear cada botón.
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             router.replace('/login');
         }
     }, [isLoading, isAuthenticated, router]);
 
+    // Roles de área admin van a /admin, excepto visualizador en /chat
     useEffect(() => {
-        if (!isLoading && isAuthenticated && canAccessAdminArea(user?.role)) {
-            router.replace(getHomeByRole(user?.role ?? 'USER'));
-        }
-    }, [isLoading, isAuthenticated, user?.role, router]);
+        if (isLoading || !isAuthenticated) return;
+        if (!canAccessAdminArea(role)) return;
+        if (isVisualizadorOnChat) return;
+        router.replace(getHomeByRole(role ?? 'USER'));
+    }, [isLoading, isAuthenticated, role, isVisualizadorOnChat, router]);
 
     useEffect(() => {
-        if (isLoading || !isAuthenticated || canAccessAdminArea(user?.role)) return;
+        if (isLoading || !isAuthenticated) return;
+        if (canAccessAdminArea(role) && !isVisualizadorOnChat) return;
 
         document.title = APP_CONFIG.PROJECT_NAME;
 
         let timeoutId: NodeJS.Timeout;
 
         const checkStatus = async () => {
+            // Visualizador en chat: solo carga conversaciones, sin modales de perfil/membresía de usuario
+            if (isVisualizadorOnChat) {
+                await loadConversations();
+                return;
+            }
+
             try {
                 const profile = await getFullProfile();
 
@@ -65,15 +85,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             } catch (error) {
                 console.error('Failed to fetch profile membership status', error);
             }
+
+            await loadConversations();
         };
 
-        checkStatus();
-        loadConversations();
+        void checkStatus();
 
         return () => {
             if (timeoutId) clearTimeout(timeoutId);
         };
-    }, [isAuthenticated, isLoading, user?.role, getFullProfile, loadConversations]);
+    }, [isAuthenticated, isLoading, role, isVisualizadorOnChat, getFullProfile, loadConversations]);
 
     // Mostrar spinner mientras se verifica la sesión o durante la redirección al login
     if (isLoading || !isAuthenticated) {
@@ -85,7 +106,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
 
     return (
-        <RouteGuard allowedRoles={['USER']}>
+        <RouteGuard allowedRoles={allowedRoles}>
             <div className="relative flex h-dvh overflow-hidden bg-surface-light text-neutral-dark">
                 <DashboardCityscapeBackground />
                 <Sidebar />
@@ -99,15 +120,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     </main>
                 </div>
 
-                <MembershipExpiringModal
-                    isOpen={isMembershipModalOpen}
-                    onClose={() => setIsMembershipModalOpen(false)}
-                    daysLeft={membershipDaysLeft}
-                />
+                {!isVisualizadorOnChat ? (
+                    <>
+                        <MembershipExpiringModal
+                            isOpen={isMembershipModalOpen}
+                            onClose={() => setIsMembershipModalOpen(false)}
+                            daysLeft={membershipDaysLeft}
+                        />
 
-                <ProfileIncompleteModal isOpen={isProfileModalOpen} onSuccess={() => setIsProfileModalOpen(false)} />
+                        <ProfileIncompleteModal
+                            isOpen={isProfileModalOpen}
+                            onSuccess={() => setIsProfileModalOpen(false)}
+                        />
 
-                <DisruptiveNewsModal />
+                        <DisruptiveNewsModal />
+                    </>
+                ) : null}
             </div>
         </RouteGuard>
     );

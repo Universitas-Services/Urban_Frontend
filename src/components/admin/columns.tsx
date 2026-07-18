@@ -103,7 +103,14 @@ export const columns: ColumnDef<User>[] = [
         header: 'Rol',
         cell: ({ row }) => {
             const role = row.getValue('role') as string;
-            const variant = role === 'ADMIN' ? 'destructive' : role === 'PAID_USER' ? 'default' : 'secondary';
+            const variant =
+                role === 'ADMIN'
+                    ? 'destructive'
+                    : role === 'ADMIN_VISUALIZADOR'
+                      ? 'outline'
+                      : role === 'PAID_USER'
+                        ? 'default'
+                        : 'secondary';
             return <Badge variant={variant}>{role}</Badge>;
         },
     },
