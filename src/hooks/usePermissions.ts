@@ -1,6 +1,12 @@
 'use client';
 
-import { canWrite, isAuditor, canAccessAdminArea, isUserAreaRole } from '@/lib/auth/permissions';
+import {
+    canWrite,
+    isAdminVisualizador,
+    canAccessAdminArea,
+    isUserAreaRole,
+    isAgentBlockedForRole,
+} from '@/lib/auth/permissions';
 import { useAuthStore } from '@/store/auth.store';
 
 export function usePermissions() {
@@ -9,9 +15,10 @@ export function usePermissions() {
     return {
         role,
         canWrite: canWrite(role),
-        isAuditor: isAuditor(role),
+        isAdminVisualizador: isAdminVisualizador(role),
         isAdmin: role === 'ADMIN',
         isUser: isUserAreaRole(role),
         canAccessAdminArea: canAccessAdminArea(role),
+        isAgentBlocked: isAgentBlockedForRole(role),
     };
 }

@@ -10,6 +10,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { getAbandonedRegistrationByIdAction, addAbandonedRegistrationNoteAction } from '@/lib/services/admin.service';
 import { AbandonedRegistration } from '@/types/admin.types';
+import { usePermissions } from '@/hooks/usePermissions';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -17,6 +18,7 @@ export default function AbandonedRegistrationDetailsPage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id as string;
+    const { canWrite } = usePermissions();
 
     const [user, setUser] = useState<AbandonedRegistration | null>(null);
     const [loading, setLoading] = useState(true);
@@ -255,34 +257,36 @@ export default function AbandonedRegistrationDetailsPage() {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <div className="relative">
-                                    <textarea
-                                        value={nuevoMensaje}
-                                        onChange={(e) => setNuevoMensaje(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                if (nuevoMensaje.trim() && !isCrmLoading) {
-                                                    handleAddNote();
+                                {canWrite ? (
+                                    <div className="relative">
+                                        <textarea
+                                            value={nuevoMensaje}
+                                            onChange={(e) => setNuevoMensaje(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault();
+                                                    if (nuevoMensaje.trim() && !isCrmLoading) {
+                                                        handleAddNote();
+                                                    }
                                                 }
-                                            }
-                                        }}
-                                        placeholder="Escribe el resultado del contacto o el motivo del abandono..."
-                                        className="w-full h-24 p-4 text-sm bg-slate-50 border border-slate-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all shadow-inner"
-                                    />
-                                    <Button
-                                        size="icon"
-                                        disabled={isCrmLoading || !nuevoMensaje.trim()}
-                                        onClick={handleAddNote}
-                                        className="absolute bottom-3 right-3 h-8 w-8 rounded-xl bg-orange-500 hover:bg-orange-600 shadow-md text-white disabled:opacity-50"
-                                    >
-                                        {isCrmLoading ? (
-                                            <div className="h-3 w-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        ) : (
-                                            <Send className="h-3.5 w-3.5" />
-                                        )}
-                                    </Button>
-                                </div>
+                                            }}
+                                            placeholder="Escribe el resultado del contacto o el motivo del abandono..."
+                                            className="w-full h-24 p-4 text-sm bg-slate-50 border border-slate-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all shadow-inner"
+                                        />
+                                        <Button
+                                            size="icon"
+                                            disabled={isCrmLoading || !nuevoMensaje.trim()}
+                                            onClick={handleAddNote}
+                                            className="absolute bottom-3 right-3 h-8 w-8 rounded-xl bg-orange-500 hover:bg-orange-600 shadow-md text-white disabled:opacity-50"
+                                        >
+                                            {isCrmLoading ? (
+                                                <div className="h-3 w-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Send className="h-3.5 w-3.5" />
+                                            )}
+                                        </Button>
+                                    </div>
+                                ) : null}
                             </div>
 
                             {/* Timeline de notas */}

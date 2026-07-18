@@ -11,7 +11,7 @@ import { APP_CONFIG } from '@/config/app.config';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { initAuth } = useAuthStore();
-    const { isAuditor } = usePermissions();
+    const { isAdminVisualizador } = usePermissions();
 
     useEffect(() => {
         initAuth();
@@ -19,7 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }, [initAuth]);
 
     return (
-        <RouteGuard allowedRoles={['ADMIN', 'AUDITOR']}>
+        <RouteGuard allowedRoles={['ADMIN', 'ADMIN_VISUALIZADOR']}>
             <div className="admin-area relative flex h-dvh overflow-hidden bg-surface-light font-sans text-neutral-dark">
                 <DashboardCityscapeBackground />
                 <SidebarProvider className="relative z-10 flex h-full min-h-0 w-full bg-transparent">
@@ -29,10 +29,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <SidebarTrigger className="-ml-1 text-primary" />
                         </header>
                         <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden">
-                            {isAuditor && (
+                            {isAdminVisualizador && (
                                 <div className="flex shrink-0 justify-end px-4 pt-4">
                                     <span className="rounded-md bg-secondary px-3 py-1 text-xs font-semibold text-primary">
-                                        Modo auditor — solo lectura
+                                        Modo visualizador — solo lectura
                                     </span>
                                 </div>
                             )}
