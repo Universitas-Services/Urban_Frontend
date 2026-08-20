@@ -1,10 +1,11 @@
 import { ChatMessage } from '@/types/admin-chat.types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { MessageMarkdown } from '@/components/chat/MessageMarkdown';
 
 interface ChatMessageBubbleProps {
     message: ChatMessage;
-    userAvatar?: string; // Opcional, para mostrar avatar del otro
+    userAvatar?: string;
 }
 
 export function ChatMessageBubble({ message, userAvatar }: ChatMessageBubbleProps) {
@@ -30,7 +31,11 @@ export function ChatMessageBubble({ message, userAvatar }: ChatMessageBubbleProp
                         : 'bg-muted text-foreground rounded-bl-none'
                 )}
             >
-                <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                {isMine ? (
+                    <MessageMarkdown content={message.content} className="text-sm" />
+                ) : (
+                    <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                )}
                 <span
                     className={cn(
                         'mt-1 block text-[10px] opacity-70',

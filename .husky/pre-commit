@@ -1,2 +1,2 @@
 pnpm lint-staged
-pnpm audit --audit-level=high
+pnpm audit --prod --audit-level=high

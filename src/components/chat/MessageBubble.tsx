@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Message } from '@/types/chat.types';
 import { AgentAvatar } from './AgentAvatar';
+import { MessageMarkdown } from './MessageMarkdown';
 import { cn } from '@/lib/utils';
 import { APP_CONFIG } from '@/config/app.config';
 
@@ -28,7 +29,6 @@ export function MessageBubble({ message, isLast, animateTyping = false }: Messag
         let currentIndex = 0;
         let cancelled = false;
 
-        // Diferir el primer setState al callback del interval para evitar set-state-in-effect
         const interval = setInterval(() => {
             if (cancelled) return;
 
@@ -78,12 +78,18 @@ export function MessageBubble({ message, isLast, animateTyping = false }: Messag
                                 : 'bg-primary text-on-primary rounded-[20px] rounded-tr-sm'
                         )}
                     >
-                        <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
-                            {displayedText}
-                            {showCursor && (
-                                <span className="inline-block w-1.5 h-4 ml-1 bg-agent-accent animate-pulse align-middle" />
-                            )}
-                        </p>
+                        {isAgent ? (
+                            <div>
+                                <MessageMarkdown content={displayedText} />
+                                {showCursor && (
+                                    <span className="inline-block w-1.5 h-4 ml-1 bg-agent-accent animate-pulse align-middle" />
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
+                                {displayedText}
+                            </p>
+                        )}
                     </div>
 
                     <div className={cn('flex items-center gap-2', isAgent ? 'justify-start ml-1' : 'justify-end mr-1')}>
