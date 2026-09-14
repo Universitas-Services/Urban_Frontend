@@ -31,7 +31,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
             toast.error('Debe seleccionar el tipo de usuario');
             return;
         }
-        if (!nombreEnte) {
+        if (tipoUsuario !== 'CIUDADANO' && !nombreEnte) {
             toast.error('Debe ingresar el Ente/Institución');
             return;
         }
@@ -50,7 +50,7 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
         try {
             await updateProfileService({
                 tipoUsuario: tipoUsuario,
-                nombre_ente: nombreEnte,
+                ...(tipoUsuario !== 'CIUDADANO' && { nombre_ente: nombreEnte }),
                 ...(tipoUsuario === 'SERVIDOR_PUBLICO' && {
                     cargo: cargo,
                     estatus_normativa_girs: estatusNormativa,
@@ -99,12 +99,13 @@ export function ProfileIncompleteModal({ isOpen, onSuccess }: ProfileIncompleteM
                             </SelectTrigger>
                             <SelectContent className="rounded-md">
                                 <SelectItem value="SERVIDOR_PUBLICO">Servidor público</SelectItem>
-                                <SelectItem value="ASESOR_PRIVADO">Asesor privado</SelectItem>
+                                <SelectItem value="ASESOR_PRIVADO">Asesor</SelectItem>
+                                <SelectItem value="CIUDADANO">Ciudadano</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
-                    {tipoUsuario && (
+                    {tipoUsuario && tipoUsuario !== 'CIUDADANO' && (
                         <div className="space-y-1.5 animate-in fade-in zoom-in duration-300">
                             <Label htmlFor="nombreEnte" className="text-gray-dark font-bold text-sm">
                                 {tipoUsuario === 'ASESOR_PRIVADO'

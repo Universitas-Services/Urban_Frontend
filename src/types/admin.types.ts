@@ -4,10 +4,10 @@ export type AdminAccountRole = AuthUserRole | 'PAID_USER';
 
 export interface AdminUserProfile {
     id: string;
-    nombreEnte: string;
-    cargo: string;
+    nombreEnte: string | null;
+    cargo: string | null;
     plazoEntregaActa: string | null;
-    estatusNormativaGirs: string;
+    estatusNormativaGirs: string | null;
     userId: string;
 }
 
@@ -115,6 +115,7 @@ export interface DashboardMetrics {
         porTipousuario: {
             servidoresPublicos: number;
             asesoresPrivados: number;
+            ciudadanos: number;
         };
         cuentasSuscritasActivas: number;
         suspensionesRecientes: number;

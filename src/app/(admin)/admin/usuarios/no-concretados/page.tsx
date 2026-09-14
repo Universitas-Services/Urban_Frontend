@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Building2, ChevronLeft, ChevronRight, User, Search, Trash2 } from 'lucide-react';
+import { Shield, Building2, ChevronLeft, ChevronRight, User, Search, Trash2, UserRound } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { getAbandonedRegistrationsAction, deleteAbandonedRegistrationAction } from '@/lib/services/admin.service';
 import { PaginationMeta, AbandonedRegistration } from '@/types/admin.types';
 import { usePermissions } from '@/hooks/usePermissions';
+import { labelTipoUsuario } from '@/types/tipo-usuario';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -162,7 +163,8 @@ export default function AbandonedRegistrationsPage() {
                         <SelectContent>
                             <SelectItem value="ALL">Todos los tipos</SelectItem>
                             <SelectItem value="SERVIDOR_PUBLICO">Servidor Público</SelectItem>
-                            <SelectItem value="ASESOR_PRIVADO">Asesor Privado</SelectItem>
+                            <SelectItem value="ASESOR_PRIVADO">Asesor</SelectItem>
+                            <SelectItem value="CIUDADANO">Ciudadano</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -241,14 +243,12 @@ export default function AbandonedRegistrationsPage() {
                                             <div className="flex items-center gap-2.5 text-slate-600 font-semibold text-sm">
                                                 {user.tipoUsuario === 'SERVIDOR_PUBLICO' ? (
                                                     <Building2 className="h-4 w-4 text-emerald-600" />
+                                                ) : user.tipoUsuario === 'CIUDADANO' ? (
+                                                    <UserRound className="h-4 w-4 text-amber-600" />
                                                 ) : (
                                                     <Shield className="h-4 w-4 text-blue-600" />
                                                 )}
-                                                {user.tipoUsuario === 'SERVIDOR_PUBLICO'
-                                                    ? 'Servidor Público'
-                                                    : user.tipoUsuario === 'ASESOR_PRIVADO'
-                                                      ? 'Asesor Privado'
-                                                      : '---'}
+                                                {labelTipoUsuario(user.tipoUsuario)}
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-5 text-slate-800 font-bold text-sm tracking-tight">

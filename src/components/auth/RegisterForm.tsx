@@ -18,15 +18,10 @@ import { cn } from '@/lib/utils';
 import { type Estado, type Municipio } from '@universitas/sdk-global';
 import { sdkApi } from '@/lib/api/universitas.sdk';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import { useAuthFormStyles } from './auth-context';
 import { RegisterTermsDialog } from './RegisterTermsDialog';
 import { RegisterPrivacyDialog } from './RegisterPrivacyDialog';
-
-const roleCheckboxClassName =
-    'cursor-pointer size-4 border-2 border-neutral-dark/45 bg-white shadow-sm ' +
-    'data-[state=checked]:border-auth-accent data-[state=checked]:bg-auth-accent data-[state=checked]:text-on-primary ' +
-    'focus-visible:border-auth-accent focus-visible:ring-auth-accent/30';
+import { TIPO_USUARIO } from '@/types/tipo-usuario';
 
 export function RegisterForm() {
     const [step, setStep] = useState(1);
@@ -122,15 +117,25 @@ export function RegisterForm() {
         loadMunicipios();
     }, [selectedEstadoId]);
 
+    const scrollPanelToTop = () => {
+        const scrollEl = document.querySelector('.auth-slide-panel__scroll');
+        if (scrollEl instanceof HTMLElement) {
+            scrollEl.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     const onNextStep = async () => {
         const isValid = await form.trigger(['email', 'password', 'confirmPassword']);
         if (isValid) {
             setStep(2);
+            // El paso 2 es más alto: llevar el scroll al inicio para ver el título
+            requestAnimationFrame(scrollPanelToTop);
         }
     };
 
     const onPrevStep = () => {
         setStep(1);
+        requestAnimationFrame(scrollPanelToTop);
     };
 
     async function onSubmit(values: z.infer<typeof registerSchema>) {
@@ -143,9 +148,13 @@ export function RegisterForm() {
                 estado: values.estado,
                 municipio: values.municipio,
                 tipo_usuario: values.tipo_usuario,
-                nombre_ente: values.nombre_ente,
-                cargo: values.cargo,
-                estatus_normativa_girs: values.estatus_normativa_girs,
+                ...(values.tipo_usuario !== 'CIUDADANO' && {
+                    nombre_ente: values.nombre_ente,
+                }),
+                ...(values.tipo_usuario === 'SERVIDOR_PUBLICO' && {
+                    cargo: values.cargo,
+                    estatus_normativa_girs: values.estatus_normativa_girs,
+                }),
                 email: values.email,
                 password: values.password,
             };
@@ -497,60 +506,40 @@ export function RegisterForm() {
                                     name="tipo_usuario"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormControl>
-                                                <div className="flex gap-40">
-                                                    <div className="flex items-center space-x-2">
-                                                        <Checkbox
-                                                            id="servidor-publico"
-                                                            className={roleCheckboxClassName}
-                                                            checked={field.value === 'SERVIDOR_PUBLICO'}
-                                                            onCheckedChange={(checked) => {
-                                                                if (checked) {
-                                                                    field.onChange('SERVIDOR_PUBLICO');
-                                                                    setShowEnteFields(true);
-                                                                    setShowCargoNormativa(true);
-                                                                } else {
-                                                                    field.onChange('');
-                                                                    setShowEnteFields(false);
-                                                                    setShowCargoNormativa(false);
-                                                                    form.setValue('nombre_ente', '');
-                                                                    form.setValue('cargo', '');
-                                                                    form.setValue('estatus_normativa_girs', '');
-                                                                }
-                                                            }}
-                                                        />
-                                                        <label htmlFor="servidor-publico" className={s.label}>
-                                                            Servidor público
-                                                        </label>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2">
-                                                        <Checkbox
-                                                            id="asesor-privado"
-                                                            className={roleCheckboxClassName}
-                                                            checked={field.value === 'ASESOR_PRIVADO'}
-                                                            onCheckedChange={(checked) => {
-                                                                if (checked) {
-                                                                    field.onChange('ASESOR_PRIVADO');
-                                                                    setShowEnteFields(true);
-                                                                    setShowCargoNormativa(false);
-                                                                    form.setValue('cargo', '');
-                                                                    form.setValue('estatus_normativa_girs', '');
-                                                                } else {
-                                                                    field.onChange('');
-                                                                    setShowEnteFields(false);
-                                                                    setShowCargoNormativa(false);
-                                                                    form.setValue('nombre_ente', '');
-                                                                    form.setValue('cargo', '');
-                                                                    form.setValue('estatus_normativa_girs', '');
-                                                                }
-                                                            }}
-                                                        />
-                                                        <label htmlFor="asesor-privado" className={s.label}>
-                                                            Asesor privado
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </FormControl>
+                                            <FormLabel className={s.label}>Tipo de usuario</FormLabel>
+                                            <Select
+                                                value={field.value || undefined}
+                                                onValueChange={(value) => {
+                                                    field.onChange(value);
+                                                    form.setValue('nombre_ente', '');
+                                                    form.setValue('cargo', '');
+                                                    form.setValue('estatus_normativa_girs', '');
+
+                                                    if (value === TIPO_USUARIO.SERVIDOR_PUBLICO) {
+                                                        setShowEnteFields(true);
+                                                        setShowCargoNormativa(true);
+                                                    } else if (value === TIPO_USUARIO.ASESOR_PRIVADO) {
+                                                        setShowEnteFields(true);
+                                                        setShowCargoNormativa(false);
+                                                    } else {
+                                                        setShowEnteFields(false);
+                                                        setShowCargoNormativa(false);
+                                                    }
+                                                }}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger className={s.input}>
+                                                        <SelectValue placeholder="Selecciona un tipo de usuario" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="z-50">
+                                                    <SelectItem value={TIPO_USUARIO.SERVIDOR_PUBLICO}>
+                                                        Servidor público
+                                                    </SelectItem>
+                                                    <SelectItem value={TIPO_USUARIO.ASESOR_PRIVADO}>Asesor</SelectItem>
+                                                    <SelectItem value={TIPO_USUARIO.CIUDADANO}>Ciudadano</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                             <FormMessage className={cn(s.messageError, 'mt-1')} />
                                         </FormItem>
                                     )}

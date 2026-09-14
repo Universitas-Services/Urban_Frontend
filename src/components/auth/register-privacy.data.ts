@@ -52,7 +52,7 @@ export const REGISTER_PRIVACY = {
                 {
                     term: 'Datos de Facturación y Pagos',
                     definition:
-                        'Para los Asesores Privados, los pagos de suscripción se realizan mediante transferencias bancarias, pago móvil o divisas, y son validados manualmente por el equipo de Universitas a través de canales oficiales como WhatsApp. La plataforma no almacena números de tarjetas de crédito ni utiliza pasarelas de pago automáticas de terceros que procesen información financiera sensible.',
+                        'Para los Asesores, los pagos de suscripción se realizan mediante transferencias bancarias, pago móvil o divisas, y son validados manualmente por el equipo de Universitas a través de canales oficiales como WhatsApp. La plataforma no almacena números de tarjetas de crédito ni utiliza pasarelas de pago automáticas de terceros que procesen información financiera sensible.',
                 },
             ],
         },

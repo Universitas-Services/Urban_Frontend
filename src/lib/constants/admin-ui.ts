@@ -68,4 +68,5 @@ export const ADMIN_CHART_COLORS = {
     barHighlight: 'var(--admin-chart-bar-highlight)',
     publicos: 'var(--color-territorial)',
     asesores: 'var(--color-primary)',
+    ciudadanos: 'var(--color-agent-accent)',
 } as const;

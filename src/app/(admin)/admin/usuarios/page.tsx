@@ -13,6 +13,7 @@ import {
     ShieldCheck,
     Search,
     Trash2,
+    UserRound,
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
@@ -38,6 +39,7 @@ import {
 } from '@/lib/services/admin.service';
 import { getDashboardMetricsAction } from '@/lib/services/admin-dashboard.service';
 import type { DashboardMetrics, PaginationMeta, User as UserType, GetUsersParams } from '@/types/admin.types';
+import { labelTipoUsuario } from '@/types/tipo-usuario';
 import { usePermissions } from '@/hooks/usePermissions';
 import { ACCOUNT_STATUS_CONFIG, getAccountStatusStyle, ADMIN_KPI_COLORS } from '@/lib/constants/admin-ui';
 import { format } from 'date-fns';
@@ -354,13 +356,22 @@ export default function UsuariosPage() {
             filter: { type: 'tipo', value: 'SERVIDOR_PUBLICO' },
         },
         {
-            title: 'ASESORES PRIVADOS',
+            title: 'ASESORES',
             value: dashboardData?.analytics.porTipousuario.asesoresPrivados.toLocaleString() || '...',
             icon: Shield,
             color: ADMIN_KPI_COLORS.institutional.color,
             bgColor: ADMIN_KPI_COLORS.institutional.bgColor,
             badge: 'Asesores',
             filter: { type: 'tipo', value: 'ASESOR_PRIVADO' },
+        },
+        {
+            title: 'CIUDADANOS',
+            value: dashboardData?.analytics.porTipousuario.ciudadanos?.toLocaleString() || '...',
+            icon: UserRound,
+            color: ADMIN_KPI_COLORS.warning.color,
+            bgColor: ADMIN_KPI_COLORS.warning.bgColor,
+            badge: 'Ciudadanos',
+            filter: { type: 'tipo', value: 'CIUDADANO' },
         },
         {
             title: 'USUARIOS VERIFICADOS',
@@ -556,6 +567,21 @@ export default function UsuariosPage() {
                                         onClick={() => handleTipoUsuarioChange('ASESOR_PRIVADO')}
                                     >
                                         Asesor
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className={`px-5 py-2 text-xs rounded-md border-none font-semibold cursor-pointer ${filters.tipoUsuario === 'CIUDADANO' ? '' : 'bg-white text-muted-foreground hover:bg-white'}`}
+                                        style={
+                                            filters.tipoUsuario === 'CIUDADANO'
+                                                ? {
+                                                      backgroundColor: 'var(--admin-toggle-active-bg)',
+                                                      color: 'var(--admin-toggle-active-text)',
+                                                  }
+                                                : {}
+                                        }
+                                        onClick={() => handleTipoUsuarioChange('CIUDADANO')}
+                                    >
+                                        Ciudadano
                                     </Badge>
                                 </div>
                             </div>
@@ -781,12 +807,12 @@ export default function UsuariosPage() {
                                                     <div className="flex items-center gap-2.5 text-slate-600 font-semibold text-sm">
                                                         {user.tipoUsuario === 'SERVIDOR_PUBLICO' ? (
                                                             <Building2 className="h-4 w-4 text-emerald-600" />
+                                                        ) : user.tipoUsuario === 'CIUDADANO' ? (
+                                                            <UserRound className="h-4 w-4 text-amber-600" />
                                                         ) : (
                                                             <Shield className="h-4 w-4 text-blue-600" />
                                                         )}
-                                                        {user.tipoUsuario === 'SERVIDOR_PUBLICO'
-                                                            ? 'Servidor Público'
-                                                            : 'Asesor Privado'}
+                                                        {labelTipoUsuario(user.tipoUsuario)}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="py-5">

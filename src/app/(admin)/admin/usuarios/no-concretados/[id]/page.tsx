@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Mail, Building, Phone, Fingerprint, Clock, Send, Shield } from 'lucide-react';
+import { ArrowLeft, Mail, Building, Phone, Fingerprint, Clock, Send, Shield, UserRound } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getAbandonedRegistrationByIdAction, addAbandonedRegistrationNoteAction } from '@/lib/services/admin.service';
 import { AbandonedRegistration } from '@/types/admin.types';
 import { usePermissions } from '@/hooks/usePermissions';
+import { labelTipoUsuario } from '@/types/tipo-usuario';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -201,6 +202,8 @@ export default function AbandonedRegistrationDetailsPage() {
                                     <div className="h-10 w-10 shrink-0 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
                                         {user.tipoUsuario === 'SERVIDOR_PUBLICO' ? (
                                             <Building className="h-5 w-5" />
+                                        ) : user.tipoUsuario === 'CIUDADANO' ? (
+                                            <UserRound className="h-5 w-5" />
                                         ) : (
                                             <Shield className="h-5 w-5" />
                                         )}
@@ -210,11 +213,7 @@ export default function AbandonedRegistrationDetailsPage() {
                                             Perfil Seleccionado
                                         </label>
                                         <p className="font-bold text-slate-800 text-sm leading-snug">
-                                            {user.tipoUsuario === 'SERVIDOR_PUBLICO'
-                                                ? 'Servidor Público'
-                                                : user.tipoUsuario === 'ASESOR_PRIVADO'
-                                                  ? 'Asesor Privado'
-                                                  : 'No seleccionado'}
+                                            {labelTipoUsuario(user.tipoUsuario)}
                                         </p>
                                     </div>
                                 </div>
