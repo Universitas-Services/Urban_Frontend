@@ -91,8 +91,15 @@ export function AuthSlidePanel({ open, side, onExited, children }: AuthSlidePane
             )}
             aria-hidden={!open && !entered}
         >
-            <div className="auth-slide-panel__scroll custom-scrollbar flex flex-col justify-center">
-                <div className="mx-auto w-full max-w-md px-6 py-12 sm:px-8 sm:py-14">{children}</div>
+            <div className="auth-slide-panel__scroll custom-scrollbar">
+                <div
+                    className={cn(
+                        'auth-slide-panel__inner flex min-h-full w-full flex-col justify-center',
+                        isLeft ? 'auth-slide-panel__inner--left' : 'auth-slide-panel__inner--right'
+                    )}
+                >
+                    <div className="w-full max-w-md">{children}</div>
+                </div>
             </div>
         </aside>
     );

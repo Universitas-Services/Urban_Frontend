@@ -36,7 +36,7 @@ export const REGISTER_TERMS = {
                         'Persona vinculada laboral o profesionalmente a un órgano público relacionada con la planificación urbana, cuyo acceso se asocia al modelo colaborativo.',
                 },
                 {
-                    term: 'Asesor Privado',
+                    term: 'Asesor',
                     definition:
                         'Profesional independiente, firma consultora o empresa que utiliza la plataforma mediante una suscripción vigente.',
                 },
@@ -90,7 +90,7 @@ export const REGISTER_TERMS = {
         {
             heading: 'CAPÍTULO VII: TARIFAS, TASA BCV E IMPUESTOS',
             paragraphs: [
-                'Los Asesores Privados accederán a la plataforma mediante el pago de una suscripción mensual de veinte dólares de los Estados Unidos de América (USD 20,00). En estricto apego a la normativa económica vigente, los pagos se realizarán en Bolívares (Bs.) calculados según la tasa oficial del Banco Central de Venezuela (BCV) vigente al momento del pago. Los pagos realizados en moneda extranjera estarán sujetos al Impuesto a las Grandes Transacciones Financieras (IGTF), constatando que las personas naturales o jurídicas que no posean calificación de Sujeto Pasivo Especial gozan de un supuesto de no sujeción tributaria. El Usuario garantiza que la información es lícita y cumple con normativas de origen de fondos y orden público.',
+                'Los Asesores accederán a la plataforma mediante el pago de una suscripción mensual de veinte dólares de los Estados Unidos de América (USD 20,00). En estricto apego a la normativa económica vigente, los pagos se realizarán en Bolívares (Bs.) calculados según la tasa oficial del Banco Central de Venezuela (BCV) vigente al momento del pago. Los pagos realizados en moneda extranjera estarán sujetos al Impuesto a las Grandes Transacciones Financieras (IGTF), constatando que las personas naturales o jurídicas que no posean calificación de Sujeto Pasivo Especial gozan de un supuesto de no sujeción tributaria. El Usuario garantiza que la información es lícita y cumple con normativas de origen de fondos y orden público.',
             ],
         },
         {

@@ -1,6 +1,16 @@
 'use client';
 
-import { ClipboardList, Ban, Building2, Shield, ShieldCheck, Users, HelpCircle, Loader2 } from 'lucide-react';
+import {
+    ClipboardList,
+    Ban,
+    Building2,
+    Shield,
+    ShieldCheck,
+    Users,
+    HelpCircle,
+    Loader2,
+    UserRound,
+} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Bar, BarChart, CartesianGrid, XAxis, Cell, PieChart, Pie } from 'recharts';
@@ -13,6 +23,7 @@ import type { DashboardMetrics } from '@/types/admin.types';
 import { NotificationBell } from '@/components/admin/dashboard/NotificationBell';
 import { getAccountStatusStyle, ADMIN_KPI_COLORS, ADMIN_CHART_COLORS } from '@/lib/constants/admin-ui';
 import Link from 'next/link';
+import { labelTipoUsuario } from '@/types/tipo-usuario';
 
 export default function DashboardPage() {
     const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -84,13 +95,22 @@ export default function DashboardPage() {
             link: '/admin/usuarios?tipoUsuario=SERVIDOR_PUBLICO',
         },
         {
-            title: 'ASESORES PRIVADOS',
+            title: 'ASESORES',
             value: metrics?.analytics.porTipousuario.asesoresPrivados.toLocaleString() || '0',
             icon: Shield,
             color: ADMIN_KPI_COLORS.institutional.color,
             bgColor: ADMIN_KPI_COLORS.institutional.bgColor,
             badge: 'Asesores',
             link: '/admin/usuarios?tipoUsuario=ASESOR_PRIVADO',
+        },
+        {
+            title: 'CIUDADANOS',
+            value: metrics?.analytics.porTipousuario.ciudadanos?.toLocaleString() || '0',
+            icon: UserRound,
+            color: ADMIN_KPI_COLORS.warning.color,
+            bgColor: ADMIN_KPI_COLORS.warning.bgColor,
+            badge: 'Ciudadanos',
+            link: '/admin/usuarios?tipoUsuario=CIUDADANO',
         },
         {
             title: 'USUARIOS VERIFICADOS',
@@ -146,12 +166,18 @@ export default function DashboardPage() {
             value: metrics?.analytics.porTipousuario.asesoresPrivados || 0,
             color: ADMIN_CHART_COLORS.asesores,
         },
+        {
+            name: 'Ciudadanos',
+            value: metrics?.analytics.porTipousuario.ciudadanos || 0,
+            color: ADMIN_CHART_COLORS.ciudadanos,
+        },
     ];
 
     const chartConfig = {
         users: { label: 'Usuarios', color: ADMIN_CHART_COLORS.bar },
         publicos: { label: 'Servidores Públicos', color: ADMIN_CHART_COLORS.publicos },
-        asesores: { label: 'Asesores Privados', color: ADMIN_CHART_COLORS.asesores },
+        asesores: { label: 'Asesores', color: ADMIN_CHART_COLORS.asesores },
+        ciudadanos: { label: 'Ciudadanos', color: ADMIN_CHART_COLORS.ciudadanos },
     };
 
     if (loading) {
@@ -433,12 +459,12 @@ export default function DashboardPage() {
                                             <div className="flex items-center justify-center gap-2 text-slate-600 font-medium text-sm">
                                                 {user.tipoUsuario === 'SERVIDOR_PUBLICO' ? (
                                                     <Building2 className="h-4 w-4 text-emerald-600" />
+                                                ) : user.tipoUsuario === 'CIUDADANO' ? (
+                                                    <Users className="h-4 w-4 text-amber-600" />
                                                 ) : (
                                                     <Shield className="h-4 w-4 text-blue-600" />
                                                 )}
-                                                {user.tipoUsuario === 'SERVIDOR_PUBLICO'
-                                                    ? 'Servidor Público'
-                                                    : 'Asesor Privado'}
+                                                {labelTipoUsuario(user.tipoUsuario)}
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-4 text-center">

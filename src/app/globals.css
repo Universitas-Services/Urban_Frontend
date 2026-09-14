@@ -654,13 +654,16 @@ a:hover .support-bounce-icon {
         max-width: 52rem;
     }
 
-    /* Desktop: curva suave solo en esquinas del borde interior */
+    /*
+      Curva en el borde interior. El radio se mantiene visible pero
+      no tan agresivo como para comerse el título del formulario.
+    */
     .auth-slide-panel--left {
-        border-radius: 0 min(36vh, 20rem) min(36vh, 20rem) 0;
+        border-radius: 0 min(28vh, 14rem) min(28vh, 14rem) 0;
     }
 
     .auth-slide-panel--right {
-        border-radius: min(36vh, 20rem) 0 0 min(36vh, 20rem);
+        border-radius: min(28vh, 14rem) 0 0 min(28vh, 14rem);
     }
 }
 
@@ -672,6 +675,48 @@ a:hover .support-bounce-icon {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.auth-slide-panel__inner {
+    box-sizing: border-box;
+    align-items: center;
+    padding: 2.5rem 1.5rem;
+}
+
+.auth-slide-panel__inner--left {
+    padding-right: 1.75rem;
+}
+
+.auth-slide-panel__inner--right {
+    padding-left: 1.75rem;
+}
+
+@media (min-width: 640px) {
+    .auth-slide-panel__inner {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+}
+
+/* Desktop: alejar el contenido del lado curvo y dejar aire arriba/abajo */
+@media (min-width: 768px) {
+    .auth-slide-panel__inner {
+        padding-top: max(2.75rem, min(7vh, 4rem));
+        padding-bottom: max(2.75rem, min(7vh, 4rem));
+    }
+
+    .auth-slide-panel__inner--left {
+        padding-left: 2rem;
+        /* Espacio extra hacia la curva derecha del panel */
+        padding-right: max(3rem, min(12vh, 7rem));
+    }
+
+    .auth-slide-panel__inner--right {
+        padding-right: 2rem;
+        /* Espacio extra hacia la curva izquierda del panel (registro) */
+        padding-left: max(3rem, min(12vh, 7rem));
+    }
 }
 
 .auth-panel-input {

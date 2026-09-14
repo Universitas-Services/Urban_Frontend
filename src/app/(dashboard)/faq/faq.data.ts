@@ -96,8 +96,8 @@ export const FAQ_SECTIONS: FaqSection[] = [
         title: 'Acceso y perfiles',
         items: [
             {
-                question: '16. ¿Cuál es la diferencia entre un Servidor Público y un Asesor Privado?',
-                answer: 'Los Servidores Públicos pueden acceder a la plataforma bajo el modelo colaborativo establecido por Ius Urbano, contribuyendo al fortalecimiento de la Biblioteca Legal mediante el aporte de información jurídica relevante. Los Asesores Privados acceden mediante una suscripción y disfrutan de las funcionalidades disponibles durante la vigencia de su plan.',
+                question: '16. ¿Cuál es la diferencia entre un Servidor Público y un Asesor?',
+                answer: 'Los Servidores Públicos pueden acceder a la plataforma bajo el modelo colaborativo establecido por Ius Urbano, contribuyendo al fortalecimiento de la Biblioteca Legal mediante el aporte de información jurídica relevante. Los Asesores acceden mediante una suscripción y disfrutan de las funcionalidades disponibles durante la vigencia de su plan.',
             },
             {
                 question: '17. ¿Puedo modificar la información de mi perfil?',
@@ -117,12 +117,12 @@ export const FAQ_SECTIONS: FaqSection[] = [
         title: 'Suscripciones y servicios',
         items: [
             {
-                question: '20. ¿Cuál es el costo de la suscripción para Asesores Privados?',
+                question: '20. ¿Cuál es el costo de la suscripción para Asesores?',
                 answer: 'La suscripción mensual tiene un costo de USD 20,00 o su equivalente en bolívares al tipo de cambio oficial aplicable para la fecha del pago. El precio no incluye los impuestos que resulten legalmente aplicables.',
             },
             {
                 question: '21. ¿Qué incluye la suscripción?',
-                answer: 'La suscripción permite acceder a las funcionalidades disponibles para los Asesores Privados durante su vigencia, incluyendo la Biblioteca Legal, el Consultor IA – Derecho Urbanístico y los demás servicios habilitados para este tipo de usuario. El alcance podrá ampliarse conforme evolucione la plataforma.',
+                answer: 'La suscripción permite acceder a las funcionalidades disponibles para los Asesores durante su vigencia, incluyendo la Biblioteca Legal, el Consultor IA – Derecho Urbanístico y los demás servicios habilitados para este tipo de usuario. El alcance podrá ampliarse conforme evolucione la plataforma.',
             },
             {
                 question: '22. ¿Qué ocurre cuando finaliza mi período de prueba?',

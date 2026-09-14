@@ -34,6 +34,7 @@ export const registerSchema = z
             if (data.tipo_usuario === 'SERVIDOR_PUBLICO' || data.tipo_usuario === 'ASESOR_PRIVADO') {
                 return data.nombre_ente && data.nombre_ente.length > 0;
             }
+            // CIUDADANO y otros: sin nombre_ente
             return true;
         },
         {

@@ -362,53 +362,63 @@ export default function ProfilePage() {
                                                                 : fullProfile?.tipo_usuario === 'SERVIDOR_PUBLICO'
                                                                   ? 'Servidor público'
                                                                   : fullProfile?.tipo_usuario === 'ASESOR_PRIVADO'
-                                                                    ? 'Asesor privado'
-                                                                    : fullProfile?.tipo_usuario || '—'
+                                                                    ? 'Asesor'
+                                                                    : fullProfile?.tipo_usuario === 'CIUDADANO'
+                                                                      ? 'Ciudadano'
+                                                                      : fullProfile?.tipo_usuario || '—'
                                                         }
                                                         disabled
                                                         className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
                                                     />
                                                 </div>
-                                                <div>
-                                                    <label className="block text-[12px] font-bold text-neutral-dark mb-1">
-                                                        Ente/Institución a la que es asesor
-                                                    </label>
-                                                    <Input
-                                                        value={
-                                                            isLoadingProfile
-                                                                ? 'Cargando...'
-                                                                : fullProfile?.nombre_ente || '—'
-                                                        }
-                                                        disabled
-                                                        className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[12px] font-bold text-neutral-dark mb-1">
-                                                        Cargo
-                                                    </label>
-                                                    <Input
-                                                        value={
-                                                            isLoadingProfile ? 'Cargando...' : fullProfile?.cargo || '—'
-                                                        }
-                                                        disabled
-                                                        className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[12px] font-bold text-neutral-dark mb-1">
-                                                        Estatus
-                                                    </label>
-                                                    <Input
-                                                        value={
-                                                            isLoadingProfile
-                                                                ? 'Cargando...'
-                                                                : fullProfile?.estatus_normativa_girs || '—'
-                                                        }
-                                                        disabled
-                                                        className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
-                                                    />
-                                                </div>
+                                                {fullProfile?.tipo_usuario !== 'CIUDADANO' && (
+                                                    <div>
+                                                        <label className="block text-[12px] font-bold text-neutral-dark mb-1">
+                                                            Ente/Institución a la que es asesor
+                                                        </label>
+                                                        <Input
+                                                            value={
+                                                                isLoadingProfile
+                                                                    ? 'Cargando...'
+                                                                    : fullProfile?.nombre_ente || '—'
+                                                            }
+                                                            disabled
+                                                            className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
+                                                        />
+                                                    </div>
+                                                )}
+                                                {fullProfile?.tipo_usuario === 'SERVIDOR_PUBLICO' && (
+                                                    <>
+                                                        <div>
+                                                            <label className="block text-[12px] font-bold text-neutral-dark mb-1">
+                                                                Cargo
+                                                            </label>
+                                                            <Input
+                                                                value={
+                                                                    isLoadingProfile
+                                                                        ? 'Cargando...'
+                                                                        : fullProfile?.cargo || '—'
+                                                                }
+                                                                disabled
+                                                                className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[12px] font-bold text-neutral-dark mb-1">
+                                                                Estatus
+                                                            </label>
+                                                            <Input
+                                                                value={
+                                                                    isLoadingProfile
+                                                                        ? 'Cargando...'
+                                                                        : fullProfile?.estatus_normativa_girs || '—'
+                                                                }
+                                                                disabled
+                                                                className="border-surface-soft bg-surface/50 text-neutral-dark/70 font-medium h-9 text-[13px]"
+                                                            />
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="border-t border-surface-soft px-4 py-3 flex justify-end gap-2.5">

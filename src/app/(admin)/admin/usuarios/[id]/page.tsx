@@ -48,6 +48,7 @@ import {
     addSubscriptionDaysAction,
     subtractSubscriptionDaysAction,
 } from '@/lib/services/admin.service';
+import { isTipoSuscripcion } from '@/types/tipo-usuario';
 import { User, CRMNotesResponse, CRMNote } from '@/types/admin.types';
 import { ACCOUNT_STATUS_CONFIG, getAccountStatusStyle } from '@/lib/constants/admin-ui';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -300,7 +301,7 @@ export default function UserDetailsPage() {
         setPopoverConvertirOpen(false);
         try {
             await convertToPrivateTrialAction(id);
-            toast.success('Usuario convertido a Asesor Privado exitosamente.');
+            toast.success('Usuario convertido a Asesor exitosamente.');
             fetchUser(); // Refrescar los datos para obtener el nuevo tipo de usuario y estado
         } catch (error) {
             console.error('Error converting user:', error);
@@ -311,7 +312,7 @@ export default function UserDetailsPage() {
     };
 
     const handleConvertToPublic = async () => {
-        if (!user || !id || user.tipoUsuario !== 'ASESOR_PRIVADO') return;
+        if (!user || !id || !isTipoSuscripcion(user.tipoUsuario)) return;
 
         setIsUpdating(true);
         setPopoverPublicoOpen(false);
@@ -321,7 +322,7 @@ export default function UserDetailsPage() {
             fetchUser(); // Refrescar los datos
         } catch (error) {
             console.error('Error converting user:', error);
-            toast.error('No se pudo convertir al usuario. Verifica que sea Asesor Privado válido.');
+            toast.error('No se pudo convertir al usuario. Verifica que sea Asesor o Ciudadano válido.');
         } finally {
             setIsUpdating(false);
         }
@@ -811,7 +812,7 @@ export default function UserDetailsPage() {
                                 })()}
 
                             <div className="flex gap-2 p-1.5 bg-white shadow-sm rounded-2xl border border-slate-100 mt-2">
-                                {user.tipoUsuario === 'ASESOR_PRIVADO' && !isUpdating && canWrite ? (
+                                {isTipoSuscripcion(user.tipoUsuario) && !isUpdating && canWrite ? (
                                     <Popover open={popoverPublicoOpen} onOpenChange={setPopoverPublicoOpen}>
                                         <PopoverTrigger asChild>
                                             <button className="flex-1 flex items-center justify-center p-3 rounded-xl transition-all bg-transparent text-slate-400 font-medium hover:bg-slate-50 cursor-pointer">
@@ -875,7 +876,7 @@ export default function UserDetailsPage() {
                                         <PopoverTrigger asChild>
                                             <button className="flex-1 flex items-center justify-center p-3 rounded-xl transition-all bg-transparent text-slate-400 font-medium hover:bg-slate-50 cursor-pointer">
                                                 <Shield className="h-4 w-4 mr-2 text-slate-400" />
-                                                Asesor Privado
+                                                Asesor
                                             </button>
                                         </PopoverTrigger>
                                         <PopoverContent
@@ -890,7 +891,7 @@ export default function UserDetailsPage() {
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <h4 className="font-bold text-slate-900 text-sm">
-                                                            Convertir a Asesor Privado
+                                                            Convertir a Asesor
                                                         </h4>
                                                         <p className="text-xs text-slate-500 mt-0.5">
                                                             Se asignarán 7 días de prueba gratis. Esta acción
@@ -920,12 +921,12 @@ export default function UserDetailsPage() {
                                     </Popover>
                                 ) : (
                                     <div
-                                        className={`flex-1 flex items-center justify-center p-3 rounded-xl transition-all ${user.tipoUsuario === 'ASESOR_PRIVADO' ? 'bg-blue-100 text-blue-700 shadow-sm font-extrabold border border-blue-200 cursor-default' : 'bg-transparent text-slate-400 font-medium opacity-50 cursor-wait'}`}
+                                        className={`flex-1 flex items-center justify-center p-3 rounded-xl transition-all ${isTipoSuscripcion(user.tipoUsuario) ? 'bg-blue-100 text-blue-700 shadow-sm font-extrabold border border-blue-200 cursor-default' : 'bg-transparent text-slate-400 font-medium opacity-50 cursor-wait'}`}
                                     >
                                         <Shield
-                                            className={`h-4 w-4 mr-2 ${user.tipoUsuario === 'ASESOR_PRIVADO' ? 'text-blue-700' : 'text-slate-400'}`}
+                                            className={`h-4 w-4 mr-2 ${isTipoSuscripcion(user.tipoUsuario) ? 'text-blue-700' : 'text-slate-400'}`}
                                         />
-                                        Asesor Privado
+                                        {user.tipoUsuario === 'CIUDADANO' ? 'Ciudadano' : 'Asesor'}
                                     </div>
                                 )}
                             </div>
@@ -947,7 +948,7 @@ export default function UserDetailsPage() {
                                     </div>
                                 </div>
 
-                                {user.tipoUsuario === 'ASESOR_PRIVADO' && canWrite && (
+                                {isTipoSuscripcion(user.tipoUsuario) && canWrite && (
                                     <div className="flex items-center gap-2 mt-2 z-10 w-full">
                                         <Popover open={popoverAddDaysOpen} onOpenChange={setPopoverAddDaysOpen}>
                                             <PopoverTrigger asChild>

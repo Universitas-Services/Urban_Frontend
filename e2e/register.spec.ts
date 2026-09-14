@@ -51,8 +51,8 @@ test.describe('Flujo de Registro GIRS', () => {
         await firstMunicipio.click();
 
         // Seleccionar Tipo de Usuario
-        const asesorPrivadoCheckbox = page.locator('#asesor-privado');
-        await asesorPrivadoCheckbox.check();
+        await page.getByText('Selecciona un tipo de usuario').click();
+        await page.getByRole('option', { name: 'Asesor' }).click();
 
         // Llenar Ente/Institución
         const enteInput = page.getByPlaceholder('Ej. Ministerio del Poder Popular...');
@@ -120,9 +120,9 @@ test.describe('Flujo de Registro GIRS', () => {
         await firstMunicipio.waitFor({ state: 'visible' });
         await firstMunicipio.click();
 
-        // Seleccionar Tipo de Usuario (Corrección aplicada para evitar bloqueo de Zod)
-        const asesorPrivadoCheckbox = page.locator('#asesor-privado');
-        await asesorPrivadoCheckbox.check();
+        // Seleccionar Tipo de Usuario
+        await page.getByText('Selecciona un tipo de usuario').click();
+        await page.getByRole('option', { name: 'Asesor' }).click();
 
         // Llenar Ente/Institución
         const enteInput = page.getByPlaceholder('Ej. Ministerio del Poder Popular...');
@@ -140,5 +140,51 @@ test.describe('Flujo de Registro GIRS', () => {
 
         // === VERIFICACIONES FINALES ===
         await expect(page.getByText('Error al registrar la cuenta')).toBeVisible({ timeout: 5000 });
+    });
+
+    test('Debería registrar un ciudadano sin pedir ente/institución', async ({ page }) => {
+        const uniqueEmail = `ciudadano_${Date.now()}@example.com`;
+
+        await page.route('**/api/auth/register', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true }),
+            });
+        });
+
+        await page.goto('/register');
+        await page.getByLabel('Correo electrónico').fill(uniqueEmail);
+        await page.locator('input[name="password"]').fill('Admin1234');
+        await page.locator('input[name="confirmPassword"]').fill('Admin1234');
+        await page.getByRole('button', { name: 'Siguiente' }).click();
+
+        await expect(page.getByRole('heading', { name: 'Completa tus datos' })).toBeVisible();
+        await page.getByLabel('Nombre').fill('Ana');
+        await page.getByLabel('Apellido').fill('Ciudadana');
+
+        const prefixSelect = page.locator('select').first();
+        await prefixSelect.selectOption('0412');
+        await page.getByPlaceholder('1234567').fill('7654321');
+
+        const estadoTrigger = page.getByText('Selecciona un estado').first();
+        await estadoTrigger.click();
+        await page.locator('[role="option"]').first().click();
+
+        const municipioTrigger = page.getByText('Selecciona un municipio');
+        await municipioTrigger.click();
+        await page.locator('[role="option"]').first().click();
+
+        await page.getByText('Selecciona un tipo de usuario').click();
+        await page.getByRole('option', { name: 'Ciudadano' }).click();
+        await expect(page.getByPlaceholder('Ej. Ministerio del Poder Popular...')).toHaveCount(0);
+
+        const checkboxes = page.locator('input[type="checkbox"]');
+        const count = await checkboxes.count();
+        await checkboxes.nth(count - 1).check();
+
+        await page.getByRole('button', { name: 'Crear cuenta' }).click();
+        await expect(page.getByText('Te hemos enviado un enlace de activación')).toBeVisible({ timeout: 5000 });
+        await expect(page).toHaveURL(/.*\/login/);
     });
 });

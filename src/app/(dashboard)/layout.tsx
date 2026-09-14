@@ -143,7 +143,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
 function checkProfileIncomplete(profile: UserProfile): boolean {
     const { tipo_usuario, nombre_ente, cargo, estatus_normativa_girs } = profile;
-    if (!tipo_usuario || !nombre_ente) return true;
+    if (!tipo_usuario) return true;
+    if (tipo_usuario === 'CIUDADANO') return false;
+    if (!nombre_ente) return true;
     if (tipo_usuario === 'SERVIDOR_PUBLICO') {
         if (!cargo || !estatus_normativa_girs) return true;
     }
