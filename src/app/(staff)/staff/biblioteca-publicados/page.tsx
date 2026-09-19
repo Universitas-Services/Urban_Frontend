@@ -12,7 +12,6 @@ import { RouteGuard } from '@/components/auth/RouteGuard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,6 +23,7 @@ import {
 } from '@/lib/services/documents.service';
 import { getEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
 import { MACRO_TIPO_OPTIONS } from '@/components/staff/documents/document-upload.constants';
+import { TruncatedText } from '@/components/staff/documents/TruncatedText';
 
 function macroLabel(macro: string) {
     return MACRO_TIPO_OPTIONS.find((m) => m.value === macro)?.label ?? macro;
@@ -262,34 +262,25 @@ function BibliotecaPublicadosContent() {
                         ) : (
                             items.map((doc) => (
                                 <TableRow key={doc.id}>
-                                    <TableCell>
-                                        <div className="min-w-0 space-y-1">
-                                            <p className="font-medium leading-tight">
-                                                {doc.tituloBreve || doc.tituloIntegro}
-                                            </p>
-                                            <p className="line-clamp-1 text-xs text-muted-foreground">
-                                                {doc.tituloIntegro}
-                                            </p>
-                                            {!!doc.etiquetas?.length && (
-                                                <div className="flex flex-wrap gap-1 pt-0.5">
-                                                    {doc.etiquetas.slice(0, 3).map((e) => (
-                                                        <Badge
-                                                            key={e.etiqueta.id}
-                                                            variant="outline"
-                                                            className="text-[10px]"
-                                                        >
-                                                            {e.etiqueta.nombre}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            )}
+                                    <TableCell className="w-[28%] max-w-[160px] overflow-hidden">
+                                        <div className="mx-auto w-full min-w-0 max-w-[140px] space-y-1 overflow-hidden text-center">
+                                            <TruncatedText
+                                                text={doc.tituloBreve || doc.tituloIntegro}
+                                                maxLength={24}
+                                                className="font-medium leading-tight"
+                                            />
+                                            <TruncatedText
+                                                text={doc.tituloIntegro}
+                                                maxLength={28}
+                                                className="text-xs text-muted-foreground"
+                                            />
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden text-sm md:table-cell">
-                                        {macroLabel(doc.macroTipo)}
+                                    <TableCell className="hidden max-w-[120px] overflow-hidden text-sm md:table-cell">
+                                        <TruncatedText text={macroLabel(doc.macroTipo)} maxLength={22} />
                                     </TableCell>
-                                    <TableCell className="hidden max-w-[160px] truncate text-sm lg:table-cell">
-                                        {doc.enteEmisor}
+                                    <TableCell className="hidden max-w-[120px] overflow-hidden text-sm lg:table-cell">
+                                        <TruncatedText text={doc.enteEmisor} maxLength={18} />
                                     </TableCell>
                                     <TableCell className="hidden text-center text-sm text-muted-foreground sm:table-cell">
                                         {format(new Date(doc.updatedAt), 'dd MMM yyyy', {

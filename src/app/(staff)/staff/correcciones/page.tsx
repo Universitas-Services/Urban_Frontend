@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getMyDocumentsAction, type Documento } from '@/lib/services/documents.service';
+import { TruncatedText } from '@/components/staff/documents/TruncatedText';
 
 function CorreccionesContent() {
     const [items, setItems] = React.useState<Documento[]>([]);
@@ -112,12 +113,22 @@ function CorreccionesContent() {
                         ) : (
                             items.map((doc) => (
                                 <TableRow key={doc.id}>
-                                    <TableCell>
-                                        <p className="font-medium">{doc.tituloBreve || doc.tituloIntegro}</p>
-                                        <p className="line-clamp-1 text-xs text-muted-foreground">{doc.enteEmisor}</p>
+                                    <TableCell className="w-[28%] max-w-[160px] overflow-hidden">
+                                        <div className="mx-auto w-full min-w-0 max-w-[140px] space-y-1 overflow-hidden text-center">
+                                            <TruncatedText
+                                                text={doc.tituloBreve || doc.tituloIntegro}
+                                                maxLength={24}
+                                                className="font-medium"
+                                            />
+                                            <TruncatedText
+                                                text={doc.enteEmisor}
+                                                maxLength={18}
+                                                className="text-xs text-muted-foreground"
+                                            />
+                                        </div>
                                     </TableCell>
-                                    <TableCell className="max-w-[280px] text-sm text-muted-foreground">
-                                        {doc.motivoRechazo || 'Sin detalle'}
+                                    <TableCell className="max-w-[160px] overflow-hidden text-sm text-muted-foreground">
+                                        <TruncatedText text={doc.motivoRechazo || 'Sin detalle'} maxLength={32} />
                                     </TableCell>
                                     <TableCell className="hidden text-center text-sm text-muted-foreground sm:table-cell">
                                         {format(new Date(doc.updatedAt), 'dd MMM yyyy', { locale: es })}

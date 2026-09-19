@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getReviewHistoryAction, type AccionRevision, type DocumentoRevision } from '@/lib/services/documents.service';
+import { TruncatedText } from '@/components/staff/documents/TruncatedText';
 
 const ACCION_LABELS: Record<AccionRevision, string> = {
     APROBADO: 'Aprobado',
@@ -141,19 +142,31 @@ function HistorialContent() {
                         ) : (
                             items.map((rev) => (
                                 <TableRow key={rev.id}>
-                                    <TableCell>
-                                        <p className="font-medium leading-tight">
-                                            {rev.documento?.tituloBreve || rev.documento?.tituloIntegro || 'Documento'}
-                                        </p>
-                                        {rev.documento?.enteEmisor && (
-                                            <p className="text-xs text-muted-foreground">{rev.documento.enteEmisor}</p>
-                                        )}
+                                    <TableCell className="w-[28%] max-w-[160px] overflow-hidden">
+                                        <div className="mx-auto w-full min-w-0 max-w-[140px] space-y-1 overflow-hidden text-center">
+                                            <TruncatedText
+                                                text={
+                                                    rev.documento?.tituloBreve ||
+                                                    rev.documento?.tituloIntegro ||
+                                                    'Documento'
+                                                }
+                                                maxLength={24}
+                                                className="font-medium leading-tight"
+                                            />
+                                            {rev.documento?.enteEmisor ? (
+                                                <TruncatedText
+                                                    text={rev.documento.enteEmisor}
+                                                    maxLength={18}
+                                                    className="text-xs text-muted-foreground"
+                                                />
+                                            ) : null}
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={ACCION_VARIANT[rev.accion]}>{ACCION_LABELS[rev.accion]}</Badge>
                                     </TableCell>
-                                    <TableCell className="hidden max-w-[280px] truncate text-sm text-muted-foreground md:table-cell">
-                                        {rev.motivo || '—'}
+                                    <TableCell className="hidden max-w-[160px] overflow-hidden text-sm text-muted-foreground md:table-cell">
+                                        <TruncatedText text={rev.motivo || '—'} maxLength={32} />
                                     </TableCell>
                                     <TableCell className="hidden text-center text-sm text-muted-foreground sm:table-cell">
                                         {format(new Date(rev.createdAt), 'dd MMM yyyy HH:mm', {

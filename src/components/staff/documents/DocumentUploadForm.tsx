@@ -34,13 +34,8 @@ import {
     getTribunalesByMunicipio,
     type TribunalTerritorio,
 } from '@/lib/api/territorio-tribunales';
-import {
-    correctAndResubmitDocumentAction,
-    uploadDocumentAction,
-    type Documento,
-    type MacroTipoDocumento,
-    type UploadDocumentMetadata,
-} from '@/lib/services/documents.service';
+import { type Documento, type MacroTipoDocumento, type UploadDocumentMetadata } from '@/lib/services/documents.service';
+import { correctDocumentDirect, uploadDocumentDirect } from '@/lib/services/documents-upload.client';
 import { EtiquetasPicker } from './EtiquetasPicker';
 import { PaisCidhSelect } from './PaisCidhSelect';
 import { TribunalSelect } from './TribunalSelect';
@@ -355,11 +350,11 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
             }
 
             if (isEdit && initialDocumento) {
-                await correctAndResubmitDocumentAction(initialDocumento.id, formData);
+                await correctDocumentDirect(initialDocumento.id, formData);
                 toast.success('Documento corregido y reenviado a revisión.');
                 router.push('/staff/correcciones');
             } else {
-                const doc = await uploadDocumentAction(formData);
+                const doc = await uploadDocumentDirect(formData);
                 toast.success('Documento enviado a revisión.');
                 router.push(`/staff/documentos/${doc.id}`);
             }
@@ -564,18 +559,12 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                 return (
                     <div className="grid gap-4 md:grid-cols-2">
                         <Field label="Tipo de norma" required>
-                            <Select value={params.tipo_norma || ''} onValueChange={(v) => setParam('tipo_norma', v)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecciona" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {TIPOS_NORMA_INSTRUMENTO.map((opt) => (
-                                        <SelectItem key={opt} value={opt}>
-                                            {opt}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            {selectWithAdd(
+                                'tipo_norma',
+                                TIPOS_NORMA_INSTRUMENTO,
+                                'Selecciona o agrega',
+                                'Agregar tipo de norma'
+                            )}
                         </Field>
                         {commonTitles}
                         <Field label="Organismo emisor" required>
