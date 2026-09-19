@@ -82,8 +82,12 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     login: async (data) => {
         set({ isLoading: true });
         try {
-            const { user } = await loginAction(data);
-            set({ user, isAuthenticated: true, isLoading: false });
+            const result = await loginAction(data);
+            if (!result.ok) {
+                set({ isLoading: false });
+                throw new Error(result.error);
+            }
+            set({ user: result.user, isAuthenticated: true, isLoading: false });
         } catch (error) {
             set({ isLoading: false });
             throw error;

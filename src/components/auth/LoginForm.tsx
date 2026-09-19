@@ -16,6 +16,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useAuthFormStyles } from './auth-context';
 import { cn } from '@/lib/utils';
 import { getHomeByRole } from '@/lib/constants/routes';
+import { getFriendlyErrorMessage } from '@/lib/utils/friendly-error';
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +38,7 @@ export function LoginForm() {
             toast.success('¡Bienvenido!');
             router.replace(getHomeByRole(loggedInUser?.role ?? 'USER'));
         } catch (error) {
-            toast.error((error as Error).message || 'Credenciales incorrectas');
+            toast.error(getFriendlyErrorMessage(error, 'No se pudo iniciar sesión. Verifica tu correo y contraseña.'));
         }
     }
 

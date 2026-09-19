@@ -19,15 +19,23 @@ import {
  * Orquestan servicios HTTP con la gestión de sesión (cookies access + refresh).
  */
 
-export async function loginAction(data: LoginInput): Promise<{ user: User }> {
-    const tokens = await loginService(data);
-    await setSessionCookies(tokens.access_token, tokens.refresh_token);
-    const user = await getProfileService();
-    // El JWT a veces no trae role; el perfil sí — necesario para redirects en proxy
-    if (user.role && isUserRole(user.role)) {
-        await enrichSessionPayload({ role: user.role, sub: user.id, email: user.email });
+export type LoginActionResult = { ok: true; user: User } | { ok: false; error: string };
+
+export async function loginAction(data: LoginInput): Promise<LoginActionResult> {
+    try {
+        const tokens = await loginService(data);
+        await setSessionCookies(tokens.access_token, tokens.refresh_token);
+        const user = await getProfileService();
+        // El JWT a veces no trae role; el perfil sí — necesario para redirects en proxy
+        if (user.role && isUserRole(user.role)) {
+            await enrichSessionPayload({ role: user.role, sub: user.id, email: user.email });
+        }
+        return { ok: true, user };
+    } catch (error) {
+        // No hacer throw: Next enmascara el mensaje en producción (#441 / digest).
+        const message = error instanceof Error ? error.message : 'Credenciales incorrectas';
+        return { ok: false, error: message || 'Credenciales incorrectas' };
     }
-    return { user };
 }
 
 export async function logoutAction(): Promise<void> {
