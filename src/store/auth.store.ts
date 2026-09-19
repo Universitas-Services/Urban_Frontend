@@ -3,7 +3,14 @@
 import { create } from 'zustand';
 import type { User, UpdateProfileInput, ChangePasswordInput } from '@/types/auth.types';
 import type { LoginInput, RegisterInput } from '@/types/auth.types';
-import { loginAction, logoutAction, getCurrentUser } from '@/lib/auth/auth';
+import {
+    loginAction,
+    logoutAction,
+    hasSessionHint,
+    ensureSessionAction,
+    clearLocalSessionAction,
+    enrichSessionRoleAction,
+} from '@/lib/auth/auth';
 import {
     registerService,
     getProfileService,
@@ -41,20 +48,33 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     initAuth: async () => {
         set({ isLoading: true });
 
-        // Lectura rápida de cookie: si no hay sesión, evitar llamada al backend
-        const session = await getCurrentUser();
-        if (!session) {
+        const hint = await hasSessionHint();
+        if (!hint) {
             set({ user: null, isAuthenticated: false, isLoading: false });
             return;
         }
 
         try {
-            // Validación real contra el backend (token puede estar expirado o revocado)
+            // Renueva access con /auth/refresh si está vencido o por vencer
+            const ok = await ensureSessionAction();
+            if (!ok) {
+                await clearLocalSessionAction();
+                set({ user: null, isAuthenticated: false, isLoading: false });
+                return;
+            }
+
             const user = await getProfileService();
+            if (user.role) {
+                await enrichSessionRoleAction({
+                    role: user.role,
+                    sub: user.id,
+                    email: user.email,
+                });
+            }
             set({ user, isAuthenticated: true, isLoading: false });
         } catch {
-            // Sesión inválida: limpiar cookies y estado
-            await logoutAction();
+            // Último intento: clear local only (no forzar logout remoto si el token ya murió)
+            await clearLocalSessionAction();
             set({ user: null, isAuthenticated: false, isLoading: false });
         }
     },
@@ -63,13 +83,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
         set({ isLoading: true });
         try {
             const { user } = await loginAction(data);
-            // Obtener perfil completo tras el login para tener todos los campos
-            try {
-                const fullUser = await getProfileService();
-                set({ user: fullUser, isAuthenticated: true, isLoading: false });
-            } catch {
-                set({ user, isAuthenticated: true, isLoading: false });
-            }
+            set({ user, isAuthenticated: true, isLoading: false });
         } catch (error) {
             set({ isLoading: false });
             throw error;

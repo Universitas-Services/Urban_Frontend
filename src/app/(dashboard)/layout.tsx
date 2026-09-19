@@ -16,6 +16,7 @@ import { getHomeByRole } from '@/lib/constants/routes';
 import { canAccessAdminArea, isAdminVisualizador } from '@/lib/auth/permissions';
 import { APP_CONFIG } from '@/config/app.config';
 import type { UserRole } from '@/types/roles';
+import { isStaffRole } from '@/types/roles';
 
 const USER_ONLY_ROLES: UserRole[] = ['USER'];
 const CHAT_VISUALIZADOR_ROLES: UserRole[] = ['USER', 'ADMIN_VISUALIZADOR'];
@@ -48,6 +49,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             router.replace('/login');
         }
     }, [isLoading, isAuthenticated, router]);
+
+    // Curador / Revisor van a su stub hasta que existan sus módulos
+    useEffect(() => {
+        if (isLoading || !isAuthenticated) return;
+        if (!isStaffRole(role)) return;
+        router.replace(getHomeByRole(role ?? 'CURADOR'));
+    }, [isLoading, isAuthenticated, role, router]);
 
     // Roles de área admin van a /admin, excepto visualizador en /chat
     useEffect(() => {

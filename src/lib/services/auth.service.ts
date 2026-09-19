@@ -8,7 +8,7 @@ import type {
     UpdateProfileInput,
     ChangePasswordInput,
 } from '@/types/auth.types';
-import { getAuthHeader } from '@/lib/auth/session';
+import { authenticatedFetch, getAuthHeader } from '@/lib/auth/session';
 
 const API = process.env.API_URL;
 
@@ -22,23 +22,34 @@ async function handleResponse<T>(res: Response): Promise<T> {
     return res.json();
 }
 
-// ─── Auth: endpoints del backend ──────────────────────────────────────────────
+export type LoginTokens = {
+    access_token: string;
+    refresh_token: string;
+};
 
-export async function loginService(data: LoginInput): Promise<{ user: User; access_token: string }> {
+export async function loginService(data: LoginInput): Promise<LoginTokens> {
     const res = await fetch(`${API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
         cache: 'no-store',
     });
-    return handleResponse<{ user: User; access_token: string }>(res);
+    return handleResponse<LoginTokens>(res);
+}
+
+export async function refreshTokensService(refreshToken: string): Promise<LoginTokens> {
+    const res = await fetch(`${API}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+        cache: 'no-store',
+    });
+    return handleResponse<LoginTokens>(res);
 }
 
 export async function logoutService(): Promise<void> {
-    await fetch(`${API}/auth/logout`, {
+    await authenticatedFetch(`${API}/auth/logout`, {
         method: 'POST',
-        headers: await getAuthHeader(),
-        cache: 'no-store',
     });
 }
 
@@ -89,8 +100,6 @@ export async function resetPasswordService(email: string, newPassword: string): 
     return handleResponse<{ message: string }>(res);
 }
 
-// ─── Usuarios (requieren sesión) ──────────────────────────────────────────────
-
 function normalizeUserProfile(raw: Record<string, unknown>): UserProfile {
     const profile = (raw.profile ?? raw.user ?? raw) as Record<string, unknown>;
 
@@ -120,57 +129,48 @@ function normalizeUserProfile(raw: Record<string, unknown>): UserProfile {
 }
 
 export async function getProfileService(): Promise<User> {
-    const res = await fetch(`${API}/users/my`, {
-        headers: await getAuthHeader(),
-        cache: 'no-store',
-    });
+    const res = await authenticatedFetch(`${API}/users/my`);
     return handleResponse<User>(res);
 }
 
 export async function getFullProfileService(): Promise<UserProfile> {
-    const res = await fetch(`${API}/users/profile`, {
-        headers: await getAuthHeader(),
-        cache: 'no-store',
-    });
+    const res = await authenticatedFetch(`${API}/users/profile`);
     const data = await handleResponse<Record<string, unknown>>(res);
     return normalizeUserProfile(data);
 }
 
 export async function updateProfileService(data: UpdateProfileInput): Promise<User> {
-    const res = await fetch(`${API}/users/profile`, {
+    const res = await authenticatedFetch(`${API}/users/profile`, {
         method: 'PATCH',
-        headers: await getAuthHeader(),
         body: JSON.stringify(data),
-        cache: 'no-store',
     });
     return handleResponse<User>(res);
 }
 
 export async function changePasswordService(data: ChangePasswordInput): Promise<{ message: string }> {
-    const res = await fetch(`${API}/users/password/change`, {
+    const res = await authenticatedFetch(`${API}/users/password/change`, {
         method: 'POST',
-        headers: await getAuthHeader(),
         body: JSON.stringify(data),
-        cache: 'no-store',
     });
     return handleResponse<{ message: string }>(res);
 }
 
 export async function acceptNewsService(): Promise<{ message: string }> {
-    const res = await fetch(`${API}/users/accept-news`, {
+    const res = await authenticatedFetch(`${API}/users/accept-news`, {
         method: 'POST',
-        headers: await getAuthHeader(),
-        cache: 'no-store',
     });
     return handleResponse<{ message: string }>(res);
 }
 
 export async function deleteAccountService(password: string): Promise<{ message: string }> {
-    const res = await fetch(`${API}/users/me`, {
+    const res = await authenticatedFetch(`${API}/users/me`, {
         method: 'DELETE',
-        headers: await getAuthHeader(),
         body: JSON.stringify({ password }),
-        cache: 'no-store',
     });
     return handleResponse<{ message: string }>(res);
+}
+
+/** @deprecated prefer authenticatedFetch */
+export async function authHeaders(): Promise<HeadersInit> {
+    return getAuthHeader();
 }
