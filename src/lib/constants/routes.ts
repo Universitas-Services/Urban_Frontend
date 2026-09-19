@@ -1,5 +1,5 @@
 import type { UserRole } from '@/types/roles';
-import { isAdminAreaRole } from '@/types/roles';
+import { isAdminAreaRole, isStaffRole } from '@/types/roles';
 
 export const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/verificar-email'] as const;
 
@@ -17,10 +17,20 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     '/admin/noticias': ['ADMIN', 'ADMIN_VISUALIZADOR'],
     '/admin/avisos': ['ADMIN', 'ADMIN_VISUALIZADOR'],
     '/admin/chats': ['ADMIN', 'ADMIN_VISUALIZADOR'],
+    '/admin/staff': ['ADMIN', 'ADMIN_VISUALIZADOR'],
+    '/staff': ['CURADOR', 'REVISOR'],
+    '/staff/perfil': ['CURADOR', 'REVISOR'],
+    '/staff/carga': ['CURADOR'],
+    '/staff/biblioteca': ['CURADOR'],
+    '/staff/correcciones': ['CURADOR'],
+    '/staff/etiquetas': ['CURADOR'],
+    '/staff/revision': ['REVISOR'],
+    '/staff/documentos': ['CURADOR', 'REVISOR'],
 };
 
 export function getHomeByRole(role: string): string {
     if (isAdminAreaRole(role)) return '/admin';
+    if (isStaffRole(role)) return '/staff';
     return '/inicio';
 }
 

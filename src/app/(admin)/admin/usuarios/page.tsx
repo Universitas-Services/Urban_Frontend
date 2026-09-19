@@ -682,7 +682,7 @@ export default function UsuariosPage() {
                                     <TableHead className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase h-12 w-[130px]">
                                         Estatus
                                     </TableHead>
-                                    <TableHead className="w-[60px] pr-6 text-right">
+                                    <TableHead className="w-[60px] pr-6 text-center">
                                         {selectedUserIds.length > 0 && canWrite && (
                                             <Popover open={bulkPopoverOpen} onOpenChange={setBulkPopoverOpen}>
                                                 <PopoverTrigger asChild>
@@ -712,7 +712,7 @@ export default function UsuariosPage() {
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <div className="flex justify-end gap-2 mt-1">
+                                                        <div className="flex justify-center gap-2 mt-1">
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"
@@ -774,7 +774,7 @@ export default function UsuariosPage() {
                                                 <TableCell className="py-5 max-w-[280px]">
                                                     <Link
                                                         href={`/admin/usuarios/${user.id}`}
-                                                        className="flex items-center gap-4 hover:opacity-80 transition-opacity w-full"
+                                                        className="flex items-center justify-center gap-4 hover:opacity-80 transition-opacity w-full"
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
                                                         <Avatar className="h-11 w-11 border border-slate-200/60 shadow-sm bg-slate-100 shrink-0">
@@ -804,7 +804,7 @@ export default function UsuariosPage() {
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell className="py-5">
-                                                    <div className="flex items-center gap-2.5 text-slate-600 font-semibold text-sm">
+                                                    <div className="flex items-center justify-center gap-2.5 text-slate-600 font-semibold text-sm">
                                                         {user.tipoUsuario === 'SERVIDOR_PUBLICO' ? (
                                                             <Building2 className="h-4 w-4 text-emerald-600" />
                                                         ) : user.tipoUsuario === 'CIUDADANO' ? (
@@ -858,7 +858,7 @@ export default function UsuariosPage() {
                                                     })()}
                                                 </TableCell>
                                                 <TableCell
-                                                    className="py-5 pr-6 text-right"
+                                                    className="py-5 pr-6 text-center"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     {canWrite && (
@@ -895,7 +895,7 @@ export default function UsuariosPage() {
                                                                             </p>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="flex justify-end gap-2 mt-1">
+                                                                    <div className="flex justify-center gap-2 mt-1">
                                                                         <Button
                                                                             size="sm"
                                                                             variant="outline"
@@ -1006,7 +1006,7 @@ export default function UsuariosPage() {
                 </div>
 
                 {/* Tarjetas Inferiores */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6 pb-12">
+                <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 pb-12">
                     {statCards.map((stat, idx) => {
                         const Icon = stat.icon;
                         const filter = 'filter' in stat ? stat.filter : undefined;
@@ -1019,24 +1019,24 @@ export default function UsuariosPage() {
                         return (
                             <Card
                                 key={idx}
-                                className={`border-2 transition-all rounded-2xl flex flex-col h-full ${filter ? 'hover:shadow-md cursor-pointer' : 'cursor-default'} ${isActive ? 'shadow-md scale-[1.02]' : 'border-transparent shadow-sm'}`}
+                                className={`border-2 transition-all rounded-xl flex flex-col h-full min-w-0 ${filter ? 'hover:shadow-md cursor-pointer' : 'cursor-default'} ${isActive ? 'shadow-md scale-[1.02]' : 'border-transparent shadow-sm'}`}
                                 style={isActive && filter ? { borderColor: stat.color, backgroundColor: 'white' } : {}}
                                 onClick={() => filter && handleCardClick(filter)}
                             >
-                                <CardContent className="p-5 flex flex-col justify-between h-full gap-4">
-                                    <div className="flex items-start justify-between w-full gap-1.5">
+                                <CardContent className="p-3 flex flex-col justify-between h-full gap-2.5">
+                                    <div className="flex items-start justify-between w-full gap-1">
                                         <div
-                                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm"
+                                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg shadow-sm"
                                             style={{
                                                 backgroundColor: stat.bgColor,
                                                 color: stat.color,
                                             }}
                                         >
-                                            <Icon className="h-4.5 w-4.5" />
+                                            <Icon className="h-3.5 w-3.5" />
                                         </div>
                                         {stat.badge && (
                                             <span
-                                                className="px-1.5 py-0.5 text-[8px] font-black rounded-md uppercase tracking-tighter h-fit border truncate max-w-[65px]"
+                                                className="px-1 py-0.5 text-[7px] font-black rounded-md uppercase tracking-tighter h-fit border truncate max-w-[52px]"
                                                 style={{
                                                     backgroundColor: `${stat.bgColor}80`,
                                                     color: stat.color,
@@ -1047,14 +1047,14 @@ export default function UsuariosPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="flex flex-col mt-auto">
+                                    <div className="flex flex-col mt-auto min-w-0">
                                         <span
-                                            className="text-2xl font-black tracking-tight"
+                                            className="text-xl font-black tracking-tight leading-none"
                                             style={{ color: 'var(--admin-text-title)' }}
                                         >
                                             {stat.value}
                                         </span>
-                                        <span className="text-[9px] font-bold tracking-widest text-muted-foreground uppercase mt-1">
+                                        <span className="text-[8px] font-bold tracking-wide text-muted-foreground uppercase mt-1 leading-tight line-clamp-2">
                                             {stat.title}
                                         </span>
                                     </div>

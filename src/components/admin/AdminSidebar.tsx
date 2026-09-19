@@ -13,6 +13,7 @@ import {
     Bell,
     Menu,
     Bot,
+    UserCog,
 } from 'lucide-react';
 
 import {
@@ -190,6 +191,15 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                     <Link href="/admin/chats">
                                         <MessageSquare />
                                         <span>Historial de Chats</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild tooltip="Curadores y Revisores">
+                                    <Link href="/admin/staff">
+                                        <UserCog />
+                                        <span>Curadores y Revisores</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

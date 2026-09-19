@@ -219,26 +219,26 @@ export default function DashboardPage() {
 
             <div className="space-y-6 mt-4">
                 {/* KPI Cards Row */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mt-2">
+                <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mt-2">
                     {statCards.map((stat, idx) => {
                         const Icon = stat.icon;
                         const hasLink = 'link' in stat && stat.link;
 
                         const cardContent = (
                             <Card
-                                className={`border-none shadow-sm transition-all rounded-2xl h-full flex flex-col ${hasLink ? 'hover:shadow-md hover:scale-[1.02] cursor-pointer' : 'cursor-default'}`}
+                                className={`border-none shadow-sm transition-all rounded-xl h-full flex flex-col min-w-0 ${hasLink ? 'hover:shadow-md hover:scale-[1.02] cursor-pointer' : 'cursor-default'}`}
                             >
-                                <CardContent className="p-5 flex flex-col justify-between h-full gap-4">
-                                    <div className="flex items-start justify-between w-full gap-1.5">
+                                <CardContent className="p-3 flex flex-col justify-between h-full gap-2.5">
+                                    <div className="flex items-start justify-between w-full gap-1">
                                         <div
-                                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm"
+                                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg shadow-sm"
                                             style={{ backgroundColor: stat.bgColor, color: stat.color }}
                                         >
-                                            <Icon className="h-4.5 w-4.5" />
+                                            <Icon className="h-3.5 w-3.5" />
                                         </div>
                                         {stat.badge && (
                                             <span
-                                                className="px-1.5 py-0.5 text-[8px] font-black rounded-md uppercase tracking-tighter h-fit border truncate max-w-[65px]"
+                                                className="px-1 py-0.5 text-[7px] font-black rounded-md uppercase tracking-tighter h-fit border truncate max-w-[52px]"
                                                 style={{
                                                     backgroundColor: `${stat.bgColor}80`,
                                                     color: stat.color,
@@ -250,14 +250,14 @@ export default function DashboardPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="flex flex-col mt-auto">
+                                    <div className="flex flex-col mt-auto min-w-0">
                                         <span
-                                            className="text-2xl font-black tracking-tight"
+                                            className="text-xl font-black tracking-tight leading-none"
                                             style={{ color: 'var(--admin-text-title)' }}
                                         >
                                             {stat.value}
                                         </span>
-                                        <span className="text-[9px] font-bold tracking-widest text-muted-foreground uppercase mt-1 leading-tight">
+                                        <span className="text-[8px] font-bold tracking-wide text-muted-foreground uppercase mt-1 leading-tight line-clamp-2">
                                             {stat.title}
                                         </span>
                                     </div>
@@ -419,7 +419,7 @@ export default function DashboardPage() {
                                     <TableHead className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase h-10 w-[180px] text-center">
                                         Estado
                                     </TableHead>
-                                    <TableHead className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase h-10 text-right">
+                                    <TableHead className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase h-10 text-center">
                                         Fecha
                                     </TableHead>
                                 </TableRow>
@@ -433,7 +433,7 @@ export default function DashboardPage() {
                                         <TableCell className="py-4">
                                             <Link
                                                 href={`/admin/usuarios/${user.id}`}
-                                                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                                                className="flex items-center justify-center gap-3 hover:opacity-80 transition-opacity"
                                             >
                                                 <Avatar className="h-11 w-11 border border-slate-200/60 shadow-sm bg-slate-100">
                                                     <AvatarImage
@@ -480,7 +480,7 @@ export default function DashboardPage() {
                                                     'Desconocido'}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="py-4 text-slate-400 font-medium text-sm text-right">
+                                        <TableCell className="py-4 text-slate-400 font-medium text-sm text-center">
                                             {new Date(user.createdAt).toLocaleDateString('es-ES', {
                                                 day: '2-digit',
                                                 month: 'short',

@@ -186,7 +186,7 @@ export default function AbandonedRegistrationsPage() {
                                 <TableHead className="py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">
                                     Fecha de Registro
                                 </TableHead>
-                                <TableHead className="py-4 pr-6 text-right font-bold text-xs uppercase tracking-wider text-muted-foreground">
+                                <TableHead className="py-4 pr-6 text-center font-bold text-xs uppercase tracking-wider text-muted-foreground">
                                     Acciones
                                 </TableHead>
                             </TableRow>
@@ -220,10 +220,10 @@ export default function AbandonedRegistrationsPage() {
                                         className="group border-b-gray-100/60 hover:bg-slate-50/80 transition-colors"
                                     >
                                         <TableCell className="py-5 pl-6">
-                                            <div className="flex items-center gap-4">
+                                            <div className="flex items-center justify-center gap-4">
                                                 <Link
                                                     href={`/admin/usuarios/no-concretados/${user.id}`}
-                                                    className="flex flex-col min-w-0 hover:opacity-80"
+                                                    className="flex flex-col min-w-0 items-center hover:opacity-80"
                                                 >
                                                     <span className="font-bold text-slate-900 text-sm hover:underline truncate">
                                                         {user.nombre} {user.apellido}
@@ -240,7 +240,7 @@ export default function AbandonedRegistrationsPage() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="py-5">
-                                            <div className="flex items-center gap-2.5 text-slate-600 font-semibold text-sm">
+                                            <div className="flex items-center justify-center gap-2.5 text-slate-600 font-semibold text-sm">
                                                 {user.tipoUsuario === 'SERVIDOR_PUBLICO' ? (
                                                     <Building2 className="h-4 w-4 text-emerald-600" />
                                                 ) : user.tipoUsuario === 'CIUDADANO' ? (
@@ -256,7 +256,7 @@ export default function AbandonedRegistrationsPage() {
                                                 locale: es,
                                             })}
                                         </TableCell>
-                                        <TableCell className="py-5 pr-6 text-right">
+                                        <TableCell className="py-5 pr-6 text-center">
                                             {canWrite ? (
                                                 <Popover
                                                     open={popoverId === user.id}
