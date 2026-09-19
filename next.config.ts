@@ -1,6 +1,13 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+    // Por si alguna acción aún recibe multipart en local; en Netlify el PDF
+    // se sube directo a Cloud Run (ver documents-upload.client.ts).
+    experimental: {
+        serverActions: {
+            bodySizeLimit: '50mb',
+        },
+    },
     async redirects() {
         return [
             {

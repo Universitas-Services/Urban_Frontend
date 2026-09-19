@@ -115,7 +115,7 @@ export interface RevisionsListResponse {
     totalPages?: number;
 }
 
-const API = process.env.API_URL;
+const API = process.env.API_URL?.replace(/\/+$/, '') ?? '';
 
 async function handleResponse<T>(res: Response): Promise<T> {
     if (!res.ok) {
@@ -125,6 +125,22 @@ async function handleResponse<T>(res: Response): Promise<T> {
     }
     if (res.status === 204) return undefined as T;
     return res.json();
+}
+
+/** Credenciales cortas para subir PDF desde el navegador (evita límite Netlify). */
+export async function getDocumentsUploadAuthAction(): Promise<{
+    apiBaseUrl: string;
+    accessToken: string;
+}> {
+    if (!API) {
+        throw new Error('API_URL no está configurada en el frontend.');
+    }
+    const { getServerToken } = await import('@/lib/auth/session');
+    const accessToken = await getServerToken();
+    if (!accessToken) {
+        throw new Error('Sesión expirada. Vuelve a iniciar sesión.');
+    }
+    return { apiBaseUrl: API, accessToken };
 }
 
 function toQuery(params?: DocumentsQueryParams): string {
@@ -188,12 +204,9 @@ export async function getDocumentByIdAction(id: string): Promise<Documento> {
     return handleResponse<Documento>(res);
 }
 
-export async function uploadDocumentAction(formData: FormData): Promise<Documento> {
-    const res = await authenticatedFetch(`${API}/documents/upload`, {
-        method: 'POST',
-        body: formData,
-    });
-    return handleResponse<Documento>(res);
+/** @deprecated No usar: el PDF debe subirse con uploadDocumentDirect (cliente → Cloud Run). */
+export async function uploadDocumentAction(_formData: FormData): Promise<Documento> {
+    throw new Error('uploadDocumentAction está deshabilitado. Usa uploadDocumentDirect desde el cliente.');
 }
 
 export async function resubmitDocumentAction(id: string): Promise<Documento> {
@@ -203,12 +216,9 @@ export async function resubmitDocumentAction(id: string): Promise<Documento> {
     return handleResponse<Documento>(res);
 }
 
-export async function correctAndResubmitDocumentAction(id: string, formData: FormData): Promise<Documento> {
-    const res = await authenticatedFetch(`${API}/documents/${id}/correct`, {
-        method: 'PATCH',
-        body: formData,
-    });
-    return handleResponse<Documento>(res);
+/** @deprecated No usar: corrige con correctDocumentDirect (cliente → Cloud Run). */
+export async function correctAndResubmitDocumentAction(_id: string, _formData: FormData): Promise<Documento> {
+    throw new Error('correctAndResubmitDocumentAction está deshabilitado. Usa correctDocumentDirect desde el cliente.');
 }
 
 export async function deleteDocumentAction(id: string): Promise<Documento> {
