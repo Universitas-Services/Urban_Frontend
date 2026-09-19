@@ -24,7 +24,7 @@ export const createStaffSchema = z.object({
     email: z.string().trim().email('Ingresa un correo válido'),
     password: staffPasswordSchema,
     role: z.enum(['CURADOR', 'REVISOR'], {
-        required_error: 'Selecciona un rol',
+        error: 'Selecciona un rol',
     }),
 });
 
