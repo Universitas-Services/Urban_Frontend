@@ -15,6 +15,7 @@ import { forgotPasswordService, verifyOtpService, resetPasswordService } from '@
 import { useRouter } from 'next/navigation';
 import { useAuthFormStyles } from './auth-context';
 import { cn } from '@/lib/utils';
+import { getFriendlyErrorMessage } from '@/lib/utils/friendly-error';
 
 const stepLabels = ['Correo', 'Código', 'Nueva clave'];
 
@@ -42,8 +43,10 @@ export function ForgotPasswordForm() {
             await forgotPasswordService(emailValue);
             toast.success('Código enviado a tu correo');
             setStep(2);
-        } catch {
-            toast.error('Error al enviar el código');
+        } catch (error) {
+            toast.error(
+                getFriendlyErrorMessage(error, 'No se pudo enviar el código. Verifica el correo e intenta de nuevo.')
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -59,8 +62,8 @@ export function ForgotPasswordForm() {
             await verifyOtpService(emailValue, code);
             toast.success('Código verificado correctamente');
             setStep(3);
-        } catch {
-            toast.error('Código inválido o expirado');
+        } catch (error) {
+            toast.error(getFriendlyErrorMessage(error, 'Código inválido o expirado.'));
         } finally {
             setIsSubmitting(false);
         }
@@ -73,8 +76,8 @@ export function ForgotPasswordForm() {
             await resetPasswordService(values.email, values.password || '');
             toast.success('Contraseña actualizada exitosamente');
             router.push('/login?panel=login');
-        } catch {
-            toast.error('Error al actualizar contraseña');
+        } catch (error) {
+            toast.error(getFriendlyErrorMessage(error, 'No se pudo actualizar la contraseña. Intenta de nuevo.'));
         } finally {
             setIsSubmitting(false);
         }

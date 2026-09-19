@@ -43,6 +43,9 @@ import { WorldCountrySelect } from './WorldCountrySelect';
 import {
     AMBITOS_TERRITORIALES,
     MACRO_TIPO_OPTIONS,
+    MAX_DOCUMENT_PDF_BYTES,
+    MAX_DOCUMENT_PDF_LABEL,
+    formatFileSize,
     SALAS_TSJ,
     TIPOS_CORTE,
     TIPOS_DOCTRINA,
@@ -50,6 +53,7 @@ import {
     TIPOS_NORMA_LEGISLACION,
     TIPOS_TRIBUNAL,
 } from './document-upload.constants';
+import { getFriendlyErrorMessage } from '@/lib/utils/friendly-error';
 
 const STEPS = ['Macro tipo', 'Tipificación', 'Archivo PDF', 'Indexación'] as const;
 
@@ -237,6 +241,12 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
             toast.error('Solo se permiten archivos PDF.');
             return;
         }
+        if (picked.size > MAX_DOCUMENT_PDF_BYTES) {
+            toast.error(
+                `El PDF supera el límite de ${MAX_DOCUMENT_PDF_LABEL} (archivo: ${formatFileSize(picked.size)}).`
+            );
+            return;
+        }
         setFile(picked);
     };
 
@@ -360,11 +370,12 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
             }
         } catch (error) {
             toast.error(
-                error instanceof Error
-                    ? error.message
-                    : isEdit
-                      ? 'No se pudo corregir el documento.'
-                      : 'No se pudo subir el documento.'
+                getFriendlyErrorMessage(
+                    error,
+                    isEdit
+                        ? 'No se pudo corregir el documento. Revisa los datos e intenta de nuevo.'
+                        : `No se pudo subir el documento. Verifica el PDF (máx. ${MAX_DOCUMENT_PDF_LABEL}) e intenta de nuevo.`
+                )
             );
         } finally {
             setSubmitting(false);
@@ -958,8 +969,8 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                             <h2 className="text-base font-semibold">Archivo PDF</h2>
                             <p className="text-sm text-muted-foreground">
                                 {isEdit
-                                    ? 'Puedes mantener el PDF actual o subir uno nuevo que lo reemplace.'
-                                    : 'Arrastra el archivo o selecciónalo. Solo se aceptan PDF.'}
+                                    ? `Puedes mantener el PDF actual o subir uno nuevo (máx. ${MAX_DOCUMENT_PDF_LABEL}).`
+                                    : `Arrastra el archivo o selecciónalo. Solo PDF, máximo ${MAX_DOCUMENT_PDF_LABEL}.`}
                             </p>
                         </div>
                         {isEdit && initialDocumento && (
@@ -1006,11 +1017,13 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                                 <p className="font-medium">
                                     {isEdit ? 'Arrastra un PDF nuevo (opcional)' : 'Arrastra el PDF aquí'}
                                 </p>
-                                <p className="text-sm text-muted-foreground">o haz clic para explorar</p>
+                                <p className="text-sm text-muted-foreground">
+                                    o haz clic para explorar · máximo {MAX_DOCUMENT_PDF_LABEL}
+                                </p>
                             </div>
                             {file && (
                                 <Badge variant="secondary" className="max-w-full truncate px-3 py-1">
-                                    {file.name} · {Math.round(file.size / 1024)} KB
+                                    {file.name} · {formatFileSize(file.size)}
                                 </Badge>
                             )}
                             {!file && isEdit && (

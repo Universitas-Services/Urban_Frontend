@@ -1,7 +1,13 @@
 import * as z from 'zod';
 
+const emailField = z
+    .string()
+    .trim()
+    .email('Ingresa un correo válido')
+    .transform((v) => v.toLowerCase());
+
 export const loginSchema = z.object({
-    email: z.string().email('Ingresa un correo válido'),
+    email: emailField,
     password: z.string().min(8, 'Mínimo 8 caracteres'),
 });
 
@@ -16,7 +22,7 @@ export const registerSchema = z
         nombre_ente: z.string().optional(),
         cargo: z.string().optional(),
         estatus_normativa_girs: z.string().optional(),
-        email: z.string().email('Ingresa un correo válido'),
+        email: emailField,
         password: z
             .string()
             .min(8, 'Mínimo 8 caracteres')
@@ -45,7 +51,7 @@ export const registerSchema = z
 
 export const forgotPasswordSchema = z
     .object({
-        email: z.string().email('Ingresa un correo válido'),
+        email: emailField,
         code: z
             .string()
             .regex(/^\d{6}$/, 'El código debe tener 6 dígitos numéricos')

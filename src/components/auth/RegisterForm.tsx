@@ -22,6 +22,7 @@ import { useAuthFormStyles } from './auth-context';
 import { RegisterTermsDialog } from './RegisterTermsDialog';
 import { RegisterPrivacyDialog } from './RegisterPrivacyDialog';
 import { TIPO_USUARIO } from '@/types/tipo-usuario';
+import { getFriendlyErrorMessage } from '@/lib/utils/friendly-error';
 
 export function RegisterForm() {
     const [step, setStep] = useState(1);
@@ -161,8 +162,10 @@ export function RegisterForm() {
             await register(payload);
             toast.success('Te hemos enviado un enlace de activación a tu correo electrónico.');
             router.push('/login?panel=login');
-        } catch {
-            toast.error('Error al registrar la cuenta');
+        } catch (error) {
+            toast.error(
+                getFriendlyErrorMessage(error, 'No se pudo crear la cuenta. Revisa los datos e intenta de nuevo.')
+            );
         }
     }
 
