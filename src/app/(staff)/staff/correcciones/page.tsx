@@ -2,27 +2,62 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Eye, Pencil, Search } from 'lucide-react';
 
 import { RouteGuard } from '@/components/auth/RouteGuard';
+import { StaffListPagination } from '@/components/staff/StaffListPagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getMyDocumentsAction, type Documento } from '@/lib/services/documents.service';
 import { TruncatedText } from '@/components/staff/documents/TruncatedText';
+import { buildStaffListReturnPath, documentDetailHref } from '@/lib/utils/staff-list-navigation';
 
 function CorreccionesContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [items, setItems] = React.useState<Documento[]>([]);
-    const [page, setPage] = React.useState(1);
+    const [page, setPage] = React.useState(Number(searchParams.get('page') || 1));
     const [totalPages, setTotalPages] = React.useState(1);
     const [total, setTotal] = React.useState(0);
-    const [tempSearch, setTempSearch] = React.useState('');
-    const [appliedQ, setAppliedQ] = React.useState('');
+    const [tempSearch, setTempSearch] = React.useState(searchParams.get('q') || '');
+    const [appliedQ, setAppliedQ] = React.useState(searchParams.get('q') || '');
     const [loading, setLoading] = React.useState(true);
+
+    const returnPath = React.useMemo(
+        () => buildStaffListReturnPath(pathname, searchParams.toString() ? `?${searchParams}` : ''),
+        [pathname, searchParams]
+    );
+
+    const syncUrl = React.useCallback(
+        (next: { page?: number; q?: string }) => {
+            const params = new URLSearchParams();
+            const p = next.page ?? page;
+            const query = next.q ?? appliedQ;
+            if (p > 1) params.set('page', String(p));
+            if (query) params.set('q', query);
+            router.replace(`/staff/correcciones${params.toString() ? `?${params}` : ''}`);
+        },
+        [page, appliedQ, router]
+    );
+
+    React.useEffect(() => {
+        const nextPage = Number(searchParams.get('page') || 1);
+        const nextQ = searchParams.get('q') || '';
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- hidratar filtros/página desde la URL
+        setPage(nextPage);
+        setAppliedQ((prev) => {
+            if (prev !== nextQ) setTempSearch(nextQ);
+            return nextQ;
+        });
+    }, [searchParams]);
 
     const load = React.useCallback(async () => {
         setLoading(true);
@@ -48,6 +83,13 @@ function CorreccionesContent() {
         void load();
     }, [load]);
 
+    const applySearch = () => {
+        const q = tempSearch.trim();
+        setPage(1);
+        setAppliedQ(q);
+        syncUrl({ q, page: 1 });
+    };
+
     return (
         <div className="flex flex-col gap-6">
             <div>
@@ -67,20 +109,10 @@ function CorreccionesContent() {
                             value={tempSearch}
                             onChange={(e) => setTempSearch(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    setPage(1);
-                                    setAppliedQ(tempSearch.trim());
-                                }
+                                if (e.key === 'Enter') applySearch();
                             }}
                         />
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => {
-                                setPage(1);
-                                setAppliedQ(tempSearch.trim());
-                            }}
-                        >
+                        <Button type="button" variant="secondary" onClick={applySearch}>
                             <Search className="h-4 w-4" />
                         </Button>
                     </div>
@@ -93,7 +125,7 @@ function CorreccionesContent() {
                         <TableRow>
                             <TableHead>Documento</TableHead>
                             <TableHead>Motivo</TableHead>
-                            <TableHead className="hidden sm:table-cell text-center">Fecha</TableHead>
+                            <TableHead className="hidden text-center sm:table-cell">Fecha</TableHead>
                             <TableHead className="w-[160px] text-center">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -136,12 +168,14 @@ function CorreccionesContent() {
                                     <TableCell>
                                         <div className="flex justify-center gap-1">
                                             <Button size="icon" variant="ghost" asChild>
-                                                <Link href={`/staff/documentos/${doc.id}`} aria-label="Ver">
+                                                <Link href={documentDetailHref(doc.id, returnPath)} aria-label="Ver">
                                                     <Eye className="h-4 w-4" />
                                                 </Link>
                                             </Button>
                                             <Button size="sm" asChild>
-                                                <Link href={`/staff/correcciones/${doc.id}`}>
+                                                <Link
+                                                    href={`/staff/correcciones/${doc.id}?from=${encodeURIComponent(returnPath)}`}
+                                                >
                                                     <Pencil className="mr-1 h-3.5 w-3.5" />
                                                     Corregir
                                                 </Link>
@@ -155,30 +189,19 @@ function CorreccionesContent() {
                 </Table>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-muted-foreground">
                     {total} · página {page} de {totalPages}
                 </span>
-                <div className="flex gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={page <= 1}
-                        onClick={() => setPage((p) => p - 1)}
-                    >
-                        Anterior
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={page >= totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                    >
-                        Siguiente
-                    </Button>
-                </div>
+                <StaffListPagination
+                    page={page}
+                    totalPages={totalPages}
+                    disabled={loading}
+                    onPageChange={(next) => {
+                        setPage(next);
+                        syncUrl({ page: next });
+                    }}
+                />
             </div>
         </div>
     );
@@ -187,7 +210,9 @@ function CorreccionesContent() {
 export default function StaffCorreccionesPage() {
     return (
         <RouteGuard allowedRoles={['CURADOR']}>
-            <CorreccionesContent />
+            <React.Suspense fallback={<p className="text-sm text-muted-foreground">Cargando...</p>}>
+                <CorreccionesContent />
+            </React.Suspense>
         </RouteGuard>
     );
 }

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowLeft, Check, ExternalLink, History, Loader2, RefreshCw, X } from 'lucide-react';
@@ -38,6 +38,7 @@ import {
     type DocumentoRevision,
 } from '@/lib/services/documents.service';
 import { ESTADO_LABELS, MACRO_TIPO_OPTIONS } from '@/components/staff/documents/document-upload.constants';
+import { resolveStaffBackHref } from '@/lib/utils/staff-list-navigation';
 import { useAuthStore } from '@/store/auth.store';
 
 const ACCION_LABELS: Record<AccionRevision, string> = {
@@ -95,6 +96,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function DocumentDetailContent() {
     const params = useParams<{ id: string }>();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user } = useAuthStore();
     const isRevisor = user?.role === 'REVISOR';
 
@@ -133,11 +135,16 @@ function DocumentDetailContent() {
     }, [loadAll]);
 
     const backHref = React.useMemo(() => {
-        if (!isRevisor) return '/staff/biblioteca';
-        if (doc?.estado === 'PUBLICADO') return '/staff/biblioteca-publicados';
-        if (doc?.estado === 'RECHAZADO') return '/staff/historial';
-        return '/staff/revision';
-    }, [isRevisor, doc?.estado]);
+        let fallback = '/staff/biblioteca';
+        if (isRevisor) {
+            if (doc?.estado === 'PUBLICADO') fallback = '/staff/biblioteca-publicados';
+            else if (doc?.estado === 'RECHAZADO') fallback = '/staff/historial';
+            else fallback = '/staff/revision';
+        } else if (doc?.estado === 'RECHAZADO') {
+            fallback = '/staff/correcciones';
+        }
+        return resolveStaffBackHref(searchParams.get('from'), fallback);
+    }, [isRevisor, doc?.estado, searchParams]);
 
     const canApprove = isRevisor && doc?.estado === 'PENDIENTE_REVISION';
     const canReject = isRevisor && (doc?.estado === 'PENDIENTE_REVISION' || doc?.estado === 'PUBLICADO');
@@ -152,7 +159,7 @@ function DocumentDetailContent() {
             await approveDocumentAction(doc.id);
             toast.success('Documento aprobado y publicado.');
             setApproveOpen(false);
-            router.push('/staff/revision');
+            router.push(backHref);
         } catch (err) {
             toast.error(err instanceof Error ? err.message : 'No se pudo aprobar');
         } finally {
@@ -173,11 +180,7 @@ function DocumentDetailContent() {
             toast.success('Documento rechazado.');
             setRejectOpen(false);
             setMotivo('');
-            if (doc.estado === 'PUBLICADO') {
-                router.push('/staff/biblioteca-publicados');
-            } else {
-                router.push('/staff/revision');
-            }
+            router.push(backHref);
         } catch (err) {
             toast.error(err instanceof Error ? err.message : 'No se pudo rechazar');
         } finally {
@@ -336,14 +339,6 @@ function DocumentDetailContent() {
                                     value={doc.legibilidadPdf === 'PDF_TEXTO' ? 'PDF con texto' : 'Solo imagen'}
                                 />
                                 <MetaRow label="Ente emisor" value={doc.enteEmisor} />
-                                <MetaRow
-                                    label="Fecha publicación"
-                                    value={
-                                        doc.fechaPublicacion
-                                            ? format(new Date(doc.fechaPublicacion), 'yyyy-MM-dd')
-                                            : undefined
-                                    }
-                                />
                             </dl>
                             {preview && (
                                 <Button asChild variant="outline" className="mt-4 w-full">
@@ -514,7 +509,9 @@ function DocumentDetailContent() {
 export default function StaffDocumentoDetailPage() {
     return (
         <RouteGuard allowedRoles={['CURADOR', 'REVISOR']}>
-            <DocumentDetailContent />
+            <React.Suspense fallback={<p className="text-sm text-muted-foreground">Cargando documento...</p>}>
+                <DocumentDetailContent />
+            </React.Suspense>
         </RouteGuard>
     );
 }

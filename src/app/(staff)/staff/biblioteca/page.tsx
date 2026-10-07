@@ -2,12 +2,13 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Eye, Search, Upload } from 'lucide-react';
 
 import { RouteGuard } from '@/components/auth/RouteGuard';
+import { StaffListPagination } from '@/components/staff/StaffListPagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,7 @@ import {
 import { getEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
 import { ESTADO_LABELS, MACRO_TIPO_OPTIONS } from '@/components/staff/documents/document-upload.constants';
 import { TruncatedText } from '@/components/staff/documents/TruncatedText';
+import { buildStaffListReturnPath, documentDetailHref } from '@/lib/utils/staff-list-navigation';
 
 const ESTADO_FILTERS: { value: 'ALL' | EstadoDocumento; label: string }[] = [
     { value: 'ALL', label: 'Todos' },
@@ -43,6 +45,7 @@ function estadoBadgeVariant(estado: EstadoDocumento) {
 
 function BibliotecaContent() {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const initialEstado = (searchParams.get('estado') as EstadoDocumento | null) || 'ALL';
 
@@ -61,6 +64,29 @@ function BibliotecaContent() {
     const [total, setTotal] = React.useState(0);
     const [items, setItems] = React.useState<Documento[]>([]);
     const [loading, setLoading] = React.useState(true);
+
+    const returnPath = React.useMemo(
+        () => buildStaffListReturnPath(pathname, searchParams.toString() ? `?${searchParams}` : ''),
+        [pathname, searchParams]
+    );
+
+    React.useEffect(() => {
+        const nextEstadoRaw = (searchParams.get('estado') as EstadoDocumento | null) || 'ALL';
+        const nextEstado = ESTADO_FILTERS.some((t) => t.value === nextEstadoRaw) ? nextEstadoRaw : 'ALL';
+        const nextPage = Number(searchParams.get('page') || 1);
+        const nextQ = searchParams.get('q') || '';
+        const nextMacro = (searchParams.get('macroTipo') as MacroTipoDocumento) || 'ALL';
+        const nextTag = searchParams.get('etiquetaId') || 'ALL';
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- hidratar filtros/página desde la URL
+        setEstado(nextEstado);
+        setPage(nextPage);
+        setMacroTipo(nextMacro);
+        setEtiquetaId(nextTag);
+        setAppliedQ((prev) => {
+            if (prev !== nextQ) setTempSearch(nextQ);
+            return nextQ;
+        });
+    }, [searchParams]);
 
     React.useEffect(() => {
         getEtiquetasAction({ page: 1, limit: 100 })
@@ -298,7 +324,10 @@ function BibliotecaContent() {
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Button size="icon" variant="ghost" asChild>
-                                            <Link href={`/staff/documentos/${doc.id}`} aria-label="Ver detalle">
+                                            <Link
+                                                href={documentDetailHref(doc.id, returnPath)}
+                                                aria-label="Ver detalle"
+                                            >
                                                 <Eye className="h-4 w-4" />
                                             </Link>
                                         </Button>
@@ -310,38 +339,19 @@ function BibliotecaContent() {
                 </Table>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-muted-foreground">
                     {total} documento{total === 1 ? '' : 's'} · página {page} de {totalPages}
                 </span>
-                <div className="flex gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={page <= 1}
-                        onClick={() => {
-                            const next = page - 1;
-                            setPage(next);
-                            syncUrl({ page: next });
-                        }}
-                    >
-                        Anterior
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={page >= totalPages}
-                        onClick={() => {
-                            const next = page + 1;
-                            setPage(next);
-                            syncUrl({ page: next });
-                        }}
-                    >
-                        Siguiente
-                    </Button>
-                </div>
+                <StaffListPagination
+                    page={page}
+                    totalPages={totalPages}
+                    disabled={loading}
+                    onPageChange={(next) => {
+                        setPage(next);
+                        syncUrl({ page: next });
+                    }}
+                />
             </div>
         </div>
     );
