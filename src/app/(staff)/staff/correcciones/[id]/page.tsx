@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowLeft } from 'lucide-react';
@@ -17,9 +17,12 @@ import {
     type Documento,
     type DocumentoRevision,
 } from '@/lib/services/documents.service';
+import { resolveStaffBackHref } from '@/lib/utils/staff-list-navigation';
 
 function CorregirDocumentoContent() {
     const params = useParams<{ id: string }>();
+    const searchParams = useSearchParams();
+    const backHref = resolveStaffBackHref(searchParams.get('from'), '/staff/correcciones');
     const [doc, setDoc] = React.useState<Documento | null>(null);
     const [revisiones, setRevisiones] = React.useState<DocumentoRevision[]>([]);
     const [loading, setLoading] = React.useState(true);
@@ -65,7 +68,7 @@ function CorregirDocumentoContent() {
             <div className="space-y-4">
                 <p className="text-sm text-destructive">{error}</p>
                 <Button asChild variant="outline" size="sm">
-                    <Link href="/staff/correcciones">
+                    <Link href={backHref}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Volver a correcciones
                     </Link>
@@ -80,7 +83,7 @@ function CorregirDocumentoContent() {
         <div className="flex flex-col gap-6">
             <div className="flex flex-wrap items-center gap-3">
                 <Button asChild variant="outline" size="sm">
-                    <Link href="/staff/correcciones">
+                    <Link href={backHref}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Volver
                     </Link>
@@ -123,7 +126,9 @@ function CorregirDocumentoContent() {
 export default function StaffCorregirDocumentoPage() {
     return (
         <RouteGuard allowedRoles={['CURADOR']}>
-            <CorregirDocumentoContent />
+            <React.Suspense fallback={<p className="text-sm text-muted-foreground">Cargando documento…</p>}>
+                <CorregirDocumentoContent />
+            </React.Suspense>
         </RouteGuard>
     );
 }

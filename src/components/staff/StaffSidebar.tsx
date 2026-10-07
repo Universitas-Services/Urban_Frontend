@@ -217,7 +217,7 @@ export function StaffSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                             </Link>
                                         </SidebarMenuButton>
                                         {rechazados > 0 && (
-                                            <SidebarMenuBadge className="bg-destructive text-destructive-foreground">
+                                            <SidebarMenuBadge className="bg-destructive text-destructive-foreground peer-hover/menu-button:text-destructive-foreground peer-data-[active=true]/menu-button:text-destructive-foreground">
                                                 {rechazados}
                                             </SidebarMenuBadge>
                                         )}
@@ -239,7 +239,7 @@ export function StaffSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                             </Link>
                                         </SidebarMenuButton>
                                         {pendientesRevision > 0 && (
-                                            <SidebarMenuBadge className="bg-primary text-primary-foreground">
+                                            <SidebarMenuBadge className="bg-primary text-primary-foreground peer-hover/menu-button:text-primary-foreground peer-data-[active=true]/menu-button:text-primary-foreground">
                                                 {pendientesRevision}
                                             </SidebarMenuBadge>
                                         )}

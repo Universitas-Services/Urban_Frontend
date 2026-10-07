@@ -129,6 +129,8 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
     const [municipios, setMunicipios] = React.useState<Municipio[]>([]);
     const [tribunalesEstado, setTribunalesEstado] = React.useState<TribunalTerritorio[]>([]);
     const [tribunalesMunicipio, setTribunalesMunicipio] = React.useState<TribunalTerritorio[]>([]);
+    const [tribunalesEstadoKey, setTribunalesEstadoKey] = React.useState<string | null>(null);
+    const [tribunalesMunicipioKey, setTribunalesMunicipioKey] = React.useState<string | null>(null);
     const [loadingTribunalesEstado, setLoadingTribunalesEstado] = React.useState(false);
     const [loadingTribunalesMunicipio, setLoadingTribunalesMunicipio] = React.useState(false);
 
@@ -173,11 +175,15 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
         setLoadingTribunalesEstado(true);
         getTribunalesByEstado(estado.id)
             .then((data) => {
-                if (!cancelled) setTribunalesEstado(data);
+                if (!cancelled) {
+                    setTribunalesEstado(data);
+                    setTribunalesEstadoKey(estado.id);
+                }
             })
             .catch(() => {
                 if (!cancelled) {
                     setTribunalesEstado([]);
+                    setTribunalesEstadoKey(estado.id);
                     toast.error('No se pudieron cargar los tribunales del estado');
                 }
             })
@@ -201,11 +207,15 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
         setLoadingTribunalesMunicipio(true);
         getTribunalesByMunicipio(municipio.id)
             .then((data) => {
-                if (!cancelled) setTribunalesMunicipio(data);
+                if (!cancelled) {
+                    setTribunalesMunicipio(data);
+                    setTribunalesMunicipioKey(municipio.id);
+                }
             })
             .catch(() => {
                 if (!cancelled) {
                     setTribunalesMunicipio([]);
+                    setTribunalesMunicipioKey(municipio.id);
                     toast.error('No se pudieron cargar los tribunales del municipio');
                 }
             })
@@ -219,10 +229,20 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
     }, [params.tipo_tribunal, params.municipio, municipios]);
 
     const municipiosDisponibles = params.estado ? municipios : [];
+    const estadoSeleccionado = estados.find((e) => e.nombre === params.estado);
+    const municipioSeleccionado = municipios.find((m) => m.nombre === params.municipio);
     const tribunalesEstadoDisponibles =
-        params.tipo_tribunal === 'Tribunales Nacionales' && params.estado ? tribunalesEstado : [];
+        params.tipo_tribunal === 'Tribunales Nacionales' &&
+        estadoSeleccionado &&
+        tribunalesEstadoKey === estadoSeleccionado.id
+            ? tribunalesEstado
+            : [];
     const tribunalesMunicipioDisponibles =
-        params.tipo_tribunal === 'Tribunales Municipales' && params.municipio ? tribunalesMunicipio : [];
+        params.tipo_tribunal === 'Tribunales Municipales' &&
+        municipioSeleccionado &&
+        tribunalesMunicipioKey === municipioSeleccionado.id
+            ? tribunalesMunicipio
+            : [];
 
     const addCustomOption = (key: string) => {
         const value = (customInput[key] || '').trim();
@@ -393,7 +413,13 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
 
     const back = () => setStep((s) => Math.max(0, s - 1));
 
-    const selectWithAdd = (key: string, options: string[], placeholder: string, addLabel = 'Agregar') => {
+    const selectWithAdd = (
+        key: string,
+        options: string[],
+        placeholder: string,
+        addLabel = 'Agregar',
+        emphasizeAdd = false
+    ) => {
         const extras = customList[key] || [];
         const all = [...options, ...extras];
         return (
@@ -416,7 +442,19 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                         value={customInput[key] || ''}
                         onChange={(e) => setCustomInput((prev) => ({ ...prev, [key]: e.target.value }))}
                     />
-                    <Button type="button" variant="outline" size="icon" onClick={() => addCustomOption(key)}>
+                    <Button
+                        type="button"
+                        variant={emphasizeAdd ? 'default' : 'outline'}
+                        size="icon"
+                        onClick={() => addCustomOption(key)}
+                        aria-label={addLabel}
+                        title={addLabel}
+                        className={
+                            emphasizeAdd
+                                ? 'shrink-0 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90'
+                                : undefined
+                        }
+                    >
                         <Plus className="h-4 w-4" />
                     </Button>
                 </div>
@@ -718,9 +756,9 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                                     loading={loadingTribunalesEstado}
                                     disabled={!params.estado}
                                     placeholder={
-                                        params.estado ? 'Selecciona un tribunal' : 'Selecciona primero un estado'
+                                        params.estado ? 'Escribe o elige un tribunal' : 'Indica primero un estado'
                                     }
-                                    emptyMessage="No hay tribunales estadales para este estado"
+                                    emptyMessage="No hay tribunales en el listado; puedes escribirlo"
                                 />
                             </Field>
                         )}
@@ -733,9 +771,9 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                                     loading={loadingTribunalesMunicipio}
                                     disabled={!params.municipio}
                                     placeholder={
-                                        params.municipio ? 'Selecciona un tribunal' : 'Selecciona primero un municipio'
+                                        params.municipio ? 'Escribe o elige un tribunal' : 'Indica primero un municipio'
                                     }
-                                    emptyMessage="No hay tribunales municipales para este municipio"
+                                    emptyMessage="No hay tribunales en el listado; puedes escribirlo"
                                 />
                             </Field>
                         )}
@@ -764,7 +802,7 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
                 return (
                     <div className="grid gap-4 md:grid-cols-2">
                         <Field label="Tipo de corte" required>
-                            {selectWithAdd('tipo_corte', TIPOS_CORTE, 'Selecciona o agrega', 'Agregar corte')}
+                            {selectWithAdd('tipo_corte', TIPOS_CORTE, 'Selecciona o agrega', 'Agregar corte', true)}
                         </Field>
                         {params.tipo_corte === 'Corte Interamericana de Derechos Humanos' && (
                             <Field label="País">

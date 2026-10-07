@@ -2,12 +2,13 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Eye, Search } from 'lucide-react';
 
 import { RouteGuard } from '@/components/auth/RouteGuard';
+import { StaffListPagination } from '@/components/staff/StaffListPagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getReviewHistoryAction, type AccionRevision, type DocumentoRevision } from '@/lib/services/documents.service';
 import { TruncatedText } from '@/components/staff/documents/TruncatedText';
+import { buildStaffListReturnPath, documentDetailHref } from '@/lib/utils/staff-list-navigation';
 
 const ACCION_LABELS: Record<AccionRevision, string> = {
     APROBADO: 'Aprobado',
@@ -30,6 +32,7 @@ const ACCION_VARIANT: Record<AccionRevision, 'default' | 'destructive' | 'second
 
 function HistorialContent() {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
 
     const [tempSearch, setTempSearch] = React.useState(searchParams.get('q') || '');
@@ -39,6 +42,22 @@ function HistorialContent() {
     const [total, setTotal] = React.useState(0);
     const [items, setItems] = React.useState<DocumentoRevision[]>([]);
     const [loading, setLoading] = React.useState(true);
+
+    const returnPath = React.useMemo(
+        () => buildStaffListReturnPath(pathname, searchParams.toString() ? `?${searchParams}` : ''),
+        [pathname, searchParams]
+    );
+
+    React.useEffect(() => {
+        const nextPage = Number(searchParams.get('page') || 1);
+        const nextQ = searchParams.get('q') || '';
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- hidratar filtros/página desde la URL
+        setPage(nextPage);
+        setAppliedQ((prev) => {
+            if (prev !== nextQ) setTempSearch(nextQ);
+            return nextQ;
+        });
+    }, [searchParams]);
 
     const syncUrl = React.useCallback(
         (next: { page?: number; q?: string }) => {
@@ -176,7 +195,7 @@ function HistorialContent() {
                                     <TableCell className="text-center">
                                         <Button size="icon" variant="ghost" asChild>
                                             <Link
-                                                href={`/staff/documentos/${rev.documentoId}`}
+                                                href={documentDetailHref(rev.documentoId, returnPath)}
                                                 aria-label="Ver documento"
                                             >
                                                 <Eye className="h-4 w-4" />
@@ -190,38 +209,19 @@ function HistorialContent() {
                 </Table>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-muted-foreground">
                     {total} acción{total === 1 ? '' : 'es'} · página {page} de {totalPages}
                 </span>
-                <div className="flex gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={page <= 1}
-                        onClick={() => {
-                            const next = page - 1;
-                            setPage(next);
-                            syncUrl({ page: next });
-                        }}
-                    >
-                        Anterior
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={page >= totalPages}
-                        onClick={() => {
-                            const next = page + 1;
-                            setPage(next);
-                            syncUrl({ page: next });
-                        }}
-                    >
-                        Siguiente
-                    </Button>
-                </div>
+                <StaffListPagination
+                    page={page}
+                    totalPages={totalPages}
+                    disabled={loading}
+                    onPageChange={(next) => {
+                        setPage(next);
+                        syncUrl({ page: next });
+                    }}
+                />
             </div>
         </div>
     );
