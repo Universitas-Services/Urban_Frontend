@@ -12,7 +12,7 @@ export type SuggestOption = {
     value: string;
     label: string;
     secondary?: string;
-    key?: string;
+    key?: string | number;
 };
 
 interface SuggestibleInputProps {
@@ -137,7 +137,7 @@ export function SuggestibleInput({
                                 const selected = value === opt.value;
                                 return (
                                     <button
-                                        key={opt.key ?? opt.value}
+                                        key={opt.key != null ? String(opt.key) : opt.value}
                                         type="button"
                                         onClick={() => pick(opt.value)}
                                         className={cn(

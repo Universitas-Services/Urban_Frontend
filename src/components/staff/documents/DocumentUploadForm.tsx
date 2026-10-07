@@ -129,8 +129,8 @@ export function DocumentUploadForm({ mode = 'create', initialDocumento }: Docume
     const [municipios, setMunicipios] = React.useState<Municipio[]>([]);
     const [tribunalesEstado, setTribunalesEstado] = React.useState<TribunalTerritorio[]>([]);
     const [tribunalesMunicipio, setTribunalesMunicipio] = React.useState<TribunalTerritorio[]>([]);
-    const [tribunalesEstadoKey, setTribunalesEstadoKey] = React.useState<string | null>(null);
-    const [tribunalesMunicipioKey, setTribunalesMunicipioKey] = React.useState<string | null>(null);
+    const [tribunalesEstadoKey, setTribunalesEstadoKey] = React.useState<number | null>(null);
+    const [tribunalesMunicipioKey, setTribunalesMunicipioKey] = React.useState<number | null>(null);
     const [loadingTribunalesEstado, setLoadingTribunalesEstado] = React.useState(false);
     const [loadingTribunalesMunicipio, setLoadingTribunalesMunicipio] = React.useState(false);
 
