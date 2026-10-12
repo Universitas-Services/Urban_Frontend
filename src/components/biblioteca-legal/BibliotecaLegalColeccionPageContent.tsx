@@ -13,52 +13,61 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { filterDocumentosByCategory } from './biblioteca-legal.category';
+import { getMacroTipoForCategoryId } from './biblioteca-legal.category';
 import type { BibliotecaLegalCategory } from './biblioteca-legal.data';
-import { filterBibliotecaLegalDocumentos } from './biblioteca-legal.filters';
-import type { BibliotecaLegalDocumento } from './biblioteca-legal.types';
 import { BibliotecaLegalColeccionToolbar } from './BibliotecaLegalColeccionToolbar';
 import {
     BibliotecaLegalColeccionDocumentCard,
     type BibliotecaLegalColeccionViewMode,
 } from './BibliotecaLegalColeccionDocumentCard';
-import { BibliotecaLegalPreviewModal } from './BibliotecaLegalPreviewModal';
-import {
-    getBibliotecaLegalDocumentosService,
-    getBibliotecaLegalPreviewService,
-} from '@/lib/services/biblioteca-legal.service';
+import { getPublishedDocumentsAction, type Documento } from '@/lib/services/documents.service';
 
 const PER_PAGE_OPTIONS = [12, 24, 48] as const;
 
-/** Ruta legacy por categoría — conservada pero no usada en el flujo principal. */
 type BibliotecaLegalColeccionPageContentProps = {
     category: BibliotecaLegalCategory;
 };
 
 export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLegalColeccionPageContentProps) {
-    const [documentos, setDocumentos] = useState<BibliotecaLegalDocumento[]>([]);
+    const macroTipo = getMacroTipoForCategoryId(category.id);
+
+    const [documentos, setDocumentos] = useState<Documento[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const [appliedQ, setAppliedQ] = useState('');
     const [viewMode, setViewMode] = useState<BibliotecaLegalColeccionViewMode>('grid');
     const [perPage, setPerPage] = useState<number>(12);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [previewDocumento, setPreviewDocumento] = useState<BibliotecaLegalDocumento | null>(null);
-    const [signedUrl, setSignedUrl] = useState<string | null>(null);
-    const [previewLoading, setPreviewLoading] = useState(false);
-    const [previewError, setPreviewError] = useState<string | null>(null);
-
     useEffect(() => {
-        let cancelled = false;
+        if (!macroTipo) return;
 
-        void getBibliotecaLegalDocumentosService({ limit: 100 })
+        let cancelled = false;
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- carga del listado por categoría
+        setIsLoading(true);
+        setError(null);
+
+        void getPublishedDocumentsAction({
+            macroTipo,
+            q: appliedQ.trim() || undefined,
+            page: currentPage,
+            limit: perPage,
+        })
             .then((response) => {
-                if (!cancelled) setDocumentos(response.items);
+                if (cancelled) return;
+                setDocumentos(response.items);
+                setTotal(response.total);
+                setTotalPages(Math.max(1, response.totalPages));
             })
             .catch((err: Error) => {
                 if (!cancelled) {
+                    setDocumentos([]);
+                    setTotal(0);
+                    setTotalPages(1);
                     setError(err.message || 'No se pudieron cargar los documentos. Intenta de nuevo más tarde.');
                 }
             })
@@ -69,62 +78,24 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [macroTipo, appliedQ, currentPage, perPage]);
 
-    const categoryDocumentos = useMemo(
-        () => filterDocumentosByCategory(documentos, category.id),
-        [documentos, category.id]
-    );
-
-    const hasActiveFilters = searchQuery.trim() !== '';
+    const hasActiveFilters = searchInput.trim() !== '' || appliedQ.trim() !== '';
 
     const handleClearFilters = () => {
-        setSearchQuery('');
+        setSearchInput('');
+        setAppliedQ('');
         setCurrentPage(1);
     };
 
-    const filteredDocumentos = useMemo(() => {
-        return filterBibliotecaLegalDocumentos(categoryDocumentos, {
-            searchQuery,
-            estadoNombre: null,
-            municipioNombre: null,
-            selectedMateria: 'todas',
-        });
-    }, [categoryDocumentos, searchQuery]);
+    const applySearch = useCallback(() => {
+        setAppliedQ(searchInput.trim());
+        setCurrentPage(1);
+    }, [searchInput]);
 
-    const totalPages = Math.max(1, Math.ceil(filteredDocumentos.length / perPage));
     const effectivePage = Math.min(currentPage, totalPages);
-
-    const paginatedDocumentos = useMemo(() => {
-        const start = (effectivePage - 1) * perPage;
-        return filteredDocumentos.slice(start, start + perPage);
-    }, [filteredDocumentos, effectivePage, perPage]);
-
-    const showingFrom = filteredDocumentos.length > 0 ? (effectivePage - 1) * perPage + 1 : 0;
-    const showingTo = Math.min(effectivePage * perPage, filteredDocumentos.length);
-
-    const handlePreview = useCallback((documento: BibliotecaLegalDocumento) => {
-        setPreviewDocumento(documento);
-        setSignedUrl(null);
-        setPreviewError(null);
-        setPreviewLoading(true);
-
-        void getBibliotecaLegalPreviewService(documento.id)
-            .then((preview) => setSignedUrl(preview.signedUrl))
-            .catch((err: Error) => {
-                setPreviewError(err.message || 'No se pudo cargar la vista previa del documento.');
-            })
-            .finally(() => setPreviewLoading(false));
-    }, []);
-
-    const handlePreviewOpenChange = (open: boolean) => {
-        if (!open) {
-            setPreviewDocumento(null);
-            setSignedUrl(null);
-            setPreviewError(null);
-            setPreviewLoading(false);
-        }
-    };
+    const showingFrom = total > 0 ? (effectivePage - 1) * perPage + 1 : 0;
+    const showingTo = Math.min(effectivePage * perPage, total);
 
     const pageNumbers = useMemo(() => {
         const pages: number[] = [];
@@ -139,6 +110,22 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
 
         return pages;
     }, [effectivePage, totalPages]);
+
+    if (!macroTipo) {
+        return (
+            <div className="flex-1 p-6">
+                <div className="mx-auto max-w-6xl rounded-xl border border-gray-200/70 bg-white px-4 py-8 text-center shadow-sm">
+                    <p className="descripcion-cards-small text-gray-soft">Categoría no válida.</p>
+                    <Link
+                        href="/biblioteca-legal"
+                        className="biblioteca-category-link mt-4 inline-flex text-sm font-semibold"
+                    >
+                        Volver a categorías
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 p-6">
@@ -174,12 +161,10 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
                         <BibliotecaLegalColeccionToolbar
                             showingFrom={showingFrom}
                             showingTo={showingTo}
-                            filteredTotal={filteredDocumentos.length}
-                            searchQuery={searchQuery}
-                            onSearchQueryChange={(value) => {
-                                setSearchQuery(value);
-                                setCurrentPage(1);
-                            }}
+                            filteredTotal={total}
+                            searchQuery={searchInput}
+                            onSearchQueryChange={setSearchInput}
+                            onSearchSubmit={applySearch}
                             hasActiveFilters={hasActiveFilters}
                             onClearFilters={handleClearFilters}
                             viewMode={viewMode}
@@ -194,23 +179,23 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
                             )}
                             aria-label={`Documentos de ${category.title}`}
                         >
-                            {paginatedDocumentos.map((documento) => (
+                            {documentos.map((documento) => (
                                 <BibliotecaLegalColeccionDocumentCard
                                     key={documento.id}
                                     documento={documento}
+                                    categoryId={category.id}
                                     viewMode={viewMode}
-                                    onPreview={handlePreview}
                                 />
                             ))}
                         </section>
 
-                        {filteredDocumentos.length === 0 ? (
+                        {documentos.length === 0 ? (
                             <p className="descripcion-cards-small rounded-xl border border-gray-200/70 bg-white px-4 py-8 text-center text-gray-soft shadow-sm">
-                                No hay documentos que coincidan con los filtros aplicados.
+                                No hay documentos publicados en esta categoría.
                             </p>
                         ) : null}
 
-                        {filteredDocumentos.length > 0 ? (
+                        {total > 0 ? (
                             <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-4 sm:flex-row">
                                 <Pagination className="mx-0 w-auto justify-start sm:justify-center">
                                     <PaginationContent>
@@ -283,22 +268,6 @@ export function BibliotecaLegalColeccionPageContent({ category }: BibliotecaLega
                         ) : null}
                     </>
                 ) : null}
-
-                <BibliotecaLegalPreviewModal
-                    open={previewDocumento !== null}
-                    documento={previewDocumento}
-                    signedUrl={signedUrl}
-                    isLoading={previewLoading}
-                    error={previewError}
-                    onOpenChange={handlePreviewOpenChange}
-                    onRetry={
-                        previewDocumento
-                            ? () => {
-                                  handlePreview(previewDocumento);
-                              }
-                            : undefined
-                    }
-                />
             </div>
         </div>
     );

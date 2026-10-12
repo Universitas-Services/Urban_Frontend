@@ -1,10 +1,10 @@
 export { BibliotecaLegalPageContent } from './BibliotecaLegalPageContent';
-export { BibliotecaLegalDocumentosPageContent } from './BibliotecaLegalDocumentosPageContent';
 export { BibliotecaLegalHero } from './BibliotecaLegalHero';
 export { BibliotecaLegalCategoryCard } from './BibliotecaLegalCategoryCard';
 export { BibliotecaLegalColeccionPageContent } from './BibliotecaLegalColeccionPageContent';
 export { BibliotecaLegalColeccionToolbar } from './BibliotecaLegalColeccionToolbar';
 export { BibliotecaLegalColeccionDocumentCard } from './BibliotecaLegalColeccionDocumentCard';
+export { BibliotecaLegalDocumentDetailContent } from './BibliotecaLegalDocumentDetailContent';
 export { BibliotecaLegalDocumentCard } from './BibliotecaLegalDocumentCard';
-export { BibliotecaLegalPreviewModal } from './BibliotecaLegalPreviewModal';
 export { getBibliotecaLegalCategoryById } from './biblioteca-legal.coleccion.data';
+export { getMacroTipoForCategoryId, CATEGORY_ID_TO_MACRO_TIPO } from './biblioteca-legal.category';

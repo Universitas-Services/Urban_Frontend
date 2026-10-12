@@ -22,13 +22,21 @@ async function readApiError(res: Response): Promise<string> {
 }
 
 async function authorizedMultipart(path: string, method: 'POST' | 'PATCH', formData: FormData): Promise<Response> {
-    const auth = await getDocumentsUploadAuthAction();
-    const apiBaseUrl = resolveApiBaseUrl(auth.apiBaseUrl);
-    return fetch(`${apiBaseUrl}${path}`, {
-        method,
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-        body: formData,
-    });
+    const send = async (forceRefresh: boolean) => {
+        const auth = await getDocumentsUploadAuthAction(forceRefresh);
+        if (!auth.ok) throw new Error(auth.error);
+        const apiBaseUrl = resolveApiBaseUrl(auth.apiBaseUrl);
+        return fetch(`${apiBaseUrl}${path}`, {
+            method,
+            headers: { Authorization: `Bearer ${auth.accessToken}` },
+            body: formData,
+        });
+    };
+
+    const res = await send(false);
+    // Access vencido entre la firma y la subida: renovar y reintentar una vez
+    if (res.status === 401) return send(true);
+    return res;
 }
 
 /**

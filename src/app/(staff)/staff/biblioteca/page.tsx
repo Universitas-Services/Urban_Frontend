@@ -21,7 +21,7 @@ import {
     type EstadoDocumento,
     type MacroTipoDocumento,
 } from '@/lib/services/documents.service';
-import { getEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
+import { getAllEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
 import { ESTADO_LABELS, MACRO_TIPO_OPTIONS } from '@/components/staff/documents/document-upload.constants';
 import { TruncatedText } from '@/components/staff/documents/TruncatedText';
 import { buildStaffListReturnPath, documentDetailHref } from '@/lib/utils/staff-list-navigation';
@@ -89,8 +89,8 @@ function BibliotecaContent() {
     }, [searchParams]);
 
     React.useEffect(() => {
-        getEtiquetasAction({ page: 1, limit: 100 })
-            .then((res) => setEtiquetas(res.items))
+        getAllEtiquetasAction()
+            .then(setEtiquetas)
             .catch(() => setEtiquetas([]));
     }, []);
 

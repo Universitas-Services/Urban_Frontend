@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getPendingDocumentsAction, type Documento, type MacroTipoDocumento } from '@/lib/services/documents.service';
-import { getEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
+import { getAllEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
 import { MACRO_TIPO_OPTIONS } from '@/components/staff/documents/document-upload.constants';
 import { TruncatedText } from '@/components/staff/documents/TruncatedText';
 import { buildStaffListReturnPath, documentDetailHref } from '@/lib/utils/staff-list-navigation';
@@ -63,8 +63,8 @@ function RevisionContent() {
     }, [searchParams]);
 
     React.useEffect(() => {
-        getEtiquetasAction({ page: 1, limit: 100 })
-            .then((res) => setEtiquetas(res.items))
+        getAllEtiquetasAction()
+            .then(setEtiquetas)
             .catch(() => setEtiquetas([]));
     }, []);
 

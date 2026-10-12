@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { createEtiquetaAction, getEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
+import { createEtiquetaAction, getAllEtiquetasAction, type Etiqueta } from '@/lib/services/etiquetas.service';
 
 interface EtiquetasPickerProps {
     value: string[];
@@ -29,8 +29,7 @@ export function EtiquetasPicker({ value, onChange, className }: EtiquetasPickerP
     const loadCatalog = React.useCallback(async () => {
         setLoading(true);
         try {
-            const res = await getEtiquetasAction({ page: 1, limit: 200 });
-            setCatalog(res.items);
+            setCatalog(await getAllEtiquetasAction());
         } catch {
             setCatalog([]);
             toast.error('No se pudieron cargar las etiquetas');
@@ -74,15 +73,23 @@ export function EtiquetasPicker({ value, onChange, className }: EtiquetasPickerP
 
         setCreating(true);
         try {
-            const created = await createEtiquetaAction({ nombre });
-            setCatalog((prev) => (prev.some((t) => t.id === created.id) ? prev : [created, ...prev]));
-            if (!value.includes(created.id)) {
-                onChange([...value, created.id]);
+            const result = await createEtiquetaAction({ nombre });
+            // Si ya existía (409), la seleccionamos en vez de fallar
+            const tag = result.ok ? result.etiqueta : result.existing;
+            if (!tag) {
+                toast.error(result.ok ? 'No se pudo crear la etiqueta' : result.error);
+                return;
+            }
+            setCatalog((prev) => (prev.some((t) => t.id === tag.id) ? prev : [tag, ...prev]));
+            if (!value.includes(tag.id)) {
+                onChange([...value, tag.id]);
             }
             setQuery('');
-            toast.success(`Etiqueta «${created.nombre}» creada`);
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'No se pudo crear la etiqueta');
+            toast.success(
+                result.ok ? `Etiqueta «${tag.nombre}» creada` : `Etiqueta «${tag.nombre}» ya existía y fue seleccionada`
+            );
+        } catch {
+            toast.error('No se pudo crear la etiqueta');
         } finally {
             setCreating(false);
         }

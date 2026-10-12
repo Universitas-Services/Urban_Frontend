@@ -91,7 +91,11 @@ function EtiquetasContent() {
                 await updateEtiquetaAction(editing.id, { nombre: nombre.trim() });
                 toast.success('Etiqueta actualizada');
             } else {
-                await createEtiquetaAction({ nombre: nombre.trim() });
+                const result = await createEtiquetaAction({ nombre: nombre.trim() });
+                if (!result.ok) {
+                    toast.error(result.error);
+                    return;
+                }
                 toast.success('Etiqueta creada');
             }
             setDialogOpen(false);

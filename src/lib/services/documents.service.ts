@@ -128,19 +128,30 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 /** Credenciales cortas para subir PDF desde el navegador (evita límite Netlify). */
-export async function getDocumentsUploadAuthAction(): Promise<{
-    apiBaseUrl: string;
-    accessToken: string;
-}> {
+export type DocumentsUploadAuthResult =
+    | { ok: true; apiBaseUrl: string; accessToken: string }
+    | { ok: false; error: string };
+
+/**
+ * Token para la subida directa a Cloud Run. No lanza: en producción Next oculta
+ * el mensaje de las excepciones de server actions (React #441).
+ * @param forceRefresh rota el token aunque no esté por vencer (p. ej. tras un 401).
+ */
+export async function getDocumentsUploadAuthAction(forceRefresh = false): Promise<DocumentsUploadAuthResult> {
     if (!API) {
-        throw new Error('API_URL no está configurada en el frontend.');
+        return { ok: false, error: 'API_URL no está configurada en el frontend.' };
     }
-    const { getServerToken } = await import('@/lib/auth/session');
-    const accessToken = await getServerToken();
-    if (!accessToken) {
-        throw new Error('Sesión expirada. Vuelve a iniciar sesión.');
+    try {
+        const { getServerToken, refreshSession } = await import('@/lib/auth/session');
+        if (forceRefresh) await refreshSession();
+        const accessToken = await getServerToken();
+        if (!accessToken) {
+            return { ok: false, error: 'Tu sesión expiró. Vuelve a iniciar sesión.' };
+        }
+        return { ok: true, apiBaseUrl: API, accessToken };
+    } catch {
+        return { ok: false, error: 'No se pudo validar la sesión. Intenta de nuevo.' };
     }
-    return { apiBaseUrl: API, accessToken };
 }
 
 function toQuery(params?: DocumentsQueryParams): string {
