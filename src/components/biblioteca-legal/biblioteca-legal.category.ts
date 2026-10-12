@@ -1,9 +1,24 @@
+import type { MacroTipoDocumento } from '@/lib/services/documents.types';
 import { BIBLIOTECA_LEGAL_CATEGORIES } from './biblioteca-legal.data';
 import { resolveBibliotecaDocumentVariant } from './biblioteca-legal.document-variant';
 import type { BibliotecaLegalDocumento } from './biblioteca-legal.types';
 import type { BibliotecaLegalDocumentVariant } from './biblioteca-legal.types';
 
 const VALID_CATEGORY_IDS = new Set(BIBLIOTECA_LEGAL_CATEGORIES.map((c) => c.id));
+
+/** Mapeo de slug de categoría (URL) → macroTipo del API `/documents/published`. */
+export const CATEGORY_ID_TO_MACRO_TIPO: Record<string, MacroTipoDocumento> = {
+    legislacion: 'LEGISLACION',
+    ordenanzas: 'ORDENANZA',
+    'sentencias-nacionales': 'SENTENCIA',
+    'sentencias-internacionales': 'SENTENCIA_INTERNACIONAL',
+    doctrina: 'DOCTRINA',
+    'instrumentos-internacionales': 'INSTRUMENTO_INTERNACIONAL',
+};
+
+export function getMacroTipoForCategoryId(categoryId: string): MacroTipoDocumento | null {
+    return CATEGORY_ID_TO_MACRO_TIPO[categoryId] ?? null;
+}
 
 const VARIANT_TO_CATEGORY_ID: Record<BibliotecaLegalDocumentVariant, string | null> = {
     legislacion: 'legislacion',

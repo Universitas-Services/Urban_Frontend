@@ -1,40 +1,40 @@
 'use client';
 
+import Link from 'next/link';
 import { FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getBibliotecaDocumentoDescripcion } from './biblioteca-legal.filters';
+import type { Documento } from '@/lib/services/documents.service';
 import {
-    getBibliotecaDocumentoDisplayFields,
-    getBibliotecaDocumentoDisplayTitle,
-    getBibliotecaDocumentVariantLabel,
-    resolveBibliotecaDocumentVariant,
-} from './biblioteca-legal.document-variant';
-import type { BibliotecaLegalDocumento } from './biblioteca-legal.types';
+    getMacroTipoLabel,
+    getPublishedCardFields,
+    getPublishedDocumentSummary,
+    getPublishedDocumentSubtitle,
+    getPublishedDocumentTitle,
+} from './biblioteca-legal.published';
 
 export type BibliotecaLegalColeccionViewMode = 'grid' | 'list';
 
 type BibliotecaLegalColeccionDocumentCardProps = {
-    documento: BibliotecaLegalDocumento;
+    documento: Documento;
+    categoryId: string;
     viewMode?: BibliotecaLegalColeccionViewMode;
-    onPreview: (documento: BibliotecaLegalDocumento) => void;
     className?: string;
 };
 
-function VerDocumentoButton({ onClick }: { onClick: () => void }) {
+function VerDocumentoLink({ href }: { href: string }) {
     return (
-        <button
-            type="button"
-            onClick={onClick}
+        <Link
+            href={href}
             className="biblioteca-category-link inline-flex shrink-0 items-center gap-1 text-sm font-semibold"
         >
             Ver documento
             <span aria-hidden>→</span>
-        </button>
+        </Link>
     );
 }
 
-function DocumentFields({ documento }: { documento: BibliotecaLegalDocumento }) {
-    const fields = getBibliotecaDocumentoDisplayFields(documento).filter((field) => field.label !== 'Título');
+function DocumentFields({ documento }: { documento: Documento }) {
+    const fields = getPublishedCardFields(documento);
 
     return (
         <dl className="descripcion-cards-small space-y-2 text-gray-soft">
@@ -53,14 +53,15 @@ function DocumentFields({ documento }: { documento: BibliotecaLegalDocumento }) 
 
 export function BibliotecaLegalColeccionDocumentCard({
     documento,
+    categoryId,
     viewMode = 'grid',
-    onPreview,
     className,
 }: BibliotecaLegalColeccionDocumentCardProps) {
-    const variant = resolveBibliotecaDocumentVariant(documento);
-    const variantLabel = getBibliotecaDocumentVariantLabel(variant);
-    const title = getBibliotecaDocumentoDisplayTitle(documento);
-    const descripcion = getBibliotecaDocumentoDescripcion(documento);
+    const title = getPublishedDocumentTitle(documento);
+    const subtitle = getPublishedDocumentSubtitle(documento);
+    const summary = getPublishedDocumentSummary(documento);
+    const tipoLabel = getMacroTipoLabel(documento.macroTipo);
+    const detailHref = `/biblioteca-legal/${categoryId}/${documento.id}`;
 
     if (viewMode === 'list') {
         return (
@@ -76,11 +77,22 @@ export function BibliotecaLegalColeccionDocumentCard({
                     </div>
                     <div className="min-w-0 flex-1">
                         <span className="mb-2 inline-flex rounded-full bg-surface-soft px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary/80">
-                            {variantLabel}
+                            {tipoLabel}
                         </span>
-                        <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">{title}</h3>
-                        {descripcion ? (
-                            <p className="descripcion-cards-small mt-1 break-words text-gray-soft">{descripcion}</p>
+                        <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">
+                            <Link href={detailHref} className="hover:underline">
+                                {title}
+                            </Link>
+                        </h3>
+                        {subtitle ? (
+                            <p className="descripcion-cards-small mt-1 line-clamp-2 break-words text-gray-soft">
+                                {subtitle}
+                            </p>
+                        ) : null}
+                        {summary ? (
+                            <p className="descripcion-cards-small mt-1 line-clamp-2 break-words text-gray-soft">
+                                {summary}
+                            </p>
                         ) : null}
                         <div className="mt-2">
                             <DocumentFields documento={documento} />
@@ -89,7 +101,7 @@ export function BibliotecaLegalColeccionDocumentCard({
                 </div>
 
                 <div className="flex shrink-0 items-center justify-end border-t border-gray-100 pt-3 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4">
-                    <VerDocumentoButton onClick={() => onPreview(documento)} />
+                    <VerDocumentoLink href={detailHref} />
                 </div>
             </article>
         );
@@ -108,14 +120,18 @@ export function BibliotecaLegalColeccionDocumentCard({
                 </div>
                 <div className="min-w-0 flex-1">
                     <span className="mb-2 inline-flex rounded-full bg-surface-soft px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary/80">
-                        {variantLabel}
+                        {tipoLabel}
                     </span>
-                    <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">{title}</h3>
+                    <h3 className="titulos-cards-proyecto-ley break-words text-[15px] leading-snug">
+                        <Link href={detailHref} className="hover:underline">
+                            {title}
+                        </Link>
+                    </h3>
                 </div>
             </div>
 
-            {descripcion ? (
-                <p className="descripcion-cards-small mt-2 break-words text-gray-soft">{descripcion}</p>
+            {summary ? (
+                <p className="descripcion-cards-small mt-2 line-clamp-3 break-words text-gray-soft">{summary}</p>
             ) : null}
 
             <div className="mt-3 flex-1">
@@ -123,7 +139,7 @@ export function BibliotecaLegalColeccionDocumentCard({
             </div>
 
             <div className="mt-4 flex items-center justify-end gap-3 border-t border-gray-100 pt-3">
-                <VerDocumentoButton onClick={() => onPreview(documento)} />
+                <VerDocumentoLink href={detailHref} />
             </div>
         </article>
     );

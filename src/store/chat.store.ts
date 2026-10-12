@@ -29,6 +29,7 @@ interface ChatActions {
     sendMessage: (content: string) => Promise<void>;
     createConversation: () => Promise<void>;
     toggleSidebar: () => void;
+    setSidebarOpen: (open: boolean) => void;
     setConversations: (conversations: Conversation[]) => void;
     addMessage: (message: Message) => void;
     reset: () => void;
@@ -138,6 +139,8 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
     },
 
     toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
+
+    setSidebarOpen: (open) => set({ isSidebarOpen: open }),
 
     setConversations: (conversations) => set({ conversations }),
 

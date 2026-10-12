@@ -65,6 +65,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         router.replace(getHomeByRole(role ?? 'USER'));
     }, [isLoading, isAuthenticated, role, isVisualizadorOnChat, router]);
 
+    const isBibliotecaDocument = /^\/biblioteca-legal\/[^/]+\/[^/]+$/.test(pathname ?? '');
+
+    useEffect(() => {
+        if (!isBibliotecaDocument) return;
+        useChatStore.getState().setSidebarOpen(false);
+        return () => {
+            useChatStore.getState().setSidebarOpen(true);
+        };
+    }, [isBibliotecaDocument]);
+
     useEffect(() => {
         if (isLoading || !isAuthenticated) return;
         if (canAccessAdminArea(role) && !isVisualizadorOnChat) return;

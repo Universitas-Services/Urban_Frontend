@@ -1,5 +1,5 @@
-import { BibliotecaLegalDocumentosPageContent } from '@/components/biblioteca-legal';
+import { BibliotecaLegalPageContent } from '@/components/biblioteca-legal';
 
 export default function BibliotecaLegalPage() {
-    return <BibliotecaLegalDocumentosPageContent />;
+    return <BibliotecaLegalPageContent />;
 }

@@ -16,6 +16,8 @@ type BibliotecaLegalColeccionToolbarProps = {
     filteredTotal: number;
     searchQuery: string;
     onSearchQueryChange: (value: string) => void;
+    /** Si se define, Enter / botón Buscar dispara la consulta al servidor. */
+    onSearchSubmit?: () => void;
     selectedCategory?: string;
     onSelectedCategoryChange?: (value: string) => void;
     hasActiveFilters: boolean;
@@ -30,6 +32,7 @@ export function BibliotecaLegalColeccionToolbar({
     filteredTotal,
     searchQuery,
     onSearchQueryChange,
+    onSearchSubmit,
     selectedCategory,
     onSelectedCategoryChange,
     hasActiveFilters,
@@ -52,11 +55,23 @@ export function BibliotecaLegalColeccionToolbar({
                             type="search"
                             value={searchQuery}
                             onChange={(event) => onSearchQueryChange(event.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    onSearchSubmit?.();
+                                }
+                            }}
                             placeholder="Buscar por título o descripción..."
                             className="h-11 border-gray-200/80 bg-surface-light/60 pl-10 text-sm"
                             aria-label="Buscar en Biblioteca Legal"
                         />
                     </div>
+                    {onSearchSubmit ? (
+                        <Button type="button" variant="secondary" onClick={onSearchSubmit} className="h-11 shrink-0">
+                            <Search className="mr-2 h-4 w-4" />
+                            Buscar
+                        </Button>
+                    ) : null}
 
                     {showCategoryFilter ? (
                         <Select value={selectedCategory} onValueChange={onSelectedCategoryChange}>

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { createHash } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { jwtDecode } from 'jwt-decode';
 import type { UserRole } from '@/types/roles';
@@ -117,46 +118,80 @@ function isJwtExpiredOrNear(token: string, skewSeconds = REFRESH_SKEW_SECONDS): 
     }
 }
 
-let refreshInFlight: Promise<boolean> | null = null;
+/**
+ * Rotaciones recientes: refresh viejo (hash) → tokens nuevos.
+ * La API rota el refresh en cada uso y trata un refresh viejo como robo (RF2),
+ * borrando la sesión. Si dos requests concurrentes traen el mismo refresh, solo
+ * la primera llama a la API; las demás reutilizan los tokens ya rotados.
+ */
+const ROTATION_GRACE_MS = 60_000;
+const recentRotations = new Map<string, { tokens: AuthTokens; at: number }>();
+const refreshInFlight = new Map<string, Promise<AuthTokens | null>>();
+
+function tokenKey(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+}
+
+function rememberRotation(key: string, tokens: AuthTokens): void {
+    const now = Date.now();
+    for (const [k, entry] of recentRotations) {
+        if (now - entry.at > ROTATION_GRACE_MS) recentRotations.delete(k);
+    }
+    recentRotations.set(key, { tokens, at: now });
+}
 
 async function callRefreshEndpoint(refreshToken: string): Promise<AuthTokens | null> {
     const API = process.env.API_URL;
     if (!API) return null;
 
-    const res = await fetch(`${API}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
-        cache: 'no-store',
-    });
+    try {
+        const res = await fetch(`${API}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+            cache: 'no-store',
+        });
 
-    if (!res.ok) return null;
-    const data = (await res.json()) as Partial<AuthTokens>;
-    if (!data.access_token || !data.refresh_token) return null;
-    return { access_token: data.access_token, refresh_token: data.refresh_token };
+        if (!res.ok) return null;
+        const data = (await res.json()) as Partial<AuthTokens>;
+        if (!data.access_token || !data.refresh_token) return null;
+        return { access_token: data.access_token, refresh_token: data.refresh_token };
+    } catch {
+        return null;
+    }
 }
 
 /**
- * Rota tokens con el refresh cookie.
- * Usa un mutex en memoria para evitar carreras (rotación invalida RT previo).
+ * Rota tokens con el refresh cookie y los persiste en la request actual.
+ * Deduplica por refresh token para no disparar la detección de reutilización.
  */
 export async function refreshSession(): Promise<boolean> {
-    if (refreshInFlight) return refreshInFlight;
+    const refreshToken = await getRefreshToken();
+    if (!refreshToken) return false;
 
-    refreshInFlight = (async () => {
-        const refreshToken = await getRefreshToken();
-        if (!refreshToken) return false;
+    const key = tokenKey(refreshToken);
+    const cached = recentRotations.get(key);
+    let tokens = cached && Date.now() - cached.at <= ROTATION_GRACE_MS ? cached.tokens : null;
 
-        const tokens = await callRefreshEndpoint(refreshToken);
-        if (!tokens) return false;
+    if (!tokens) {
+        let pending = refreshInFlight.get(key);
+        if (!pending) {
+            pending = callRefreshEndpoint(refreshToken)
+                .then((result) => {
+                    if (result) rememberRotation(key, result);
+                    return result;
+                })
+                .finally(() => refreshInFlight.delete(key));
+            refreshInFlight.set(key, pending);
+        }
+        tokens = await pending;
+    }
 
-        await setSessionCookies(tokens.access_token, tokens.refresh_token);
-        return true;
-    })().finally(() => {
-        refreshInFlight = null;
-    });
+    if (!tokens) return false;
 
-    return refreshInFlight;
+    // Cada request escribe sus propias cookies (cookies() es por request)
+    await setSessionCookies(tokens.access_token, tokens.refresh_token);
+    return true;
 }
 
 /** Si el access falta o está por vencer, intenta refresh. */
